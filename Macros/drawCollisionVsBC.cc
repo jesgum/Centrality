@@ -23,7 +23,7 @@ void styleHistogram(TH1F* hist, int color)
   hist->SetTitle("");
 
   // Adjust axis range
-  hist->GetXaxis()->SetRangeUser(0, 55000);
+  hist->GetXaxis()->SetRangeUser(0, 125);
   hist->GetYaxis()->SetRangeUser(1e-7, 5e+0);
 }
 
@@ -47,10 +47,10 @@ void drawCollisionVsBC(const char* dataset = "LHC25_pass1", const char* ar = "AR
     return;
   }
 
-  // TH1F* hCoT0C = (TH1F*)file->Get("centrality-study/hFT0C_Collisions");
-  // TH1F* hBcT0C = (TH1F*)file->Get("centrality-study/hFT0C_BCs");
-  TH1F* hCoT0C = (TH1F*)file->Get("centrality-study_rejectpileup/hFT0C_Collisions");
-  TH1F* hBcT0C = (TH1F*)file->Get("centrality-study_rejectpileup/hFT0C_BCs");
+  TH1F* hCoT0C = (TH1F*)file->Get("centrality-study/hFT0C_Collisions");
+  TH1F* hBcT0C = (TH1F*)file->Get("centrality-study/hFT0C_BCs");
+  // TH1F* hCoT0C = (TH1F*)file->Get("centrality-study_rejectpileup/hFT0C_Collisions");
+  // TH1F* hBcT0C = (TH1F*)file->Get("centrality-study_rejectpileup/hFT0C_BCs");
 
   if (!hCoT0C || !hBcT0C) {
     std::cerr << "Error: Could not retrieve histograms from file " << filePath << std::endl;
