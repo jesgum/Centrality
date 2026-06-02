@@ -1,3 +1,5 @@
 
 *.root
 !basehistos.root
+.vscode
+*.pdf
