@@ -3,33 +3,48 @@
 #include "TFile.h"
 #include "TStyle.h"
 #include "TLegend.h"
+#include "TLatex.h"
+#include "TLine.h"
+#include "TPad.h"
 
 #include <array>
 #include <iostream>
 
 void styleHistogram(TH1F* hist, int color)
 {
-  std::array<int, 2> normRange = {350, 55000};
-  std::array<int, 2> normBins = {hist->FindBin(normRange[0]), hist->FindBin(normRange[1])};
+  std::array<int, 2> normRange = { 500, 55000 };
+  std::array<int, 2> normBins = { hist->FindBin(normRange[0]), hist->FindBin(normRange[1]) };
   hist->SetLineColor(color);
   hist->SetLineWidth(2);
   hist->Scale(1. / hist->Integral(normBins[0], normBins[1]));
-  hist->GetXaxis()->SetTitle("FT0C Amplitude");
+  hist->GetXaxis()->SetTitle("FT0M Amplitude");
   hist->GetYaxis()->SetTitle("Normalized count");
   hist->GetXaxis()->SetTitleSize(0.05);
   hist->GetYaxis()->SetTitleSize(0.05);
   hist->GetXaxis()->SetLabelSize(0.05);
   hist->GetYaxis()->SetLabelSize(0.05);
   hist->SetTitle("");
+}
 
-  // Adjust axis range
-  hist->GetXaxis()->SetRangeUser(0, 125);
-  hist->GetYaxis()->SetRangeUser(1e-7, 5e+0);
+void styleRatioHistogram(TH1F* hist)
+{
+  hist->SetLineColor(kBlack);
+  hist->SetLineWidth(2);
+  hist->SetTitle("");
+  hist->GetXaxis()->SetTitle("FT0C Amplitude");
+  hist->GetYaxis()->SetTitle("Coll. / BC");
+  hist->GetYaxis()->SetNdivisions(505);
+  hist->GetYaxis()->CenterTitle();
+  hist->GetXaxis()->SetTitleSize(0.12);
+  hist->GetYaxis()->SetTitleSize(0.10);
+  hist->GetXaxis()->SetLabelSize(0.10);
+  hist->GetYaxis()->SetLabelSize(0.10);
+  hist->GetXaxis()->SetTitleOffset(1.0);
+  hist->GetYaxis()->SetTitleOffset(0.55);
 }
 
 void styleCanvas(TCanvas* canv)
 {
-  // canv->SetGrid();
   canv->SetTicks(1, 1);
   canv->SetLeftMargin(0.13);
   canv->SetBottomMargin(0.13);
@@ -37,7 +52,12 @@ void styleCanvas(TCanvas* canv)
   canv->SetTopMargin(0.03);
 }
 
-void drawCollisionVsBC(const char* dataset = "LHC25_pass1", const char* ar = "AR_567905.root")
+// OO           AR_564374.root
+// NeNe         AR_564468.root
+// PbPb 2023    AR_545210.root
+// PbPb 2024    AR_560089.root
+// PbPb 2025    AR_567905.root
+void drawCollisionVsBC(const char* dataset = "LHC23_pass5", const char* ar = "AR_545210.root", const char* system = "PbPb23")
 {
   gStyle->SetOptStat(0);
   const char* filePath = Form("../AnalysisResults/%s/%s", dataset, ar);
@@ -47,33 +67,137 @@ void drawCollisionVsBC(const char* dataset = "LHC25_pass1", const char* ar = "AR
     return;
   }
 
-  TH1F* hCoT0C = (TH1F*)file->Get("centrality-study/hFT0C_Collisions");
-  TH1F* hBcT0C = (TH1F*)file->Get("centrality-study/hFT0C_BCs");
-  // TH1F* hCoT0C = (TH1F*)file->Get("centrality-study_rejectpileup/hFT0C_Collisions");
-  // TH1F* hBcT0C = (TH1F*)file->Get("centrality-study_rejectpileup/hFT0C_BCs");
+  // TH1F* hCoT0 = (TH1F*)file->Get("centrality-study_no_rejectpileup/hFT0M_Collisions");
+  // TH1F* hBcT0 = (TH1F*)file->Get("centrality-study_no_rejectpileup/hFT0M_BCs");
+  TH1F* hCoT0 = (TH1F*)file->Get("centrality-study/hFT0C_Collisions");
+  TH1F* hBcT0 = (TH1F*)file->Get("centrality-study/hFT0C_BCs");
+  TH1F* hCoT0_Zoom = (TH1F*)hCoT0->Clone("hCoT0_Zoom");
+  TH1F* hBcT0_Zoom = (TH1F*)hBcT0->Clone("hBcT0_Zoom");
+  const float xmin = 0;
+  const float xmax = 60000;
+  const float ymax = 5e+1;
+  const float ymin = 1e-9;
+  const float xmin_zoom = 0;
+  const float xmax_zoom = 600;
+  const float ymax_zoom = 5e+1;
+  const float ymin_zoom = 1e-5;
 
-  if (!hCoT0C || !hBcT0C) {
+  if (!hCoT0 || !hBcT0) {
     std::cerr << "Error: Could not retrieve histograms from file " << filePath << std::endl;
     return;
   }
 
-  styleHistogram(hCoT0C, kRed);
-  styleHistogram(hBcT0C, kBlue);
+  styleHistogram(hCoT0, kRed);
+  styleHistogram(hBcT0, kBlue);
+  styleHistogram(hCoT0_Zoom, kRed);
+  styleHistogram(hBcT0_Zoom, kBlue);
+
+  TH1F* hRatio = (TH1F*)hCoT0->Clone("hRatio");
+  hRatio->Divide(hBcT0);
+  styleRatioHistogram(hRatio);
+
+  TH1F* hRatio_Zoom = (TH1F*)hCoT0_Zoom->Clone("hRatio_Zoom");
+  hRatio_Zoom->Divide(hBcT0_Zoom);
+  styleRatioHistogram(hRatio_Zoom);
 
   TLegend* legend = new TLegend(0.6, 0.7, 0.92, 0.92);
   legend->SetBorderSize(0);
   legend->SetFillColorAlpha(0, 0);
-  legend->AddEntry(hCoT0C, "Collisions", "l");
-  legend->AddEntry(hBcT0C, "BCs", "l");
+  legend->AddEntry(hCoT0, "Collisions", "l");
+  legend->AddEntry(hBcT0, "BCs", "l");
 
-  TCanvas* canvCollVsBC = new TCanvas("canvCollVsBC", "Collision vs BC", 800, 600);
-  styleCanvas(canvCollVsBC);
-  canvCollVsBC->SetLogy();
-  hCoT0C->Draw("hist ");
-  hBcT0C->Draw("hist same");
+  TLatex* latex = new TLatex();
+  latex->SetNDC();
+  latex->SetTextFont(42);
+  latex->SetTextSize(0.08);
+
+  const float splitY = 0.30;
+  TCanvas* canvCollVsBC = new TCanvas("canvCollVsBC", "Collision vs BC", 800, 800);
+  TPad* padUp = new TPad("padUp", "", 0, splitY, 1, 1);
+  padUp->SetLeftMargin(0.13);
+  padUp->SetRightMargin(0.03);
+  padUp->SetTopMargin(0.04);
+  padUp->SetBottomMargin(0.02);
+  padUp->SetTicks(1, 1);
+  padUp->SetLogy();
+  padUp->Draw();
+  padUp->cd();
+  hCoT0->GetXaxis()->SetLabelSize(0);
+  hCoT0->GetXaxis()->SetTitleSize(0);
+  hBcT0->GetXaxis()->SetLabelSize(0);
+  hBcT0->GetXaxis()->SetTitleSize(0);
+  hCoT0->GetYaxis()->SetTitleSize(0.07);
+  hCoT0->GetYaxis()->SetLabelSize(0.07);
+  hCoT0->GetYaxis()->SetTitleOffset(0.85);
+  hCoT0->GetXaxis()->SetRangeUser(xmin, xmax);
+  hBcT0->GetXaxis()->SetRangeUser(xmin, xmax);
+  hCoT0->GetYaxis()->SetRangeUser(ymin, ymax);
+  hCoT0->Draw("hist");
+  hBcT0->Draw("hist same");
   legend->Draw();
-  canvCollVsBC->SaveAs("hCollVsBC.pdf");
-}
+  latex->DrawLatex(0.2, 0.80, Form("%s", system));
+  canvCollVsBC->cd();
 
-// ../AnalysisResults/LHC25_pass1/AR_567905.root
-//   /AnalysisResults/LHC25_pass1/AR_567905.root
+  TPad* padLo = new TPad("padLo", "", 0, 0, 1, splitY);
+  padLo->SetLeftMargin(0.13);
+  padLo->SetRightMargin(0.03);
+  padLo->SetTopMargin(0.02);
+  padLo->SetBottomMargin(0.35);
+  padLo->SetTicks(1, 1);
+  padLo->Draw();
+  padLo->cd();
+  hRatio->GetXaxis()->SetRangeUser(xmin, xmax);
+  hRatio->GetYaxis()->SetRangeUser(0.9, 1.1);
+  hRatio->Draw("hist");
+
+  TLine* line1 = new TLine(xmin, 1, xmax, 1);
+  line1->SetLineStyle(2);
+  line1->SetLineColor(kGray + 1);
+  line1->Draw();
+  canvCollVsBC->SaveAs("hCollVsBC.pdf");
+
+  // <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+  TCanvas* canvCollVsBC_Zoom = new TCanvas("canvCollVsBC_Zoom", "Collision vs BC (Zoomed)", 800, 800);
+  TPad* padUp2 = new TPad("padUp2", "", 0, splitY, 1, 1);
+  padUp2->SetLeftMargin(0.13);
+  padUp2->SetRightMargin(0.03);
+  padUp2->SetTopMargin(0.04);
+  padUp2->SetBottomMargin(0.02);
+  padUp2->SetTicks(1, 1);
+  padUp2->SetLogy();
+  padUp2->Draw();
+  padUp2->cd();
+  hCoT0_Zoom->GetXaxis()->SetLabelSize(0);
+  hCoT0_Zoom->GetXaxis()->SetTitleSize(0);
+  hBcT0_Zoom->GetXaxis()->SetLabelSize(0);
+  hBcT0_Zoom->GetXaxis()->SetTitleSize(0);
+  hCoT0_Zoom->GetYaxis()->SetTitleSize(0.07);
+  hCoT0_Zoom->GetYaxis()->SetLabelSize(0.07);
+  hCoT0_Zoom->GetYaxis()->SetTitleOffset(0.85);
+  hCoT0_Zoom->GetXaxis()->SetRangeUser(xmin_zoom, xmax_zoom);
+  hBcT0_Zoom->GetXaxis()->SetRangeUser(xmin_zoom, xmax_zoom);
+  hCoT0_Zoom->GetYaxis()->SetRangeUser(ymin_zoom, ymax_zoom);
+  hCoT0_Zoom->Draw("hist");
+  hBcT0_Zoom->Draw("hist same");
+  legend->Draw();
+  latex->DrawLatex(0.2, 0.80, Form("%s", system));
+  canvCollVsBC_Zoom->cd();
+
+  TPad* padLo2 = new TPad("padLo2", "", 0, 0, 1, splitY);
+  padLo2->SetLeftMargin(0.13);
+  padLo2->SetRightMargin(0.03);
+  padLo2->SetTopMargin(0.02);
+  padLo2->SetBottomMargin(0.35);
+  padLo2->SetTicks(1, 1);
+  padLo2->Draw();
+  padLo2->cd();
+  hRatio_Zoom->GetXaxis()->SetRangeUser(xmin_zoom, xmax_zoom);
+  hRatio_Zoom->GetYaxis()->SetRangeUser(0, 1.1);
+  hRatio_Zoom->Draw("hist");
+
+  TLine* line2 = new TLine(xmin_zoom, 1, xmax_zoom, 1);
+  line2->SetLineStyle(2);
+  line2->SetLineColor(kGray + 1);
+  line2->Draw();
+  canvCollVsBC_Zoom->SaveAs("hCollVsBC_Zoom.pdf");
+}
