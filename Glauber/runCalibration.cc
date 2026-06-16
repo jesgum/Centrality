@@ -20,12 +20,8 @@
 /// @param anchorPointPercentage anchor point percentage to use
 /// @param matchRange width of region in which data/glauber matching is to be done in rolling anchoring test
 /// @param doNpartNcoll wether or not to attempt calculating Npart, Ncoll in centrality bins
-void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root")
+void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root", Double_t anchorPointPercentage = 90.0, Double_t matchRange = 200.0, Bool_t doNpartNcoll = false)
 {
-  double anchorPointPercentage = 90.0;
-  double matchRange = 200.0;
-  bool doNpartNcoll = false;
-
   TFile* file = new TFile(lInputFileName.Data(), "READ");
   file->ls();
 
@@ -145,6 +141,9 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
     TProfile* hProfileNcoll = new TProfile("hProfileNcoll", "", 100, 0, 100);
     TH2F* h2dNpart = new TH2F("h2dNpart", "", 100, 0, 100, 500, -0.5f, 499.5f);
     TH2F* h2dNcoll = new TH2F("h2dNcoll", "", 100, 0, 100, 3000, -0.5f, 2999.5);
+    TH2F* h2dEcc = new TH2F("h2dEcc", "", 100, 0, 100, 100, 0.0f, 1.0f);
+    TH2F* h2dB = new TH2F("h2dB", "", 100, 0, 100, 100, 0.0f, 20.0f);
+    TH2F* h2dNancestors = new TH2F("h2dNancestors", "", 100, 0, 100, 900, -0.5f, 899.5f);
 
     // Replay
     multGlauberNBDFitter* g = new multGlauberNBDFitter("lglau");
@@ -152,7 +151,9 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
 
     // Step 1: open the (Npart, Ncoll) pair information, provide
     TFile* fbasefile = new TFile("basehistos.root", "READ");
-    TH2D* hNpNc = (TH2D*)fbasefile->Get("hNpNc");
+    TH2D *hNpNc = (TH2D*) fbasefile->Get("hNpNc");
+    TH3D *hNpNcEcc = (TH3D*) fbasefile->Get("hNpNcEcc");
+    TH3D *hNpNcB = (TH3D*) fbasefile->Get("hNpNcB");
     g->SetNpartNcollCorrelation(hNpNc);
     g->InitializeNpNc();
 
@@ -165,13 +166,14 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
     Double_t lMax = hData->GetBinLowEdge(hData->GetNbinsX() + 1);
 
     // uncomment if Np Nc needed -> Warning, slow!
-    g->CalculateAvNpNc(hProfileNpart, hProfileNcoll, h2dNpart, h2dNcoll, hCalib, 0, lMax);
+  g->CalculateAvNpNc( hProfileNpart, hProfileNcoll, h2dNpart, h2dNcoll, hCalib, 0, lMax , hNpNcEcc, h2dEcc, hNpNcB, h2dB, h2dNancestors, 1e-6 );
 
     hProfileNpart->Write();
     hProfileNcoll->Write();
     h2dNpart->Write();
     h2dNcoll->Write();
   }
+
   TH1F* hMatchRange = new TH1F("hMatchRange", "", 1, 0, 1);
   TH1F* hAnchorPoint = new TH1F("hAnchorPoint", "", 1, 0, 1);
   hMatchRange->SetBinContent(1, matchRange);
