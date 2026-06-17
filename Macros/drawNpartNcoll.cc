@@ -9,13 +9,22 @@
 
 #include <iostream>
 #include <vector>
+#include <string>  
 
 #include "colorManager.h"
 
-std::vector<TH1F*> doNpartNcoll(TString filePath, const char* name)
+std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, const char* name)
 {
+  Bool_t fixedMu = true;
+  Bool_t fixedK = true;
+  Int_t ancesterMode = 2;
   Bool_t printNpartNcoll = true;
-  TFile* infile = new TFile(filePath, "read");
+
+  TString mu = (fixedMu) ? "fixedMu" : "freeMu";
+  TString k = (fixedK) ? "fixedK" : "freeK";
+  TString filePath = Form("../AnalysisResults/%s/%s_calibration_ancestorMode%d_%s_%s_hFT0C_BCs.root", dataset.Data(), ar.Data(), ancesterMode, k.Data(), mu.Data());
+  TFile* infile = new TFile(filePath.Data(), "read");
+
   if (!infile || infile->IsZombie()) {
     std::cerr << "Could not find " << filePath << std::endl;
     return {};
@@ -105,14 +114,20 @@ std::vector<TH1F*> doNpartNcoll(TString filePath, const char* name)
 }
 
 struct Histos {
-  Histos(std::vector<TH1F*> vec) { histos = vec; };
-  void setColor(int color) {
+  Histos(std::vector<TH1F*> vec, const char* run)
+  {
+    histos = vec;
+    runNumber = run;
+  }
+  void setColor(int color)
+  {
     for (auto& hist : histos) {
       hist->SetMarkerColor(color);
       hist->SetLineColor(color);
     }
   }
 
+  const char* runNumber;
   std::vector<TH1F*> histos;
 };
 
@@ -127,18 +142,25 @@ void drawNpartNcoll()
     kB
   };
 
-  Histos* pbpb25_567905 = new Histos(doNpartNcoll("../AnalysisResults/LHC25_pass1/AR_567905_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root", "PbPb25"));
-  Histos* pbpb25_568242 = new Histos(doNpartNcoll("../AnalysisResults/LHC25_pass1/AR_568242_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root", "PbPb25"));
-  Histos* pbpb25_568146 = new Histos(doNpartNcoll("../AnalysisResults/LHC25_pass1/AR_568146_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root", "PbPb25"));
-  Histos* pbpb25_568067 = new Histos(doNpartNcoll("../AnalysisResults/LHC25_pass1/AR_568067_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root", "PbPb25"));
-  Histos* pbpb25_568409 = new Histos(doNpartNcoll("../AnalysisResults/LHC25_pass1/AR_568409_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root", "PbPb25"));
-  Histos* pbpb25_568117 = new Histos(doNpartNcoll("../AnalysisResults/LHC25_pass1/AR_568117_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root", "PbPb25"));
-  std::vector<Histos*> registry = { /* pbpb25_567905, */
-                                    pbpb25_568242,
-                                    pbpb25_568146,
-                                    pbpb25_568067,
-                                    pbpb25_568409,
-                                    pbpb25_568117 };
+  // Histos* pbpb25_567905 = new Histos(doNpartNcoll("../AnalysisResults/LHC25_pass1/AR_567905_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root", "PbPb25"), "567905");
+  Histos* pbpb25_568242 = new Histos(doNpartNcoll("LHC25_pass1", "AR_568242", "PbPb25"), "568242");
+  Histos* pbpb25_568146 = new Histos(doNpartNcoll("LHC25_pass1", "AR_568146", "PbPb25"), "568146");
+  Histos* pbpb25_568067 = new Histos(doNpartNcoll("LHC25_pass1", "AR_568067", "PbPb25"), "568067");
+  Histos* pbpb25_568409 = new Histos(doNpartNcoll("LHC25_pass1", "AR_568409", "PbPb25"), "568409");
+  Histos* pbpb25_568117 = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "PbPb25"), "568117");
+
+  Histos* pbpb25_567911 = new Histos(doNpartNcoll("LHC25_pass1", "AR_567911", "PbPb25"), "567911");
+  Histos* pbpb25_567912 = new Histos(doNpartNcoll("LHC25_pass1", "AR_567912", "PbPb25"), "567912");
+  Histos* pbpb25_568367 = new Histos(doNpartNcoll("LHC25_pass1", "AR_568367", "PbPb25"), "568367");
+  Histos* pbpb25_568522 = new Histos(doNpartNcoll("LHC25_pass1", "AR_568522", "PbPb25"), "568522");
+  Histos* pbpb25_567905 = new Histos(doNpartNcoll("LHC25_pass1", "AR_567905", "PbPb25"), "567905");
+
+  std::vector<Histos*> registry = { pbpb25_567911,
+                                    pbpb25_567912,
+                                    pbpb25_568367,
+                                    pbpb25_568522,
+                                    pbpb25_567905 };
+                                    
 
   TH1F* hAvgNpart = new TH1F("hAvgNpart", "", 100, 0, 100);
   TH1F* hAvgNcoll = new TH1F("hAvgNcoll", "", 100, 0, 100);
@@ -159,13 +181,25 @@ void drawNpartNcoll()
   hAvgNpart->Scale(1. / registry.size());
   hAvgNcoll->Scale(1. / registry.size());
 
-  ColorManager cm(6);
-  pbpb25_567905->setColor(cm.getColor(0));
-  pbpb25_568242->setColor(cm.getColor(1));
-  pbpb25_568146->setColor(cm.getColor(2));
-  pbpb25_568067->setColor(cm.getColor(3));
-  pbpb25_568409->setColor(cm.getColor(4));
-  pbpb25_568117->setColor(cm.getColor(5));
+  ColorManager cm(5);
+  pbpb25_568242->setColor(cm.getColor(0));
+  pbpb25_568146->setColor(cm.getColor(1));
+  pbpb25_568067->setColor(cm.getColor(2));
+  pbpb25_568409->setColor(cm.getColor(3));
+  pbpb25_568117->setColor(cm.getColor(4));
+
+  pbpb25_567911->setColor(cm.getColor(0));
+  pbpb25_567912->setColor(cm.getColor(1));
+  pbpb25_568367->setColor(cm.getColor(2));
+  pbpb25_568522->setColor(cm.getColor(3));
+  pbpb25_567905->setColor(cm.getColor(4));
+
+  TLegend* legend = new TLegend(0.17, 0.7, 0.37, 0.95);
+  legend->SetBorderSize(0);
+  legend->SetFillColorAlpha(0, 0);
+  for (const auto& hist : registry) {
+    legend->AddEntry(hist->histos[kNpart], hist->runNumber, "l");
+  }
 
   TCanvas* canvNpart = new TCanvas("canvNpart", "", 1200, 800);
   canvNpart->SetTopMargin(0.03);
@@ -206,12 +240,15 @@ void drawNpartNcoll()
   for (auto& hist : registry) {
     TH1F* hRatio = (TH1F*)hist->histos[kNpart]->Clone();
     hRatio->Divide(hist->histos[kNpart], hAvgNpart, 1, 1, "");
-    hRatio->GetYaxis()->SetRangeUser(0.997, 1.003);
+    hRatio->GetYaxis()->SetRangeUser(0.985, 1.015);
+    // hRatio->GetYaxis()->SetRangeUser(0.997, 1.003);
     hRatio->GetYaxis()->SetTitle("<N_{part}> /<N_{part}>_{Avg}");
     hRatio->GetXaxis()->SetTitle("Centrality percentile (FT0C)");
     hRatio->Draw(firstNpart ? "hist" : "hist same");
     firstNpart = false;
   }
+
+  legend->Draw();
   canvNpartRatio->SaveAs("hNpartRatio.pdf");
 
   // Ratio histograms Ncoll
@@ -226,11 +263,13 @@ void drawNpartNcoll()
     TH1F* hRatio = (TH1F*)hist->histos[kNcoll]->Clone();
     hRatio->Divide(hist->histos[kNcoll], hAvgNcoll, 1, 1, "B");
 
-    hRatio->GetYaxis()->SetRangeUser(0.997, 1.003);
+    hRatio->GetYaxis()->SetRangeUser(0.985, 1.015);
+    // hRatio->GetYaxis()->SetRangeUser(0.997, 1.003);
     hRatio->GetYaxis()->SetTitle("<N_{coll}> /<N_{coll}>_{Avg}");
     hRatio->GetXaxis()->SetTitle("Centrality percentile (FT0C)");
     hRatio->Draw(firstNcoll ? "hist" : "hist same");
     firstNcoll = false;
   }
+  legend->Draw();
   canvNcollRatio->SaveAs("hNcollRatio.pdf");
 }
