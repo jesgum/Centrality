@@ -20,7 +20,7 @@
 /// @param anchorPointPercentage anchor point percentage to use
 /// @param matchRange width of region in which data/glauber matching is to be done in rolling anchoring test
 /// @param doNpartNcoll wether or not to attempt calculating Npart, Ncoll in centrality bins
-void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root", Double_t anchorPointPercentage = 90.0, Double_t matchRange = 200.0, Bool_t doNpartNcoll = false)
+void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root", Double_t anchorPointPercentage = 90.0, Double_t matchRange = 200.0, Bool_t doNpartNcoll = false, TString basename = "basehistos.root")
 {
   TFile* file = new TFile(lInputFileName.Data(), "READ");
   file->ls();
@@ -150,7 +150,7 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
     TF1* fitfunc = g->GetGlauberNBD();
 
     // Step 1: open the (Npart, Ncoll) pair information, provide
-    TFile* fbasefile = new TFile("basehistos.root", "READ");
+    TFile* fbasefile = new TFile(Form("%s.root", basename.Data()), "READ");
     TH2D *hNpNc = (TH2D*) fbasefile->Get("hNpNc");
     TH3D *hNpNcEcc = (TH3D*) fbasefile->Get("hNpNcEcc");
     TH3D *hNpNcB = (TH3D*) fbasefile->Get("hNpNcB");

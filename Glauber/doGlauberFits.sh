@@ -18,6 +18,7 @@ OO_2025="${AR_PATH}LHC25ae_pass2_small/"
 
 # AR_567905.root
 
+###  High statistics runs
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_567905.root\"\,500,\"hFT0C_BCs\"\,2\)
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568242.root\"\,500,\"hFT0C_BCs\"\,2\)&
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568146.root\"\,500,\"hFT0C_BCs\"\,2\)&
@@ -25,12 +26,19 @@ OO_2025="${AR_PATH}LHC25ae_pass2_small/"
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568409.root\"\,500,\"hFT0C_BCs\"\,2\)&
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,2\)&
 
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_567911.root\"\,500,\"hFT0C_BCs\"\,2\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_567912.root\"\,500,\"hFT0C_BCs\"\,2\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568367.root\"\,500,\"hFT0C_BCs\"\,2\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568522.root\"\,500,\"hFT0C_BCs\"\,2\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_567905.root\"\,500,\"hFT0C_BCs\"\,2\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568524.root\"\,500,\"hFT0C_BCs\"\,2\)&
+###  Low statistics runs
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_567911.root\"\,500,\"hFT0C_BCs\"\,2\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_567912.root\"\,500,\"hFT0C_BCs\"\,2\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568367.root\"\,500,\"hFT0C_BCs\"\,2\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568522.root\"\,500,\"hFT0C_BCs\"\,2\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_567905.root\"\,500,\"hFT0C_BCs\"\,2\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568524.root\"\,500,\"hFT0C_BCs\"\,2\)&
+
+### Basehistos test
+root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pb\"\)&
+root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_PbHN\"\)&
+root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpn\"\)&
+root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbstar\"\)&
 
 wait
-pingme "done"
+echo "Done!"

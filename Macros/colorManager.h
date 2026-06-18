@@ -27,7 +27,7 @@ class ColorManager
 
   int getColor(size_t i) const
   {
-    if (i >= mColors.size()) {
+    if (i >= mColors.size() || i < 0) {
       return mColStd;
     }
 

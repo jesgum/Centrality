@@ -21,12 +21,16 @@ OO_2025="${AR_PATH}LHC25ae_pass2_small/"
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568409_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
 
-root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_567911_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
-root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_567912_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
-root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568367_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
-root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568522_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
-root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_567905_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
-root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568524_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_567911_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_567912_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568367_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568522_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_567905_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568524_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root\"\,90.0,200.0,kTRUE\)&
+
+root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pb\"\)&
+root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_PbHN.root\"\,90.0,200.0,kTRUE\,\"basehistos_PbHN\"\)&
+root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbpn.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbpn\"\)&
+root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbstar.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbstar\"\)&
 
 wait
-pingme "done"
