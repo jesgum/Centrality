@@ -4,7 +4,7 @@
 https://cernbox.cern.ch/s/II69QOGcUaIUICu
 
 
-## For single run analysis, the following runs are choesen:
+## For single run analysis, the following runs are chosen:
   - PbPb 2023: run 545210
   - PbPb 2024: run 560089
   - PbPb 2025: run 567905
