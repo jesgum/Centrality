@@ -3,8 +3,16 @@
 !basehistos*
 .vscode
 *.pdf
+*.png
 
 glaubernew
 *.so
 *.d
 *.pcm
+
+Glauber/Pb
+Glauber/PbHN
+Glauber/Pbpn
+Glauber/Pbpnrw
+Glauber/Pbrw
+Glauber/Pbstar

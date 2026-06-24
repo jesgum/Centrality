@@ -34,11 +34,21 @@ OO_2025="${AR_PATH}LHC25ae_pass2_small/"
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_567905.root\"\,500,\"hFT0C_BCs\"\,2\)&
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568524.root\"\,500,\"hFT0C_BCs\"\,2\)&
 
-### Basehistos test
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pb\"\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_PbHN\"\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpn\"\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbstar\"\)&
+###  Basehistos test
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pb\"\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_PbHN\"\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpn\"\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbstar\"\)&
+
+###  OO: Fitting BC vs collisions
+# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
 
 wait
 echo "Done!"

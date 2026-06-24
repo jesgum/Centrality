@@ -98,6 +98,12 @@ void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString 
     guessedNorm = 2.95339e+09;
     XaxisLabel = "FT0M amplitude";
   }
+  if(type == "hFT0M_BCs"){
+    rebinFactor = 20;
+    guessedMu = 150;
+    guessedNorm = 2.95339e+09;
+    XaxisLabel = "FT0M amplitude";
+  }
   if(type == "hFT0MOuterA_Collisions"){
     rebinFactor = 20;
     guessedMu = 150;
@@ -114,7 +120,7 @@ void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString 
   
   //hV0Mfine = (TH1F *) file -> Get(Form("centrality-study/Run_564359/%s", "hFT0C_Collisions"));
   // hV0Mfine = (TH1F *) file -> Get(Form("centrality-study/Run_%i/%s", runNumber, type.Data())); // hNPVContributors
-  hV0Mfine = (TH1F *) file -> Get(Form("centrality-study_bc_vtxZ/%s", histogramName.Data()));
+  hV0Mfine = (TH1F *) file -> Get(Form("centrality-study/%s", histogramName.Data()));
 
   hV0Mfine->SetTitle("");
   
@@ -190,7 +196,7 @@ void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString 
   
   //=======================================================
   
-  TString baseHistoIdentifier = Form("../basehistos_%s_%s_omega%.1f.root", nuclearProfile.Data(), nuclearProfile.Data(), omega);
+  TString baseHistoIdentifier = Form("basehistos_%s_%s_omega%.1f.root", nuclearProfile.Data(), nuclearProfile.Data(), omega);
   
   // TFile *fOutput = new TFile(Form("glauberfit_%i_%s_%s_%.1f.root", runNumber, type.Data(), nuclearProfile.Data(), omega), "RECREATE");
   
