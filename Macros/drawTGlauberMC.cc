@@ -147,13 +147,17 @@ void drawTGlauberMC()
   Histos* pbpb25_568117_PbHN = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "_basehistos_PbHN", "PbPb25"), "568117");
   Histos* pbpb25_568117_Pbpn = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "_basehistos_Pbpn", "PbPb25"), "568117");
   Histos* pbpb25_568117_Pbstar = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "_basehistos_Pbstar", "PbPb25"), "568117");
+  Histos* pbpb25_568117_Pbrw = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "_basehistos_Pbrw", "PbPb25"), "568117");
+  Histos* pbpb25_568117_Pbpnrw = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "_basehistos_Pbpnrw", "PbPb25"), "568117");
 
-  ColorManager cm(4);
+  ColorManager cm(6);
   pbpb25_568117->setColor(cm.getColor(-1));
   pbpb25_568117_Pb->setColor(cm.getColor(0));
   pbpb25_568117_PbHN->setColor(cm.getColor(1));
   pbpb25_568117_Pbpn->setColor(cm.getColor(2));
   pbpb25_568117_Pbstar->setColor(cm.getColor(3));
+  pbpb25_568117_Pbrw->setColor(cm.getColor(4));
+  pbpb25_568117_Pbpnrw->setColor(cm.getColor(5));
 
   TLegend* legend = new TLegend(0.67, 0.7, 0.87, 0.95);
   legend->SetBorderSize(0);
@@ -163,6 +167,8 @@ void drawTGlauberMC()
   legend->AddEntry(pbpb25_568117_PbHN->histos[kNpart], "PbHN", "pl");
   legend->AddEntry(pbpb25_568117_Pbpn->histos[kNpart], "Pbpn", "lp");
   legend->AddEntry(pbpb25_568117_Pbstar->histos[kNpart], "Pb*", "pl");
+  legend->AddEntry(pbpb25_568117_Pbrw->histos[kNpart], "Pbrw", "pl");
+  legend->AddEntry(pbpb25_568117_Pbpnrw->histos[kNpart], "Pbpnrw*", "pl");
 
   TCanvas* canvNpart = new TCanvas("canvNpart", "", 1200, 800);
   canvNpart->SetTopMargin(0.03);
@@ -176,6 +182,8 @@ void drawTGlauberMC()
   pbpb25_568117_PbHN->histos[kNpart]->Draw("pe same");
   pbpb25_568117_Pbpn->histos[kNpart]->Draw("pe same");
   pbpb25_568117_Pbstar->histos[kNpart]->Draw("pe same");
+  pbpb25_568117_Pbrw->histos[kNpart]->Draw("pe same");
+  pbpb25_568117_Pbpnrw->histos[kNpart]->Draw("pe same");
   legend->Draw();
   canvNpart->SaveAs("hNpartTGlauberMC.pdf");
 
@@ -191,13 +199,17 @@ void drawTGlauberMC()
   pbpb25_568117_PbHN->histos[kNcoll]->Draw("pe same");
   pbpb25_568117_Pbpn->histos[kNcoll]->Draw("pe same");
   pbpb25_568117_Pbstar->histos[kNcoll]->Draw("pe same");
+  pbpb25_568117_Pbrw->histos[kNcoll]->Draw("pe same");
+  pbpb25_568117_Pbpnrw->histos[kNcoll]->Draw("pe same");
   legend->Draw();
   canvNcoll->SaveAs("hNcollTGlauberMC.pdf");
 
   std::vector<Histos*> registry = { pbpb25_568117_Pb,
                                     pbpb25_568117_PbHN,
                                     pbpb25_568117_Pbpn,
-                                    pbpb25_568117_Pbstar };
+                                    pbpb25_568117_Pbstar,
+                                    pbpb25_568117_Pbrw,
+                                    pbpb25_568117_Pbpnrw };
   
   TLegend* legend2 = new TLegend(0.17, 0.7, 0.37, 0.95);
   legend2->SetBorderSize(0);
@@ -206,6 +218,8 @@ void drawTGlauberMC()
   legend2->AddEntry(pbpb25_568117_PbHN->histos[kNpart], "PbHN", "pl");
   legend2->AddEntry(pbpb25_568117_Pbpn->histos[kNpart], "Pbpn", "lp");
   legend2->AddEntry(pbpb25_568117_Pbstar->histos[kNpart], "Pb*", "pl");
+  legend2->AddEntry(pbpb25_568117_Pbrw->histos[kNpart], "Pbrw", "pl");
+  legend2->AddEntry(pbpb25_568117_Pbpnrw->histos[kNpart], "Pbpnrw*", "pl");
 
   // Ratio histograms Npart
   TCanvas* canvNpartRatio = new TCanvas("canvNpartRatio", "", 1200, 800);
