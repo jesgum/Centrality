@@ -21,7 +21,7 @@ https://cernbox.cern.ch/s/II69QOGcUaIUICu
   - HN: "hard nucleon size", nucleons given spatial extend instead of being point-like
 
 ### TGlauberMC documentation links
-  - https://arxiv.org/abs/2507.05853
-  - https://arxiv.org/abs/1710.07098
-  - https://arxiv.org/abs/1408.2549
-  - https://arxiv.org/abs/0805.4411
+  - [Glauber predictions for oxygen and neon collisions at the LHC](https://arxiv.org/abs/2507.05853)
+  - [Improved Monte Carlo Glauber predictions at present and future nuclear colliders](https://arxiv.org/abs/1710.07098)
+  - [Improved version of the PHOBOS Glauber Monte Carlo](https://arxiv.org/abs/1408.2549)
+  - [The PHOBOS Glauber Monte Carlo](https://arxiv.org/abs/0805.4411)
