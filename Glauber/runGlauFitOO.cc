@@ -120,7 +120,7 @@ void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString 
   
   //hV0Mfine = (TH1F *) file -> Get(Form("centrality-study/Run_564359/%s", "hFT0C_Collisions"));
   // hV0Mfine = (TH1F *) file -> Get(Form("centrality-study/Run_%i/%s", runNumber, type.Data())); // hNPVContributors
-  hV0Mfine = (TH1F *) file -> Get(Form("centrality-study/%s", histogramName.Data()));
+  hV0Mfine = (TH1F *) file -> Get(Form("centrality-study_bc_vtxZ/%s", histogramName.Data()));
 
   hV0Mfine->SetTitle("");
   
@@ -223,6 +223,7 @@ void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString 
   g->SetNpartNcollCorrelation(hNpNc);
   g->SetInputV0M(hV0M);
   g->SetFitRange(lFitRange,lFitRangeMax);
+  // g->SetFitRange(0,lFitRangeMax);
   
   TString lString = "REM0";
   g->SetFitOptions(lString.Data());
@@ -361,13 +362,29 @@ void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString 
   Float_t lYShift = 0.25;
   lat->SetTextSize(0.042);
 
-  // save the glauber parameters explicitly
-  TH1D *hGlauberParameters = new TH1D("hGlauberParameters", "", 10,0,10);
-  TH1D *hGlauberFitRange = new TH1D("hGlauberFitRange", "", 10,0,10);
+
   
   // Large-scale comparison of integrals
   cout<<"Ratio of integrals: "<<hV0MUltraFine->Integral(1,hV0MUltraFine->GetNbinsX())/hGlauber->Integral(1,hGlauber->GetNbinsX())<<endl;
   
+
+  
+  TH1D *hRatioOfIntegrals = new TH1D("hRatioOfIntegrals", "", 1, -0.5f, 0.5f);
+  hRatioOfIntegrals->SetBinContent(1, hV0MUltraFine->Integral(1,hV0MUltraFine->GetNbinsX())/hGlauber->Integral(1,hGlauber->GetNbinsX()));
+  hRatioOfIntegrals->Write();
+  
+  
+  hV0MUltraFine->Write();
+  hV0Mfine->Write();
+  hV0M->Write();
+  
+  hGlauberFine->Write();
+  hGlauber->Write();
+  
+  // save the glauber parameters explicitly
+  TH1D *hGlauberParameters = new TH1D("hGlauberParameters", "", 10,0,10);
+  TH1D *hGlauberFitRange = new TH1D("hGlauberFitRange", "", 10,0,10);
+
   //fitfunc
   hGlauberParameters -> SetBinContent( 1, fitfunc -> GetParameter(0));
   hGlauberParameters -> SetBinContent( 2, fitfunc -> GetParameter(1));
@@ -375,23 +392,13 @@ void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString 
   hGlauberParameters -> SetBinContent( 4, fitfunc -> GetParameter(3));
   hGlauberParameters -> SetBinContent( 5, fitfunc -> GetParameter(4));
   hGlauberParameters -> Write();
-  
-  TH1D *hRatioOfIntegrals = new TH1D("hRatioOfIntegrals", "", 1, -0.5f, 0.5f);
-  hRatioOfIntegrals->SetBinContent(1, hV0MUltraFine->Integral(1,hV0MUltraFine->GetNbinsX())/hGlauber->Integral(1,hGlauber->GetNbinsX()));
-  hRatioOfIntegrals->Write();
-  
+
   Double_t lLoRangeGlauber, lHiRangeGlauber;
   fitfunc->GetRange(lLoRangeGlauber, lHiRangeGlauber);
   hGlauberFitRange->SetBinContent(1, lLoRangeGlauber);
   hGlauberFitRange->SetBinContent(2, lHiRangeGlauber);
   hGlauberFitRange->Write();
 
-  hV0MUltraFine->Write();
-  hV0Mfine->Write();
-  hV0M->Write();
-  
-  hGlauberFine->Write();
-  hGlauber->Write();
   hRatio->Write();
   fOutput->Write();
   

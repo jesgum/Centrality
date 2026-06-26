@@ -103,6 +103,21 @@ void drawLightIonGlauberFit()
   coll.hInsetGlauber->SetLineColor(kRed+1);
   bcs.hInsetRatio->SetLineColor(kBlue+1);
   coll.hInsetRatio->SetLineColor(kRed+1);
+
+  bcs.hData->SetMarkerColor(kBlack);
+  coll.hData->SetMarkerColor(kBlack);
+  bcs.hInsetData->SetMarkerColor(kBlack);
+  coll.hInsetData->SetMarkerColor(kBlack);
+
+  bcs.hGlauber->SetMarkerColor(kBlue+1);
+  coll.hGlauber->SetMarkerColor(kRed+1);
+  bcs.hRatio->SetMarkerColor(kBlue+1);
+  coll.hRatio->SetMarkerColor(kRed+1);
+
+  bcs.hInsetGlauber->SetMarkerColor(kBlue+1);
+  coll.hInsetGlauber->SetMarkerColor(kRed+1);
+  bcs.hInsetRatio->SetMarkerColor(kBlue+1);
+  coll.hInsetRatio->SetMarkerColor(kRed+1);
   bcs.hData->GetXaxis()->SetRangeUser(0, xmax);
   coll.hData->GetXaxis()->SetRangeUser(0, xmax);
 

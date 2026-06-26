@@ -30,7 +30,7 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
   TH1F* hGlauberFitRange = (TH1F*)file->Get("hGlauberFitRange");
   hData->SetName("hData");
   TH1F* hStitched = (TH1F*)hData->Clone("hStitched");
-  TH1F* hFit = (TH1F*)file->Get("hGlauber");
+  TH1F* hFit = (TH1F*)file->Get("hGlauberFine");
 
   TCanvas* c1 = new TCanvas("c1", "", 800, 600);
   c1->SetLeftMargin(0.17);
@@ -82,6 +82,19 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
 
   cout << "Anchor point determined to be: " << anchorPoint << endl;
   cout << "Preparing stitched histogram ... " << endl;
+
+  //____________________________________________
+  // Cross check
+  const int anchorpointBin = hData->FindBin(anchorPoint);
+  const float normIntegralData = hData->Integral(anchorpointBin, anchorpointBin + matchRange);
+  const float normIntegralFit = hFit->Integral(anchorpointBin, anchorpointBin + matchRange);
+  const float normIntegralStitched = hStitched->Integral(anchorpointBin, anchorpointBin + matchRange);
+
+  cout << " - - - Cross-check: Range = " << anchorpointBin << ", "  << anchorpointBin + matchRange << endl;
+  cout << " - - - Cross-check: Integral Data = " << normIntegralData << endl;
+  cout << " - - - Cross-check: Integral Fit = " << normIntegralFit << endl;
+  cout << " - - - Cross-check: Integral Stitched = " << normIntegralStitched << endl;
+
 
   hFit->SetLineColor(kRed);
   hStitched->SetLineColor(kBlue);

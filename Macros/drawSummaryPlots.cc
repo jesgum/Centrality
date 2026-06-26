@@ -53,11 +53,20 @@ Double_t GetBoundaryForPercentile( TH1 *histo, Double_t lPercentileRequested ) {
   return lReturnValue;
 }
 
-void drawSummaryPlots( TString lInputFileName = "AnalysisResultsLHC24ar_glauberNBD_ancestorMode2_isCollision0.root",
-                         TString lRunNumber = "000000",
-                         TString lXaxisTitle = "FT0C Amplitude"
-                         ){
+void drawSummaryPlots(){
+  // TFile* fCalibColl = new TFile("../AnalysisResults/LHC25ae_pass2_small/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root", "read");
+  // TFile* fCalibBCs = new TFile("../AnalysisResults/LHC25ae_pass2_small/AR_564374_calibration_hFT0M_BCs_LightIonDef.root", "read");
+  // TFile* fCalibAncColl = new TFile("../AnalysisResults/LHC25ae_pass2_small/AR_564374_calibration_hFT0M_Collisions_Anchor90.root", "read");
+  // TFile* fCalibAncBCs = new TFile("../AnalysisResults/LHC25ae_pass2_small/AR_564374_calibration_hFT0M_BCs_Anchor90.root", "read");
 
+  // TString lInputFileName = "../AnalysisResults/LHC25ae_pass2_small/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root";
+  // TString lInputFileName = "../AnalysisResults/LHC25ae_pass2_small/AR_564374_calibration_hFT0M_BCs_LightIonDef.root";
+  // TString lInputFileName = "../AnalysisResults/LHC25ae_pass2_small/AR_564374_calibration_hFT0M_BCs_LightIonDef.root";
+  // TString lInputFileName = "../AnalysisResults/LHC25ae_pass2_small/AR_564374_calibration_hFT0M_Collisions_Anchor90.root";
+  TString lInputFileName = "../AnalysisResults/LHC25ae_pass2_small/AR_564374_calibration_hFT0M_BCs_Anchor90.root";
+  TString lRunNumber = "000000";
+  TString lXaxisTitle = "FT0M Amplitude";
+                         
   TFile *file = new TFile(lInputFileName.Data(), "READ");
   file->ls();
 
@@ -74,7 +83,7 @@ void drawSummaryPlots( TString lInputFileName = "AnalysisResultsLHC24ar_glauberN
   //TH1F *hRatio = (TH1F*) file->Get("hRatio");
 //  hRatio->SetName("hRatio");
 //  TH1F *hRawStitched = (TH1F*) file2->Get("hCalib");
-  TH1F *hGlauberFunctionHyperFine = (TH1F*) file2->Get("hGlauber");
+  TH1F *hGlauberFunctionHyperFine = (TH1F*) file2->Get("hGlauberFine");
   
   int rebinRatio = 20;
   TH1F *hRatio = (TH1F*) hV0M->Clone("hRatio");

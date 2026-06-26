@@ -2,7 +2,7 @@
 void runCalibrationLightIon(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root") {
   TString nuclearProfile = "Oho2";
   float omega = 0.3;
-  bool doNpartNcoll = true;
+  bool doNpartNcoll = false;
   TFile *file = new TFile(lInputFileName.Data(), "READ");
   file->ls();
   

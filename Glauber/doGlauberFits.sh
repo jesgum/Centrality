@@ -16,8 +16,6 @@ OO_2025="${AR_PATH}LHC25ae_pass2_small/"
 # Bool_t lFreef = kFALSE
 # Float_t lfvalue = 0.800
 
-# AR_567905.root
-
 ###  High statistics runs
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_567905.root\"\,500,\"hFT0C_BCs\"\,2\)
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568242.root\"\,500,\"hFT0C_BCs\"\,2\)&
@@ -39,15 +37,18 @@ OO_2025="${AR_PATH}LHC25ae_pass2_small/"
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_PbHN\"\)&
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpn\"\)&
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbstar\"\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpnrw\"\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbrw\"\)&
 
 ###  OO: Fitting BC vs collisions
-# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
-# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
 root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
-root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
 root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
-root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
 root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
 root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
 
 wait

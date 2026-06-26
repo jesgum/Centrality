@@ -32,8 +32,21 @@ OO_2025="${AR_PATH}LHC25ae_pass2_small/"
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_PbHN.root\"\,90.0,200.0,kTRUE\,\"basehistos_PbHN\"\)&
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbpn.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbpn\"\)&
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbstar.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbstar\"\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbpnrw.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbpnrw\"\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbrw.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbrw\"\)&
 
-root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\)&
-root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\)&
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\)&
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\)&
+
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,80.0,200.0,kFALSE\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,90.0,200.0,kFALSE\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+
+# root.exe -b -q ../Macros/drawSummaryPlots.cc
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564356_glauberNBD_hFT0M_Collisions.root\"\)&
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564359_glauberNBD_hFT0M_Collisions.root\"\)&
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564373_glauberNBD_hFT0M_Collisions.root\"\)&
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564356_glauberNBD_hFT0M_BCs.root\"\)&
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564359_glauberNBD_hFT0M_BCs.root\"\)&
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564373_glauberNBD_hFT0M_BCs.root\"\)&
 
 wait
