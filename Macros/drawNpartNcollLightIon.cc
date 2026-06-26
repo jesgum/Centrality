@@ -126,6 +126,12 @@ struct Histos {
       hist->SetLineColor(color);
     }
   }
+  void setMarker(int marker)
+  {
+    for (auto& hist : histos) {
+      hist->SetMarkerStyle(marker);
+    }
+  }
 
   const char* runNumber;
   std::vector<TH1F*> histos;
@@ -142,22 +148,85 @@ void drawNpartNcollLightIon()
     kB
   };
 
-  Histos* ooBCs = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564374", "hFT0M_BCs"), "BCs");
-  Histos* ooColls = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564374", "hFT0M_Collisions"), "Collisions");
+  // 564374
+  // 564356
+  // 564359
+  // 564373
 
-  std::vector<Histos*> registry = { ooBCs,
-                                    ooColls };
+  Histos* ooBCs_564374 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564374", "hFT0M_BCs"), "BCs 564374");
+  Histos* ooBCs_564356 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564356", "hFT0M_BCs"), "BCs 564356");
+  Histos* ooBCs_564359 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564359", "hFT0M_BCs"), "BCs 564359");
+  Histos* ooBCs_564373 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564373", "hFT0M_BCs"), "BCs 564373");
+  Histos* ooColls_564374 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564374", "hFT0M_Collisions"), "Coll 564374");
+  Histos* ooColls_564356 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564356", "hFT0M_Collisions"), "Coll 564356");
+  Histos* ooColls_564359 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564359", "hFT0M_Collisions"), "Coll 564359");
+  Histos* ooColls_564373 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564373", "hFT0M_Collisions"), "Coll 564373");
+
+  std::vector<Histos*> registry = { ooBCs_564374,
+                                    ooBCs_564356,
+                                    ooBCs_564359,
+                                    ooBCs_564373,
+                                    ooColls_564374,
+                                    ooColls_564356,
+                                    ooColls_564359,
+                                    ooColls_564373};
                                     
 
-  ooBCs->setColor(kBlue + 1);
-  ooColls->setColor(kRed + 1);
+  ColorManager cm(4);
+  ooBCs_564374->setColor(cm.getColor(0));
+  ooBCs_564374->setMarker(kFullSquare);
+  ooBCs_564356->setColor(cm.getColor(1));
+  ooBCs_564356->setMarker(kFullSquare);
+  ooBCs_564359->setColor(cm.getColor(2));
+  ooBCs_564359->setMarker(kFullSquare);
+  ooBCs_564373->setColor(cm.getColor(3));
+  ooBCs_564373->setMarker(kFullSquare);
 
-  TLegend* legend = new TLegend(0.67, 0.64, 0.97, 0.94);
-  legend->SetBorderSize(0);
-  legend->SetFillColorAlpha(0, 0);
+  ooColls_564374->setColor(cm.getColor(0));
+  ooColls_564374->setMarker(kFullCircle);
+  ooColls_564356->setColor(cm.getColor(1));
+  ooColls_564356->setMarker(kFullCircle);
+  ooColls_564359->setColor(cm.getColor(2));
+  ooColls_564359->setMarker(kFullCircle);
+  ooColls_564373->setColor(cm.getColor(3));
+  ooColls_564373->setMarker(kFullCircle);
+
+
+  TH1F* h564374 = new TH1F();
+  TH1F* h564356 = new TH1F();
+  TH1F* h564359 = new TH1F();
+  TH1F* h564373 = new TH1F();
+  h564374->SetLineColor(cm.getColor(0));
+  h564356->SetLineColor(cm.getColor(1));
+  h564359->SetLineColor(cm.getColor(2));
+  h564373->SetLineColor(cm.getColor(3));
+  h564374->SetLineWidth(2);
+  h564356->SetLineWidth(2);
+  h564359->SetLineWidth(2);
+  h564373->SetLineWidth(2);
+  TLegend* legRun = new TLegend(0.77, 0.6, 1.1, 0.94);
+  legRun->SetBorderSize(0);
+  legRun->SetFillColorAlpha(0, 0);
+  legRun->AddEntry(h564374, "564374", "l");
+  legRun->AddEntry(h564356, "564356", "l");
+  legRun->AddEntry(h564359, "564359", "l");
+  legRun->AddEntry(h564373, "564373", "l");
+
+  TH1F* hFullCircle = new TH1F();
+  TH1F* hFullSquare = new TH1F();
+  hFullCircle->SetMarkerStyle(kFullCircle);
+  hFullCircle->SetMarkerSize(2);
+  hFullCircle->SetMarkerColor(kBlack);
+  hFullSquare->SetMarkerStyle(kFullSquare);
+  hFullSquare->SetMarkerSize(2);
+  hFullSquare->SetMarkerColor(kBlack);
+  TLegend* legHist = new TLegend(0.66, 0.77, 0.87, 0.94);
+  legHist->SetBorderSize(0);
+  legHist->SetFillColorAlpha(0, 0);
+  legHist->AddEntry(hFullCircle, "Coll", "p");
+  legHist->AddEntry(hFullSquare, "BCs", "p");
 
   for (auto& hist : registry) {
-    legend->AddEntry(hist->histos[kNpart], hist->runNumber, "pl");
     hist->histos[kNpart]->GetXaxis()->SetLabelSize(0);
     hist->histos[kNcoll]->GetXaxis()->SetLabelSize(0);
     hist->histos[kNpart]->GetYaxis()->SetLabelSize(0.045);
@@ -169,102 +238,132 @@ void drawNpartNcollLightIon()
   }
 
 // === Canvas: Npart with ratio ===
-TCanvas* canvNpart = new TCanvas("canvNpart", "", 1200, 800);
-canvNpart->SetTopMargin(0.0);
-canvNpart->SetBottomMargin(0.0);
+  TCanvas* canvNpart = new TCanvas("canvNpart", "", 1200, 800);
+  canvNpart->SetTopMargin(0.0);
+  canvNpart->SetBottomMargin(0.0);
 
-// Upper pad (main plot)
-TPad* padNpartTop = new TPad("padNpartTop", "", 0, 0.3, 1, 1);
-padNpartTop->SetTicks(1, 1);
-padNpartTop->SetTopMargin(0.04);
-padNpartTop->SetBottomMargin(0.02);
-padNpartTop->SetLeftMargin(0.1);
-padNpartTop->SetRightMargin(0.03);
-padNpartTop->Draw();
-padNpartTop->cd();
-ooBCs->histos[kNpart]->Draw("pe");
-ooColls->histos[kNpart]->Draw("pe same");
-legend->Draw();
+  TPad* padNpartTop = new TPad("padNpartTop", "", 0, 0.3, 1, 1);
+  padNpartTop->SetTicks(1, 1);
+  padNpartTop->SetTopMargin(0.04);
+  padNpartTop->SetBottomMargin(0.02);
+  padNpartTop->SetLeftMargin(0.1);
+  padNpartTop->SetRightMargin(0.03);
+  padNpartTop->Draw();
+  padNpartTop->cd();
+  ooBCs_564374->histos[kNpart]->Draw("pe");
+  ooBCs_564356->histos[kNpart]->Draw("pe same");
+  ooBCs_564359->histos[kNpart]->Draw("pe same");
+  ooBCs_564373->histos[kNpart]->Draw("pe same");
+  ooColls_564374->histos[kNpart]->Draw("pe same");
+  ooColls_564356->histos[kNpart]->Draw("pe same");
+  ooColls_564359->histos[kNpart]->Draw("pe same");
+  ooColls_564373->histos[kNpart]->Draw("pe same");
+  legRun->Draw();
+  legHist->Draw();
 
-// Lower pad (ratio)
-canvNpart->cd();
-TPad* padNpartBot = new TPad("padNpartBot", "", 0, 0, 1, 0.3);
-padNpartBot->SetTicks(1, 1);
-padNpartBot->SetTopMargin(0.02);
-padNpartBot->SetBottomMargin(0.35);
-padNpartBot->SetLeftMargin(0.1);
-padNpartBot->SetRightMargin(0.03);
-padNpartBot->Draw();
-padNpartBot->cd();
+  canvNpart->cd();
+  TPad* padNpartBot = new TPad("padNpartBot", "", 0, 0, 1, 0.3);
+  padNpartBot->SetTicks(1, 1);
+  padNpartBot->SetTopMargin(0.02);
+  padNpartBot->SetBottomMargin(0.35);
+  padNpartBot->SetLeftMargin(0.1);
+  padNpartBot->SetRightMargin(0.03);
+  padNpartBot->Draw();
+  padNpartBot->cd();
 
-TH1* hRatioNpart = (TH1*)ooBCs->histos[kNpart]->Clone("hRatioNpart");
-hRatioNpart->Divide(ooColls->histos[kNpart]);
-hRatioNpart->SetMarkerColor(kBlack);
-hRatioNpart->SetLineColor(kBlack);
-hRatioNpart->SetTitle("");
-hRatioNpart->GetYaxis()->SetTitle("BCs / Colls");
-hRatioNpart->GetYaxis()->SetNdivisions(505);
-hRatioNpart->GetYaxis()->SetTitleSize(0.12);
-hRatioNpart->GetYaxis()->SetTitleOffset(0.4);
-hRatioNpart->GetYaxis()->SetLabelSize(0.10);
-hRatioNpart->GetXaxis()->SetTitleSize(0.13);
-hRatioNpart->GetXaxis()->SetLabelSize(0.11);
+  std::vector<std::pair<Histos*, Histos*>> runPairsNpart = {
+    {ooBCs_564374, ooColls_564374},
+    {ooBCs_564356, ooColls_564356},
+    {ooBCs_564359, ooColls_564359},
+    {ooBCs_564373, ooColls_564373}
+  };
 
-TLine* lineNpart = new TLine(hRatioNpart->GetXaxis()->GetXmin(), 1,
-                              hRatioNpart->GetXaxis()->GetXmax(), 1);
-lineNpart->SetLineStyle(2);
-lineNpart->SetLineColor(kGray + 1);
-hRatioNpart->Draw("pe");
-lineNpart->Draw("same");
-canvNpart->SaveAs("hNpartOO.pdf");
+  std::vector<TH1F*> hRatiosNpart;
+  for (int i = 0; i < 4; ++i) {
+    TH1F* hRatio = (TH1F*)runPairsNpart[i].first->histos[kNpart]->Clone(Form("hRatioNpart_%d", i));
+    hRatio->Divide(runPairsNpart[i].second->histos[kNpart]);
+    hRatio->SetTitle("");
+    hRatio->GetYaxis()->SetTitle("BCs / Colls");
+    hRatio->GetYaxis()->SetNdivisions(505);
+    hRatio->GetYaxis()->SetTitleSize(0.12);
+    hRatio->GetYaxis()->SetTitleOffset(0.4);
+    hRatio->GetYaxis()->SetLabelSize(0.10);
+    hRatio->GetXaxis()->SetTitleSize(0.13);
+    hRatio->GetXaxis()->SetLabelSize(0.11);
+    hRatiosNpart.push_back(hRatio);
+  }
+  hRatiosNpart[0]->Draw("pe");
+  for (int i = 1; i < 4; ++i) hRatiosNpart[i]->Draw("pe same");
 
-// === Canvas: Ncoll with ratio ===
-TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 800);
-canvNcoll->SetTopMargin(0.0);
-canvNcoll->SetBottomMargin(0.0);
+  TLine* lineNpart = new TLine(hRatiosNpart[0]->GetXaxis()->GetXmin(), 1,
+                                hRatiosNpart[0]->GetXaxis()->GetXmax(), 1);
+  lineNpart->SetLineStyle(2);
+  lineNpart->SetLineColor(kGray + 1);
+  lineNpart->Draw("same");
+  canvNpart->SaveAs("hNpartOO.pdf");
 
-// Upper pad (main plot)
-TPad* padNcollTop = new TPad("padNcollTop", "", 0, 0.3, 1, 1);
-padNcollTop->SetTicks(1, 1);
-padNcollTop->SetTopMargin(0.04);
-padNcollTop->SetBottomMargin(0.02);
-padNcollTop->SetLeftMargin(0.1);
-padNcollTop->SetRightMargin(0.03);
-padNcollTop->Draw();
-padNcollTop->cd();
-ooBCs->histos[kNcoll]->Draw("pe");
-ooColls->histos[kNcoll]->Draw("pe same");
-legend->Draw();
+  // === Canvas: Ncoll with ratio ===
+  TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 800);
+  canvNcoll->SetTopMargin(0.0);
+  canvNcoll->SetBottomMargin(0.0);
 
-// Lower pad (ratio)
-canvNcoll->cd();
-TPad* padNcollBot = new TPad("padNcollBot", "", 0, 0, 1, 0.3);
-padNcollBot->SetTicks(1, 1);
-padNcollBot->SetTopMargin(0.02);
-padNcollBot->SetBottomMargin(0.35);
-padNcollBot->SetLeftMargin(0.1);
-padNcollBot->SetRightMargin(0.03);
-padNcollBot->Draw();
-padNcollBot->cd();
+  TPad* padNcollTop = new TPad("padNcollTop", "", 0, 0.3, 1, 1);
+  padNcollTop->SetTicks(1, 1);
+  padNcollTop->SetTopMargin(0.04);
+  padNcollTop->SetBottomMargin(0.02);
+  padNcollTop->SetLeftMargin(0.1);
+  padNcollTop->SetRightMargin(0.03);
+  padNcollTop->Draw();
+  padNcollTop->cd();
+  ooBCs_564374->histos[kNcoll]->Draw("pe");
+  ooBCs_564356->histos[kNcoll]->Draw("pe same");
+  ooBCs_564359->histos[kNcoll]->Draw("pe same");
+  ooBCs_564373->histos[kNcoll]->Draw("pe same");
+  ooColls_564374->histos[kNcoll]->Draw("pe same");
+  ooColls_564356->histos[kNcoll]->Draw("pe same");
+  ooColls_564359->histos[kNcoll]->Draw("pe same");
+  ooColls_564373->histos[kNcoll]->Draw("pe same");
+  legRun->Draw();
+  legHist->Draw();
 
-TH1* hRatioNcoll = (TH1*)ooBCs->histos[kNcoll]->Clone("hRatioNcoll");
-hRatioNcoll->Divide(ooColls->histos[kNcoll]);
-hRatioNcoll->SetMarkerColor(kBlack);
-hRatioNcoll->SetLineColor(kBlack);
-hRatioNcoll->SetTitle("");
-hRatioNcoll->GetYaxis()->SetTitle("BCs / Colls");
-hRatioNcoll->GetYaxis()->SetNdivisions(505);
-hRatioNcoll->GetYaxis()->SetTitleSize(0.12);
-hRatioNcoll->GetYaxis()->SetTitleOffset(0.4);
-hRatioNcoll->GetYaxis()->SetLabelSize(0.10);
-hRatioNcoll->GetXaxis()->SetTitleSize(0.13);
-hRatioNcoll->GetXaxis()->SetLabelSize(0.11);
+  canvNcoll->cd();
+  TPad* padNcollBot = new TPad("padNcollBot", "", 0, 0, 1, 0.3);
+  padNcollBot->SetTicks(1, 1);
+  padNcollBot->SetTopMargin(0.02);
+  padNcollBot->SetBottomMargin(0.35);
+  padNcollBot->SetLeftMargin(0.1);
+  padNcollBot->SetRightMargin(0.03);
+  padNcollBot->Draw();
+  padNcollBot->cd();
 
-TLine* lineNcoll = new TLine(hRatioNcoll->GetXaxis()->GetXmin(), 1,
-                              hRatioNcoll->GetXaxis()->GetXmax(), 1);
-lineNcoll->SetLineStyle(2);
-lineNcoll->SetLineColor(kGray + 1);
-hRatioNcoll->Draw("pe");
-lineNcoll->Draw("same");
-canvNcoll->SaveAs("hNcollOO.pdf");
+  std::vector<std::pair<Histos*, Histos*>> runPairsNcoll = {
+    {ooBCs_564374, ooColls_564374},
+    {ooBCs_564356, ooColls_564356},
+    {ooBCs_564359, ooColls_564359},
+    {ooBCs_564373, ooColls_564373}
+  };
+
+  std::vector<TH1F*> hRatiosNcoll;
+  for (int i = 0; i < 4; ++i) {
+    TH1F* hRatio = (TH1F*)runPairsNcoll[i].first->histos[kNcoll]->Clone(Form("hRatioNcoll_%d", i));
+    hRatio->Divide(runPairsNcoll[i].second->histos[kNcoll]);
+    hRatio->SetTitle("");
+    hRatio->GetYaxis()->SetTitle("BCs / Colls");
+    hRatio->GetYaxis()->SetNdivisions(505);
+    hRatio->GetYaxis()->SetTitleSize(0.12);
+    hRatio->GetYaxis()->SetTitleOffset(0.4);
+    hRatio->GetYaxis()->SetLabelSize(0.10);
+    hRatio->GetXaxis()->SetTitleSize(0.13);
+    hRatio->GetXaxis()->SetLabelSize(0.11);
+    hRatiosNcoll.push_back(hRatio);
+  }
+  hRatiosNcoll[0]->Draw("pe");
+  for (int i = 1; i < 4; ++i) hRatiosNcoll[i]->Draw("pe same");
+
+  TLine* lineNcoll = new TLine(hRatiosNcoll[0]->GetXaxis()->GetXmin(), 1,
+                                hRatiosNcoll[0]->GetXaxis()->GetXmax(), 1);
+  lineNcoll->SetLineStyle(2);
+  lineNcoll->SetLineColor(kGray + 1);
+  lineNcoll->Draw("same");
+  canvNcoll->SaveAs("hNcollOO.pdf");
 }
