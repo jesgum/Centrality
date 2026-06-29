@@ -8,6 +8,7 @@
 #include "TPad.h"
 #include "TString.h"
 #include "TGraph.h"
+#include "TGraphErrors.h"
 
 #include <iostream>
 #include <vector>
@@ -79,30 +80,37 @@ void drawLightIonCalibration()
     };
 
     // --- Alternatively: swap into a TGraph (cleaner for a calibration curve) ---
-    auto swapToGraph = [](TH1F* h, const char* newName) -> TGraph* {
+    auto swapToGraph = [](TH1F* h, const char* newName) -> TGraphErrors* {
         int nPoints = 0;
         for (int ix = 1; ix <= h->GetNbinsX(); ix++)
             if (h->GetBinContent(ix) != 0) nPoints++;
 
-        TGraph* g = new TGraph(nPoints);
+        TGraphErrors* g = new TGraphErrors(nPoints);
         g->SetName(newName);
-        g->GetXaxis()->SetTitle(h->GetYaxis()->GetTitle()); // old content -> new X
-        g->GetYaxis()->SetTitle(h->GetXaxis()->GetTitle()); // old X -> new Y
 
         int iPoint = 0;
         for (int ix = 1; ix <= h->GetNbinsX(); ix++) {
             double content = h->GetBinContent(ix);
             if (content == 0) continue;
-            double oldX = h->GetBinCenter(ix);
-            g->SetPoint(iPoint++, content, oldX); // swap: content -> X, oldX -> Y
+
+            double oldX      = h->GetBinCenter(ix);
+            double halfWidth = h->GetBinWidth(ix) / 2.0;
+
+            // Swapped: content -> X (centrality), oldX -> Y (FT0M amplitude)
+            // The Y-error encodes the full bin range in the original amplitude axis
+            g->SetPoint(iPoint, content, oldX);
+            g->SetPointError(iPoint,
+                            0,          // no error on centrality (X)
+                            halfWidth); // half-bin-width on amplitude (Y)
+            iPoint++;
         }
         return g;
     };
 
-    TGraph* gSwapColl    = swapToGraph(hCalibColl,    "gSwapColl");
-    TGraph* gSwapBCs     = swapToGraph(hCalibBCs,     "gSwapBCs");
-    TGraph* gSwapAncColl = swapToGraph(hCalibAncColl, "gSwapAncColl");
-    TGraph* gSwapAncBCs  = swapToGraph(hCalibAncBCs,  "gSwapAncBCs");
+    TGraphErrors* gSwapColl    = swapToGraph(hCalibColl,    "gSwapColl");
+    TGraphErrors* gSwapBCs     = swapToGraph(hCalibBCs,     "gSwapBCs");
+    TGraphErrors* gSwapAncColl = swapToGraph(hCalibAncColl, "gSwapAncColl");
+    TGraphErrors* gSwapAncBCs  = swapToGraph(hCalibAncBCs,  "gSwapAncBCs");
 
     ColorManager cm(4);
     styleTH1(hCalibColl,    cm.getColor(0));
@@ -166,6 +174,7 @@ styleTGraph(gSwapBCs,     cm.getColor(1));
 styleTGraph(gSwapAncColl, cm.getColor(2));
 styleTGraph(gSwapAncBCs,  cm.getColor(3));
 
+gSwapColl->GetYaxis()->SetRangeUser(2e+0, 5e+5);
 gSwapColl->Draw("AP");
 gSwapColl->GetXaxis()->SetLabelSize(0);  // hide X labels on main pad
 gSwapColl->GetYaxis()->SetTitle("FT0M amplitude");
@@ -178,10 +187,10 @@ gSwapAncBCs->Draw("P same");
 TLegend* legSwap = new TLegend(0.6, 0.65, 0.95, 0.9);
 legSwap->SetBorderSize(0);
 legSwap->SetFillColorAlpha(0, 0);
-legSwap->AddEntry(gSwapColl,    "Collision data slicing",    "p");
-legSwap->AddEntry(gSwapAncColl, "Collision data 90% anchor", "p");
-legSwap->AddEntry(gSwapBCs,     "BC data slicing",           "p");
-legSwap->AddEntry(gSwapAncBCs,  "BC data 90% anchor",        "p");
+legSwap->AddEntry(gSwapColl,    "Collision data slicing",    "pe");
+legSwap->AddEntry(gSwapAncColl, "Collision data 90% anchor", "pe");
+legSwap->AddEntry(gSwapBCs,     "BC data slicing",           "pe");
+legSwap->AddEntry(gSwapAncBCs,  "BC data 90% anchor",        "pe");
 legSwap->Draw();
 
 // --- Build ratio graphs: gSwapBCs/gSwapColl, gSwapAncColl/gSwapColl, gSwapAncBCs/gSwapColl ---
