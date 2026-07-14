@@ -76,12 +76,12 @@ void drawLightIonGlauberFit()
   const float legHeight = 0.2;
 
   gStyle->SetOptStat(0);
-  GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_BCs_Anchor60.root");
-  GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor60.root");
+  GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_BCs_Anchor90.root");
+  GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor90.root");
   // GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_BCs_LightIonDef.root");
   // GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
 
-  TCanvas* canvGlauber = new TCanvas("canvGlauber", "", 1200, 1600);
+  TCanvas* canvGlauber = new TCanvas("canvGlauber", "", 1600, 1200);
   canvGlauber->SetTopMargin(0.0);
   canvGlauber->SetBottomMargin(0.0);
 

@@ -10,15 +10,14 @@
 #include <array>
 #include <iostream>
 
-static std::array<int, 2> normRange = { 500, 15000 };
+static std::array<int, 2> normRange = { 2000, 12000 };
 
 void styleHistogram(TH1F* hist, int color)
 {
   std::array<int, 2> normBins = { hist->FindBin(normRange[0]), hist->FindBin(normRange[1]) };
   hist->SetLineColor(color);
   hist->SetLineWidth(2);
-  // hist->Scale(1. / hist->Integral(normBins[0], normBins[1]));
-  hist->Scale(1. / hist->Integral());
+  hist->Scale(1. / hist->Integral(normBins[0], normBins[1]));
   hist->GetXaxis()->SetTitle("FT0M Amplitude");
   hist->GetYaxis()->SetTitle("Normalized count");
   hist->GetXaxis()->SetTitleSize(0.05);
@@ -80,7 +79,7 @@ void drawCollisionVsBC(const char* dataset = "LHC25ae_pass2", const char* ar = "
   const float ymax = 5e-2;
   const float ymin = 5e-10;
   const float xmin_zoom = 0;
-  const float xmax_zoom = 1100;
+  const float xmax_zoom = 4000;
   const float ymax_zoom = 5e-2;
   const float ymin_zoom = 5e-7;
 
@@ -139,8 +138,7 @@ void drawCollisionVsBC(const char* dataset = "LHC25ae_pass2", const char* ar = "
   latex->SetTextSize(0.08);
   latex->DrawLatex(0.175, 0.80, Form("%s", system));
   latex->SetTextSize(0.04);
-  // latex->DrawLatex(0.175, 0.75, Form("Normalization range: [%d, %d]", normRange[0], normRange[1]));
-  latex->DrawLatex(0.175, 0.75, "Normalized to integral");
+  latex->DrawLatex(0.175, 0.75, Form("Normalization range: [%d, %d]", normRange[0], normRange[1]));
 
   canvCollVsBC->cd();
 
@@ -189,8 +187,7 @@ void drawCollisionVsBC(const char* dataset = "LHC25ae_pass2", const char* ar = "
   latex->SetTextSize(0.08);
   latex->DrawLatex(0.175, 0.80, Form("%s", system));
   latex->SetTextSize(0.04);
-  // latex->DrawLatex(0.175, 0.75, Form("Normalization range: [%d, %d]", normRange[0], normRange[1]));
-  latex->DrawLatex(0.175, 0.75, "Normalized to integral");
+  latex->DrawLatex(0.175, 0.75, Form("Normalization range: [%d, %d]", normRange[0], normRange[1]));
   canvCollVsBC_Zoom->cd();
 
   TPad* padLo2 = new TPad("padLo2", "", 0, 0, 1, splitY);

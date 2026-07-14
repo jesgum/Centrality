@@ -212,7 +212,7 @@ void drawGlauberSet(TCanvas* canv, std::vector<GlauberInfo>& info, const char* t
     auto& g = info[ii];
     TLine* anchorLine = new TLine(g.mAnchorPoint, ratio_ymin, g.mAnchorPoint, ratio_ymax);
     anchorLine->SetLineStyle(7);
-    anchorLine->SetLineColorAlpha(g.mColor, 0.4);
+    anchorLine->SetLineColorAlpha(g.mColor, 0.6);
     anchorLine->Draw();
   }
 
@@ -262,7 +262,7 @@ void drawGlauberSet(TCanvas* canv, std::vector<GlauberInfo>& info, const char* t
     auto& g = info[ii];
     TLine* anchorLine = new TLine(g.mAnchorPoint, ratio_ymin, g.mAnchorPoint, ratio_ymax);
     anchorLine->SetLineStyle(7);
-    anchorLine->SetLineColorAlpha(g.mColor, 0.4);
+    anchorLine->SetLineColorAlpha(g.mColor, 0.6);
     anchorLine->Draw();
   }
 
@@ -274,7 +274,7 @@ void drawGlauberSet(TCanvas* canv, std::vector<GlauberInfo>& info, const char* t
 
 TCanvas* makeCanvas(const char* title)
 {
-  TCanvas* canv = new TCanvas(title, "", 1600, 1200);
+  TCanvas* canv = new TCanvas(title, "", 1600, 1600);
 
   canv->SetRightMargin(0.0);
   canv->SetLeftMargin(0.06);
