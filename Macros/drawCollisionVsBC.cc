@@ -17,7 +17,8 @@ void styleHistogram(TH1F* hist, int color)
   std::array<int, 2> normBins = { hist->FindBin(normRange[0]), hist->FindBin(normRange[1]) };
   hist->SetLineColor(color);
   hist->SetLineWidth(2);
-  hist->Scale(1. / hist->Integral(normBins[0], normBins[1]));
+  // hist->Scale(1. / hist->Integral(normBins[0], normBins[1]));
+  hist->Scale(1. / hist->Integral());
   hist->GetXaxis()->SetTitle("FT0M Amplitude");
   hist->GetYaxis()->SetTitle("Normalized count");
   hist->GetXaxis()->SetTitleSize(0.05);
@@ -58,7 +59,7 @@ void styleCanvas(TCanvas* canv)
 // PbPb 2023    AR_545210.root
 // PbPb 2024    AR_560089.root
 // PbPb 2025    AR_567905.root
-void drawCollisionVsBC(const char* dataset = "LHC25af_pass2", const char* ar = "AR_564468.root", const char* system = "NeNe")
+void drawCollisionVsBC(const char* dataset = "LHC25ae_pass2", const char* ar = "AR_564374.root", const char* system = "OO")
 {
   gStyle->SetOptStat(0);
   const char* filePath = Form("../AnalysisResults/%s/%s", dataset, ar);
@@ -79,7 +80,7 @@ void drawCollisionVsBC(const char* dataset = "LHC25af_pass2", const char* ar = "
   const float ymax = 5e-2;
   const float ymin = 5e-10;
   const float xmin_zoom = 0;
-  const float xmax_zoom = 900;
+  const float xmax_zoom = 1100;
   const float ymax_zoom = 5e-2;
   const float ymin_zoom = 5e-7;
 
@@ -138,7 +139,8 @@ void drawCollisionVsBC(const char* dataset = "LHC25af_pass2", const char* ar = "
   latex->SetTextSize(0.08);
   latex->DrawLatex(0.175, 0.80, Form("%s", system));
   latex->SetTextSize(0.04);
-  latex->DrawLatex(0.175, 0.75, Form("Normalization range: [%d, %d]", normRange[0], normRange[1]));
+  // latex->DrawLatex(0.175, 0.75, Form("Normalization range: [%d, %d]", normRange[0], normRange[1]));
+  latex->DrawLatex(0.175, 0.75, "Normalized to integral");
 
   canvCollVsBC->cd();
 
@@ -146,12 +148,12 @@ void drawCollisionVsBC(const char* dataset = "LHC25af_pass2", const char* ar = "
   padLo->SetLeftMargin(0.13);
   padLo->SetRightMargin(0.03);
   padLo->SetTopMargin(0.02);
-  padLo->SetBottomMargin(0.35);
+  padLo->SetBottomMargin(0.3);
   padLo->SetTicks(1, 1);
   padLo->Draw();
   padLo->cd();
   hRatio->GetXaxis()->SetRangeUser(xmin, xmax);
-  hRatio->GetYaxis()->SetRangeUser(0.01, 1.14);
+  hRatio->GetYaxis()->SetRangeUser(0.01, 1.21);
   hRatio->Draw("hist");
 
   TLine* line1 = new TLine(xmin, 1, xmax, 1);
@@ -187,14 +189,15 @@ void drawCollisionVsBC(const char* dataset = "LHC25af_pass2", const char* ar = "
   latex->SetTextSize(0.08);
   latex->DrawLatex(0.175, 0.80, Form("%s", system));
   latex->SetTextSize(0.04);
-  latex->DrawLatex(0.175, 0.75, Form("Normalization range: [%d, %d]", normRange[0], normRange[1]));
+  // latex->DrawLatex(0.175, 0.75, Form("Normalization range: [%d, %d]", normRange[0], normRange[1]));
+  latex->DrawLatex(0.175, 0.75, "Normalized to integral");
   canvCollVsBC_Zoom->cd();
 
   TPad* padLo2 = new TPad("padLo2", "", 0, 0, 1, splitY);
   padLo2->SetLeftMargin(0.13);
   padLo2->SetRightMargin(0.03);
   padLo2->SetTopMargin(0.02);
-  padLo2->SetBottomMargin(0.35);
+  padLo2->SetBottomMargin(0.3);
   padLo2->SetTicks(1, 1);
   padLo2->Draw();
   padLo2->cd();

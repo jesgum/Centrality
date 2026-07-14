@@ -1,8 +1,7 @@
 // void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root")
-void runCalibrationLightIon(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root") {
+void runCalibrationLightIon(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root", Bool_t doNpartNcoll = kFALSE) {
   TString nuclearProfile = "Oho2";
   float omega = 0.3;
-  bool doNpartNcoll = false;
   TFile *file = new TFile(lInputFileName.Data(), "READ");
   file->ls();
   
@@ -84,6 +83,7 @@ void runCalibrationLightIon(TString lInputFileName = "results/AR_544122_glauberN
   
   TString calibFileName = lInputFileName.Data();
   calibFileName.ReplaceAll("glauberNBD", "calibration");
+  calibFileName.ReplaceAll(".root", "_LightIonDef.root");
   TFile *fileCalib = new TFile(calibFileName.Data(), "RECREATE");
   
   TH1F *hCalib = lCalib->GetCalibrationHistogram(hStitched, "hCalib");

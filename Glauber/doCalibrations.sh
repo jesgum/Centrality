@@ -5,7 +5,7 @@ PBPB_2025="${AR_PATH}LHC25_pass1/"
 PBPB_2024="${AR_PATH}LHC24_pass3/"
 PBPB_2023="${AR_PATH}LHC23_pass5/"
 NeNe_2025="${AR_PATH}LHC25af_pass2/"
-OO_2025="${AR_PATH}LHC25ae_pass2_small/"
+OO_2025="${AR_PATH}LHC25ae_pass2/"
 
 # TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root"
 # double anchorPointPercentage = 90.0
@@ -35,11 +35,29 @@ OO_2025="${AR_PATH}LHC25ae_pass2_small/"
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbpnrw.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbpnrw\"\)&
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbrw.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbrw\"\)&
 
-# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\)&
-# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\)&
 
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,80.0,200.0,kFALSE\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,90.0,200.0,kFALSE\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+DO_NPART_NCOLL=kFALSE
+
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\",${DO_NPART_NCOLL}\)&
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\",${DO_NPART_NCOLL}\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,${ANCHOR_POINT_PERCENTAGE},200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,${ANCHOR_POINT_PERCENTAGE},200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+
+
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564373_glauberNBD_hFT0M_Collisions.root\",${DO_NPART_NCOLL}\)&
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564373_glauberNBD_hFT0M_BCs.root\",${DO_NPAR/T_NCOLL}\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564373_glauberNBD_hFT0M_Collisions.root\"\,${ANCHOR_POINT_PERCENTAGE},200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564373_glauberNBD_hFT0M_BCs.root\"\,${ANCHOR_POINT_PERCENTAGE},200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564359_glauberNBD_hFT0M_Collisions.root\",${DO_NPART_NCOLL}\)&
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564359_glauberNBD_hFT0M_BCs.root\",${DO_NPART_NCOLL}\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564359_glauberNBD_hFT0M_Collisions.root\"\,${ANCHOR_POINT_PERCENTAGE},200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564359_glauberNBD_hFT0M_BCs.root\"\,${ANCHOR_POINT_PERCENTAGE},200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564356_glauberNBD_hFT0M_Collisions.root\",${DO_NPART_NCOLL}\)&
+# root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564356_glauberNBD_hFT0M_BCs.root\",${DO_NPART_NCOLL}\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564356_glauberNBD_hFT0M_Collisions.root\"\,${ANCHOR_POINT_PERCENTAGE},200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564356_glauberNBD_hFT0M_BCs.root\"\,${ANCHOR_POINT_PERCENTAGE},200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
 
 # root.exe -b -q ../Macros/drawSummaryPlots.cc
 # root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564356_glauberNBD_hFT0M_Collisions.root\"\)&
@@ -49,4 +67,10 @@ root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.roo
 # root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564359_glauberNBD_hFT0M_BCs.root\"\)&
 # root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564373_glauberNBD_hFT0M_BCs.root\"\)&
 
-wait
+#!/bin/bash
+
+for ANCHOR_POINT_PERCENTAGE in $(seq 100 -5 0); do
+  root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,${ANCHOR_POINT_PERCENTAGE},200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+  root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,${ANCHOR_POINT_PERCENTAGE},200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+  wait
+done

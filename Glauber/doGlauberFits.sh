@@ -5,7 +5,7 @@ PBPB_2025="${AR_PATH}LHC25_pass1/"
 PBPB_2024="${AR_PATH}LHC24_pass3/"
 PBPB_2023="${AR_PATH}LHC23_pass5/"
 NeNe_2025="${AR_PATH}LHC25af_pass2/"
-OO_2025="${AR_PATH}LHC25ae_pass2_small/"
+OO_2025="${AR_PATH}LHC25ae_pass2/"
 
 # TString lInputFileName = "AnalysisResultsLHC24ar.root"
 # Double_t lFitRange = /*350*/500.
@@ -42,14 +42,14 @@ OO_2025="${AR_PATH}LHC25ae_pass2_small/"
 
 ###  OO: Fitting BC vs collisions
 root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
-root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
-root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
-root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
 
-root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
-root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
-root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
-root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
 
 wait
 echo "Done!"

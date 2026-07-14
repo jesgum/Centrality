@@ -20,7 +20,7 @@ std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, const char* name)
   Int_t ancesterMode = 2;
   Bool_t printNpartNcoll = true;
 
-  TString filePath = Form("../AnalysisResults/%s/%s_calibration_%s.root", dataset.Data(), ar.Data(), name);
+  TString filePath = Form("../AnalysisResults/%s/%s_calibration_%s_Anchor90.root", dataset.Data(), ar.Data(), name);
   TFile* infile = new TFile(filePath.Data(), "read");
 
   if (!infile || infile->IsZombie()) {
@@ -153,14 +153,14 @@ void drawNpartNcollLightIon()
   // 564359
   // 564373
 
-  Histos* ooBCs_564374 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564374", "hFT0M_BCs"), "BCs 564374");
-  Histos* ooBCs_564356 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564356", "hFT0M_BCs"), "BCs 564356");
-  Histos* ooBCs_564359 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564359", "hFT0M_BCs"), "BCs 564359");
-  Histos* ooBCs_564373 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564373", "hFT0M_BCs"), "BCs 564373");
-  Histos* ooColls_564374 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564374", "hFT0M_Collisions"), "Coll 564374");
-  Histos* ooColls_564356 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564356", "hFT0M_Collisions"), "Coll 564356");
-  Histos* ooColls_564359 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564359", "hFT0M_Collisions"), "Coll 564359");
-  Histos* ooColls_564373 = new Histos(doNpartNcoll("LHC25ae_pass2_small", "AR_564373", "hFT0M_Collisions"), "Coll 564373");
+  Histos* ooBCs_564374 = new Histos(doNpartNcoll("LHC25ae_pass2", "AR_564374", "hFT0M_BCs"), "BCs 564374");
+  Histos* ooBCs_564356 = new Histos(doNpartNcoll("LHC25ae_pass2", "AR_564356", "hFT0M_BCs"), "BCs 564356");
+  Histos* ooBCs_564359 = new Histos(doNpartNcoll("LHC25ae_pass2", "AR_564359", "hFT0M_BCs"), "BCs 564359");
+  Histos* ooBCs_564373 = new Histos(doNpartNcoll("LHC25ae_pass2", "AR_564373", "hFT0M_BCs"), "BCs 564373");
+  Histos* ooColls_564374 = new Histos(doNpartNcoll("LHC25ae_pass2", "AR_564374", "hFT0M_Collisions"), "Coll 564374");
+  Histos* ooColls_564356 = new Histos(doNpartNcoll("LHC25ae_pass2", "AR_564356", "hFT0M_Collisions"), "Coll 564356");
+  Histos* ooColls_564359 = new Histos(doNpartNcoll("LHC25ae_pass2", "AR_564359", "hFT0M_Collisions"), "Coll 564359");
+  Histos* ooColls_564373 = new Histos(doNpartNcoll("LHC25ae_pass2", "AR_564373", "hFT0M_Collisions"), "Coll 564373");
 
   std::vector<Histos*> registry = { ooBCs_564374,
                                     ooBCs_564356,
@@ -205,6 +205,7 @@ void drawNpartNcollLightIon()
   h564359->SetLineWidth(2);
   h564373->SetLineWidth(2);
   TLegend* legRun = new TLegend(0.77, 0.6, 1.1, 0.94);
+  legRun->SetTextFont(42);
   legRun->SetBorderSize(0);
   legRun->SetFillColorAlpha(0, 0);
   legRun->AddEntry(h564374, "564374", "l");
@@ -221,6 +222,7 @@ void drawNpartNcollLightIon()
   hFullSquare->SetMarkerSize(2);
   hFullSquare->SetMarkerColor(kBlack);
   TLegend* legHist = new TLegend(0.66, 0.77, 0.87, 0.94);
+  legHist->SetTextFont(42);
   legHist->SetBorderSize(0);
   legHist->SetFillColorAlpha(0, 0);
   legHist->AddEntry(hFullCircle, "Coll", "p");
@@ -235,6 +237,8 @@ void drawNpartNcollLightIon()
     hist->histos[kNcoll]->GetYaxis()->SetTitleSize(0.05);
     hist->histos[kNpart]->GetYaxis()->SetTitle("Oxygen#minusOxygen <N_{part}>");
     hist->histos[kNcoll]->GetYaxis()->SetTitle("Oxygen#minusOxygen <N_{coll}>");
+    hist->histos[kNpart]->GetYaxis()->SetTitleOffset(0);
+    hist->histos[kNcoll]->GetYaxis()->SetTitleOffset(0);
   }
 
 // === Canvas: Npart with ratio ===

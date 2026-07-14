@@ -110,7 +110,7 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
 
   // All fine, let's try the calibrator
   multCalibrator* lCalib = new multCalibrator("lCalib");
-  lCalib->SetAnchorPointPercentage(100.0f);
+  lCalib->SetAnchorPointPercentage(anchorPointPercentage);
   lCalib->SetAnchorPointRaw(-1e-6);
 
   // Set standard Pb-Pb boundaries
@@ -118,6 +118,7 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
 
   TString calibFileName = lInputFileName.Data();
   calibFileName.ReplaceAll("glauberNBD", "calibration");
+  calibFileName.ReplaceAll(".root", Form("_Anchor%.0f.root", anchorPointPercentage));
   TFile* fileCalib = new TFile(calibFileName.Data(), "RECREATE");
   // TFile* fileCalib = new TFile(outfile, "RECREATE");
 
@@ -179,7 +180,7 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
     Double_t lMax = hData->GetBinLowEdge(hData->GetNbinsX() + 1);
 
     // uncomment if Np Nc needed -> Warning, slow!
-  g->CalculateAvNpNc( hProfileNpart, hProfileNcoll, h2dNpart, h2dNcoll, hCalib, 0, lMax , hNpNcEcc, h2dEcc, hNpNcB, h2dB, h2dNancestors, 1e-6 );
+    g->CalculateAvNpNc( hProfileNpart, hProfileNcoll, h2dNpart, h2dNcoll, hCalib, 0, lMax , hNpNcEcc, h2dEcc, hNpNcB, h2dB, h2dNancestors, 1e-6 );
 
     hProfileNpart->Write();
     hProfileNcoll->Write();
