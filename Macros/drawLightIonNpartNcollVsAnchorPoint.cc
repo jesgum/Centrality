@@ -216,7 +216,7 @@ struct Histos {
 
 void drawLightIonNpartNcollVsAnchorPoint()
 {
-  int cfgDraw = 1; // 0: BCs, 1: Collisions
+  int cfgDraw = 0; // 0: BCs, 1: Collisions
   TH1F* hAvgNpart = new TH1F("hAvgNpart_global", "", 11, 0, 100);
   hAvgNpart->SetLineColor(kBlack);
   hAvgNpart->SetMarkerColor(kBlack);
@@ -289,10 +289,11 @@ void drawLightIonNpartNcollVsAnchorPoint()
     if (cfgDraw == 1) col[ii]->histos[kNpart]->Draw("pe same");
   }
 
-  TLegend* legAnchor = new TLegend(0.82, 0.52, 1.15, 0.94);
+  TLegend* legAnchor = new TLegend(0.8, 0.48, 1.12, 0.94);
   legAnchor->SetTextFont(42);
   legAnchor->SetBorderSize(0);
   legAnchor->SetFillColorAlpha(0, 0);
+  legAnchor->AddEntry(hAvgNpart, "Table", "pl");
   for (int ii{ 0 }; ii < anchorpointPercentage.size(); ++ii) {
     legAnchor->AddEntry(bcs[ii]->histos[kNpart], Form("%d%%", anchorpointPercentage[ii]), "pl");
   }
