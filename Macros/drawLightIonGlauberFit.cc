@@ -39,7 +39,7 @@ struct GlauberInfo
     hDataClone->Rebin(rebin);
     hInsetGlauberClone->Rebin(rebin);
 
-    hRatio->Divide(hDataClone, hInsetGlauberClone, 1, 1, "B");
+    hRatio->Divide(hInsetGlauberClone, hDataClone, 1, 1, "B");
     hInsetRatio->Divide(hInsetGlauber, hInsetData, 1, 1, "B");
     delete hDataClone; delete hInsetGlauberClone;
   }
@@ -81,7 +81,7 @@ void drawLightIonGlauberFit()
   // GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_BCs_LightIonDef.root");
   // GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
 
-  TCanvas* canvGlauber = new TCanvas("canvGlauber", "", 1600, 1200);
+  TCanvas* canvGlauber = new TCanvas("canvGlauber", "", 1200, 1400);
   canvGlauber->SetTopMargin(0.0);
   canvGlauber->SetBottomMargin(0.0);
 

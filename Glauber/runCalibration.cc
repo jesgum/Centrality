@@ -110,7 +110,7 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
 
   // All fine, let's try the calibrator
   multCalibrator* lCalib = new multCalibrator("lCalib");
-  lCalib->SetAnchorPointPercentage(anchorPointPercentage);
+  lCalib->SetAnchorPointPercentage(100.f);
   lCalib->SetAnchorPointRaw(-1e-6);
 
   // Set standard Pb-Pb boundaries
