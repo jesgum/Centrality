@@ -15,7 +15,7 @@
 
 #include "colorManager.h"
 
-static std::array<int, 2> normRange = { 3000, 10000 };
+static std::array<int, 2> normRange = { 2000, 12000 };
 
 void styleHistogram(TH1F* hist)
 {
@@ -65,7 +65,7 @@ void styleCanvas(TCanvas* canv, bool log = true)
 struct CentralityStudy {
   CentralityStudy(const char* subwagon, int col0, int col1)
   {
-    TFile file("../AnalysisResults/LHC25h3c/AR_564374.root", "READ");
+    TFile file("../AnalysisResults/LHC25ae_pass2_extra/AR_564374.root", "READ");
     if (file.IsZombie()) {
       std::cerr << "Could not open file!" << std::endl;
       return;
@@ -119,7 +119,7 @@ struct CentralityStudy {
   TH1F* hRatio_Zoom = nullptr;
 };
 
-void drawLightIonMonteCarlo()
+void drawLightIonSameSelections()
 {
   gStyle->SetOptStat(0);
   ColorManager cm(4);
@@ -141,7 +141,7 @@ void drawLightIonMonteCarlo()
   base.hBCs->Draw("hist");
   base.hCol->Draw("hist same");
   leg->Draw();
-  canv_base->SaveAs("h_mc_base.pdf");
+  canv_base->SaveAs("h_base.pdf");
 
   TCanvas* canv_nobc = new TCanvas("canv_nobc", "", 1600, 1000);
   styleCanvas(canv_nobc);
@@ -155,14 +155,14 @@ void drawLightIonMonteCarlo()
   pileup.hBCs->Draw("hist");
   pileup.hCol->Draw("hist same");
   leg->Draw();
-  canv_pileup->SaveAs("h_mc_pileup.pdf");
+  canv_pileup->SaveAs("h_pileup.pdf");
 
   TCanvas* canv_nobcpileup = new TCanvas("canv_nobcpileup", "", 1600, 1000);
   styleCanvas(canv_nobcpileup);
   nobcpileup.hBCs->Draw("hist");
   nobcpileup.hCol->Draw("hist same");
   leg->Draw();
-  canv_nobcpileup->SaveAs("h_mc_nobcpileup.pdf");
+  canv_nobcpileup->SaveAs("h_nobcpileup.pdf");
 
   TCanvas* canv_ratio = new TCanvas("canv_ratio", "", 1600, 1000);
   styleCanvas(canv_ratio, false);
@@ -173,7 +173,7 @@ void drawLightIonMonteCarlo()
   pileup.hRatio->Draw("hist same");
   nobcpileup.hRatio->Draw("hist same");
   leg->Draw();
-  canv_ratio->SaveAs("h_mc_ratio.pdf");
+  canv_ratio->SaveAs("h_ratio.pdf");
 
   // Zoomed-in version of the ratio plot: same curves, tighter y-axis window
   // around 1 so the differences between base/nobc/pileup/nobcpileup are
@@ -188,5 +188,5 @@ void drawLightIonMonteCarlo()
   pileup.hRatio_Zoom->Draw("hist same");
   nobcpileup.hRatio_Zoom->Draw("hist same");
   leg->Draw();
-  canv_ratio_zoom->SaveAs("h_mc_ratio_zoom.pdf");
+  canv_ratio_zoom->SaveAs("h_ratio_zoom.pdf");
 }
