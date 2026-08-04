@@ -65,7 +65,7 @@ void styleCanvas(TCanvas* canv, bool log = true)
 struct CentralityStudy {
   CentralityStudy(const char* subwagon, int col0, int col1)
   {
-    TFile file("../AnalysisResults/LHC25h3c/AR_564374.root", "READ");
+    TFile file("../AnalysisResults/LHC25h3c_extra2/AR_564374.root", "READ");
     if (file.IsZombie()) {
       std::cerr << "Could not open file!" << std::endl;
       return;
@@ -122,19 +122,23 @@ struct CentralityStudy {
 void drawLightIonMonteCarlo()
 {
   gStyle->SetOptStat(0);
-  ColorManager cm(4);
+  ColorManager cm(6);
   CentralityStudy base("", kBlack, cm.getColor(0));
   CentralityStudy nobc("_rejectnobc", kBlack, cm.getColor(1));
   CentralityStudy pileup("_rejectpileup", kBlack, cm.getColor(2));
   CentralityStudy nobcpileup("_rejectnobc_rejectpileup", kBlack, cm.getColor(3));
+  CentralityStudy vtxZ("_vtxZ", kBlack, cm.getColor(4));
+  CentralityStudy nobcvtxZ("_rejectnobc_vtxZ", kBlack, cm.getColor(5));
 
-  TLegend* leg = new TLegend(0.8, 0.4, 1.1, 0.6);
+  TLegend* leg = new TLegend(0.8, 0.35, 1.1, 0.65);
   leg->SetBorderSize(0);
   leg->SetFillColorAlpha(0, 0);
   leg->AddEntry(base.hCol, "base", "l");
   leg->AddEntry(nobc.hCol, "nobc", "l");
   leg->AddEntry(pileup.hCol, "pileup", "l");
   leg->AddEntry(nobcpileup.hCol, "nobcpileup", "l");
+  leg->AddEntry(vtxZ.hCol, "vtxZ", "l");
+  leg->AddEntry(nobcvtxZ.hCol, "nobcvtxZ", "l");
 
   TCanvas* canv_base = new TCanvas("canv_base", "", 1600, 1000);
   styleCanvas(canv_base);
@@ -164,6 +168,20 @@ void drawLightIonMonteCarlo()
   leg->Draw();
   canv_nobcpileup->SaveAs("h_mc_nobcpileup.pdf");
 
+  TCanvas* canv_vtxZ = new TCanvas("canv_vtxZ", "", 1600, 1000);
+  styleCanvas(canv_vtxZ);
+  vtxZ.hBCs->Draw("hist");
+  vtxZ.hCol->Draw("hist same");
+  leg->Draw();
+  canv_vtxZ->SaveAs("h_mc_vtxZ.pdf");
+
+  TCanvas* canv_nobcvtxZ = new TCanvas("canv_nobcvtxZ", "", 1600, 1000);
+  styleCanvas(canv_nobcvtxZ);
+  nobcvtxZ.hBCs->Draw("hist");
+  nobcvtxZ.hCol->Draw("hist same");
+  leg->Draw();
+  canv_nobcvtxZ->SaveAs("h_mc_nobcvtxZ.pdf");
+
   TCanvas* canv_ratio = new TCanvas("canv_ratio", "", 1600, 1000);
   styleCanvas(canv_ratio, false);
   base.hRatio->GetYaxis()->SetRangeUser(0, 2);
@@ -172,6 +190,8 @@ void drawLightIonMonteCarlo()
   nobc.hRatio->Draw("hist same");
   pileup.hRatio->Draw("hist same");
   nobcpileup.hRatio->Draw("hist same");
+  vtxZ.hRatio->Draw("hist same");
+  nobcvtxZ.hRatio->Draw("hist same");
   leg->Draw();
   canv_ratio->SaveAs("h_mc_ratio.pdf");
 
@@ -187,6 +207,8 @@ void drawLightIonMonteCarlo()
   nobc.hRatio_Zoom->Draw("hist same");
   pileup.hRatio_Zoom->Draw("hist same");
   nobcpileup.hRatio_Zoom->Draw("hist same");
+  vtxZ.hRatio_Zoom->Draw("hist same");
+  nobcvtxZ.hRatio_Zoom->Draw("hist same");
   leg->Draw();
   canv_ratio_zoom->SaveAs("h_mc_ratio_zoom.pdf");
 }

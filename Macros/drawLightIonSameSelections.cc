@@ -65,7 +65,7 @@ void styleCanvas(TCanvas* canv, bool log = true)
 struct CentralityStudy {
   CentralityStudy(const char* subwagon, int col0, int col1)
   {
-    TFile file("../AnalysisResults/LHC25ae_pass2_extra/AR_564374.root", "READ");
+    TFile file("../AnalysisResults/LHC25ae_pass2_extra2/AR_564374.root", "READ");
     if (file.IsZombie()) {
       std::cerr << "Could not open file!" << std::endl;
       return;
@@ -122,47 +122,65 @@ struct CentralityStudy {
 void drawLightIonSameSelections()
 {
   gStyle->SetOptStat(0);
-  ColorManager cm(4);
+  ColorManager cm(6);
   CentralityStudy base("", kBlack, cm.getColor(0));
   CentralityStudy nobc("_rejectnobc", kBlack, cm.getColor(1));
   CentralityStudy pileup("_rejectpileup", kBlack, cm.getColor(2));
   CentralityStudy nobcpileup("_rejectnobc_rejectpileup", kBlack, cm.getColor(3));
+  CentralityStudy vtxZ("_vtxZ", kBlack, cm.getColor(4));
+  CentralityStudy nobcvtxZ("_rejectnobc_vtxZ", kBlack, cm.getColor(5));
 
-  TLegend* leg = new TLegend(0.8, 0.4, 1.1, 0.6);
+  TLegend* leg = new TLegend(0.8, 0.35, 1.1, 0.65);
   leg->SetBorderSize(0);
   leg->SetFillColorAlpha(0, 0);
   leg->AddEntry(base.hCol, "base", "l");
   leg->AddEntry(nobc.hCol, "nobc", "l");
   leg->AddEntry(pileup.hCol, "pileup", "l");
   leg->AddEntry(nobcpileup.hCol, "nobcpileup", "l");
+  leg->AddEntry(vtxZ.hCol, "vtxZ", "l");
+  leg->AddEntry(nobcvtxZ.hCol, "nobcvtxZ", "l");
 
   TCanvas* canv_base = new TCanvas("canv_base", "", 1600, 1000);
   styleCanvas(canv_base);
   base.hBCs->Draw("hist");
   base.hCol->Draw("hist same");
   leg->Draw();
-  canv_base->SaveAs("h_base.pdf");
+  canv_base->SaveAs("h_data_base.pdf");
 
   TCanvas* canv_nobc = new TCanvas("canv_nobc", "", 1600, 1000);
   styleCanvas(canv_nobc);
   nobc.hBCs->Draw("hist");
   nobc.hCol->Draw("hist same");
   leg->Draw();
-  canv_nobc->SaveAs("h_mc_nobc.pdf");
+  canv_nobc->SaveAs("h_data_nobc.pdf");
 
   TCanvas* canv_pileup = new TCanvas("canv_pileup", "", 1600, 1000);
   styleCanvas(canv_pileup);
   pileup.hBCs->Draw("hist");
   pileup.hCol->Draw("hist same");
   leg->Draw();
-  canv_pileup->SaveAs("h_pileup.pdf");
+  canv_pileup->SaveAs("h_data_pileup.pdf");
 
   TCanvas* canv_nobcpileup = new TCanvas("canv_nobcpileup", "", 1600, 1000);
   styleCanvas(canv_nobcpileup);
   nobcpileup.hBCs->Draw("hist");
   nobcpileup.hCol->Draw("hist same");
   leg->Draw();
-  canv_nobcpileup->SaveAs("h_nobcpileup.pdf");
+  canv_nobcpileup->SaveAs("h_data_nobcpileup.pdf");
+
+  TCanvas* canv_vtxZ = new TCanvas("canv_vtxZ", "", 1600, 1000);
+  styleCanvas(canv_vtxZ);
+  vtxZ.hBCs->Draw("hist");
+  vtxZ.hCol->Draw("hist same");
+  leg->Draw();
+  canv_vtxZ->SaveAs("h_data_vtxZ.pdf");
+
+  TCanvas* canv_nobcvtxZ = new TCanvas("canv_nobcvtxZ", "", 1600, 1000);
+  styleCanvas(canv_nobcvtxZ);
+  nobcvtxZ.hBCs->Draw("hist");
+  nobcvtxZ.hCol->Draw("hist same");
+  leg->Draw();
+  canv_nobcvtxZ->SaveAs("h_data_nobcvtxZ.pdf");
 
   TCanvas* canv_ratio = new TCanvas("canv_ratio", "", 1600, 1000);
   styleCanvas(canv_ratio, false);
@@ -172,8 +190,10 @@ void drawLightIonSameSelections()
   nobc.hRatio->Draw("hist same");
   pileup.hRatio->Draw("hist same");
   nobcpileup.hRatio->Draw("hist same");
+  vtxZ.hRatio->Draw("hist same");
+  nobcvtxZ.hRatio->Draw("hist same");
   leg->Draw();
-  canv_ratio->SaveAs("h_ratio.pdf");
+  canv_ratio->SaveAs("h_data_ratio.pdf");
 
   // Zoomed-in version of the ratio plot: same curves, tighter y-axis window
   // around 1 so the differences between base/nobc/pileup/nobcpileup are
@@ -187,6 +207,8 @@ void drawLightIonSameSelections()
   nobc.hRatio_Zoom->Draw("hist same");
   pileup.hRatio_Zoom->Draw("hist same");
   nobcpileup.hRatio_Zoom->Draw("hist same");
+  vtxZ.hRatio_Zoom->Draw("hist same");
+  nobcvtxZ.hRatio_Zoom->Draw("hist same");
   leg->Draw();
-  canv_ratio_zoom->SaveAs("h_ratio_zoom.pdf");
+  canv_ratio_zoom->SaveAs("h_data_ratio_zoom.pdf");
 }
