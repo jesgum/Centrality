@@ -30,10 +30,7 @@ void runCalibrationMC(TString estimator = "FT0M", TString histogramName = "hFT0M
   std::vector<const char*> subwagons = {
     "",
     "_rejectpileup",
-    "_vtxZ",
-    "_rejectnobc",
-    "_rejectnobc_rejectpileup",
-    "_rejectnobc_vtxZ"
+    "_vtxZ"
   };
 
   for (const auto& subwagon : subwagons) {
@@ -144,8 +141,8 @@ void runCalibrationMC(TString estimator = "FT0M", TString histogramName = "hFT0M
 
       // perform supercalibration
 
-      lFitRangeMin = 200;
-      lFitRangeMax = 20000;
+      lFitRangeMin = 0;
+      lFitRangeMax = 15000;
 
       cout << "Using fit range [" << lFitRangeMin << ", " << lFitRangeMax << "]" << endl;
       TF1* f1 = new TF1("f1", "[0] + [1]*TMath::Power(x,[2])", lFitRangeMin, lFitRangeMax);
@@ -179,8 +176,8 @@ void runCalibrationMC(TString estimator = "FT0M", TString histogramName = "hFT0M
       leg3->SetColumnSeparation(0.001);
       leg3->AddEntry(hProfData, Form("Real Data, %i", runNumber), "l");
       leg3->AddEntry(hProfMC, Form("Monte Carlo, %i", runNumber), "l");
-      leg3->AddEntry(f1, Form("data fit: %.2f + %.3f#times(FT0C)^{%.3f}", f1->GetParameter(0), f1->GetParameter(1), f1->GetParameter(2)), "l");
-      leg3->AddEntry(f1mc, Form("mc fit: %.2f + %.3f#times(FT0C)^{%.3f}", f1mc->GetParameter(0), f1mc->GetParameter(1), f1mc->GetParameter(2)), "l");
+      leg3->AddEntry(f1, Form("data fit: %.2f + %.3f#times(FT0M)^{%.3f}", f1->GetParameter(0), f1->GetParameter(1), f1->GetParameter(2)), "l");
+      leg3->AddEntry(f1mc, Form("mc fit: %.2f + %.3f#times(FT0M)^{%.3f}", f1mc->GetParameter(0), f1mc->GetParameter(1), f1mc->GetParameter(2)), "l");
       leg3->AddEntry((TObject*)0x0, Form("1%% boundary in data: %.1f", xBoundFor1), "");
       leg3->Draw();
       c1->SaveAs(Form("mc/%s_superCalib_%i%s.pdf", estimator.Data(), runNumber, subwagon));
@@ -297,12 +294,12 @@ void runCalibrationMC(TString estimator = "FT0M", TString histogramName = "hFT0M
     hAmc->Draw("same");
     leg2a->Draw();
     c5->cd(2);
-    hB->GetYaxis()->SetRangeUser(0, 0.06);
+    hB->GetYaxis()->SetRangeUser(0, 0.03);
     hB->Draw();
     hBmc->Draw("same");
     leg2a->Draw();
     c5->cd(3);
-    hC->GetYaxis()->SetRangeUser(0.8, 1.2);
+    hC->GetYaxis()->SetRangeUser(0.85, 1.15);
     hC->Draw();
     hCmc->Draw("same");
     leg2a->Draw();
