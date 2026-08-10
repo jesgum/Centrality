@@ -42,6 +42,11 @@ struct Histos {
     hColScaledMc->Reset();
     hBcScaledMc->Reset();
 
+    hColMc->SetLineStyle(7);
+    hBcMc->SetLineStyle(7);
+    hColScaledMc->SetLineStyle(7);
+    hBcScaledMc->SetLineStyle(7);
+
     for (int ixpar = 0; ixpar < NParams; ++ixpar) {
       parameters[ixpar] = f1scale->GetParameter(ixpar);
     }
@@ -76,7 +81,7 @@ struct Histos {
     hColScaledMc->Rebin(Rebin);
     hBcScaledMc->Rebin(Rebin);
 
-    static std::array<int, 2> normRange = { 2000, 15000 };
+    static std::array<int, 2> normRange = { 2000, 12500 };
     auto styleHistogram = [this](TH1D* hist, int color) {
       std::array<int, 2> normBins = { hist->FindBin(normRange[0]), hist->FindBin(normRange[1]) };
       hist->SetLineColor(color);
@@ -114,6 +119,9 @@ struct Histos {
     hBcRatioMc = makeRatio(hBcMc, hBcData, "hBcRatioMc", kRed + 1);
     hColRatioScaledMc = makeRatio(hColScaledMc, hColData, "hColRatioScaledMc", kBlue + 1);
     hBcRatioScaledMc = makeRatio(hBcScaledMc, hBcData, "hBcRatioScaledMc", kBlue + 1);
+    hCollBcRatioData = makeRatio(hColData, hBcData, "hCollBcRatioData", kBlack);
+    hCollBcRatioMc = makeRatio(hColScaledMc, hBcScaledMc, "hCollBcRatioMc", kBlue + 1);
+
 
     // Zoomed variants: same content, restricted y-axis range around 1
     auto makeZoomed = [](TH1D* hSrc, const char* suffix) {
@@ -126,12 +134,8 @@ struct Histos {
     hBcRatioMcZoomed = makeZoomed(hBcRatioMc, "_Zoomed");
     hColRatioScaledMcZoomed = makeZoomed(hColRatioScaledMc, "_Zoomed");
     hBcRatioScaledMcZoomed = makeZoomed(hBcRatioScaledMc, "_Zoomed");
-
-    TLegend* legend = new TLegend(0.6, 0.7, 0.88, 0.88);
-    legend->SetBorderSize(0);
-    legend->AddEntry(hColData, "Data", "l");
-    legend->AddEntry(hColMc, "MC", "l");
-    legend->AddEntry(hColScaledMc, "MC (scaled)", "l");
+    hCollBcRatioDataZoom = makeZoomed(hCollBcRatioData, "_Zoomed");
+    hCollBcRatioMcZoom = makeZoomed(hCollBcRatioMc, "_Zoomed");
 
     auto styleCanvas = [](TCanvas* canv) {
       canv->SetTicks(1, 1);
@@ -141,13 +145,23 @@ struct Histos {
       canv->SetTopMargin(0.03);
     };
 
+    hColData->Smooth(Smooth);
+    hColMc->Smooth(Smooth);
+    hColScaledMc->Smooth(Smooth);
+    hBcData->Smooth(Smooth);
+    hBcMc->Smooth(Smooth);
+    hBcScaledMc->Smooth(Smooth);
+
+    TLegend* legend = new TLegend(0.6, 0.7, 0.88, 0.88);
+    legend->SetBorderSize(0);
+    legend->AddEntry(hColData, "Data", "l");
+    legend->AddEntry(hColMc, "MC", "l");
+    legend->AddEntry(hColScaledMc, "MC (scaled)", "l");
+
     TCanvas* canv_coll = new TCanvas(Form("canv_coll%s", key), "", 1200, 1000);
     styleCanvas(canv_coll);
     canv_coll->SetLogy();
     hColData->GetXaxis()->SetRangeUser(0, 31000);
-    hColData->Smooth(Smooth);
-    hColMc->Smooth(Smooth);
-    hColScaledMc->Smooth(Smooth);
     hColData->Draw("hist");
     hColMc->Draw("hist same");
     hColScaledMc->Draw("hist same");
@@ -159,9 +173,7 @@ struct Histos {
       styleCanvas(canv_bc);
       canv_bc->SetLogy();
       hBcData->GetXaxis()->SetRangeUser(0, 31000);
-      hBcData->Smooth(Smooth);
-      hBcMc->Smooth(Smooth);
-      hBcScaledMc->Smooth(Smooth);
+
       hBcData->Draw("hist");
       hBcMc->Draw("hist same");
       hBcScaledMc->Draw("hist same");
@@ -170,7 +182,7 @@ struct Histos {
     }
     
     // --- Ratio canvases: before (red) vs after (blue) scaling, overlaid on hline at 1 ---
-    auto drawRatioCanvas = [&styleCanvas](TH1D* hBefore, TH1D* hAfter, double xmax, const char* fname) {
+    auto drawRatioToMc = [&styleCanvas](TH1D* hBefore, TH1D* hAfter, double xmax, const char* fname) {
       TCanvas* c = new TCanvas(Form("canv_ratio_%s", fname), "", 1200, 1000);
       styleCanvas(c);
       hBefore->GetXaxis()->SetRangeUser(0, xmax);
@@ -192,16 +204,65 @@ struct Histos {
     
     hColRatioMc->GetYaxis()->SetRangeUser(0, 1.3);
     hColRatioMcZoomed->GetYaxis()->SetRangeUser(0.7, 1.3);
-    drawRatioCanvas(hColRatioMc, hColRatioScaledMc, 31000, Form("h_coll_ratio%s", key));
-    drawRatioCanvas(hColRatioMcZoomed, hColRatioScaledMcZoomed, 1000, Form("h_coll_ratio_zoomed%s", key));
+    drawRatioToMc(hColRatioMc, hColRatioScaledMc, 31000, Form("h_coll_ratio%s", key));
+    drawRatioToMc(hColRatioMcZoomed, hColRatioScaledMcZoomed, 1000, Form("h_coll_ratio_zoomed%s", key));
 
     if (drawBc) {
       hBcRatioMc->GetYaxis()->SetRangeUser(0, 1.3);
       hBcRatioMcZoomed->GetYaxis()->SetRangeUser(0.7, 1.3);
-      drawRatioCanvas(hBcRatioMc, hBcRatioScaledMc, 31000, Form("h_bc_ratio%s", key));
-      drawRatioCanvas(hBcRatioMcZoomed, hBcRatioScaledMcZoomed, 1000, Form("h_bc_ratio_zoomed%s", key));
+      drawRatioToMc(hBcRatioMc, hBcRatioScaledMc, 31000, Form("h_bc_ratio%s", key));
+      drawRatioToMc(hBcRatioMcZoomed, hBcRatioScaledMcZoomed, 1000, Form("h_bc_ratio_zoomed%s", key));
     }
-  }
+
+    auto drawRatioCollToBc = [&styleCanvas](TH1D* hColl, TH1D* hBc, double xmax, const char* fname) {
+      TCanvas* c = new TCanvas(Form("canv_ratio_%s", fname), "", 1200, 1000);
+      styleCanvas(c);
+      hColl->GetXaxis()->SetRangeUser(0, xmax);
+      hColl->Smooth(Smooth);
+      hBc->Smooth(Smooth);
+      hColl->Draw("hist");
+      hBc->Draw("hist same");
+      TLine* line = new TLine(0, 1, xmax, 1);
+      line->SetLineStyle(2);
+      line->SetLineColor(kGray + 2);
+      line->Draw("same");
+      TLegend* leg = new TLegend(0.16, 0.79, 0.44, 0.92);
+      leg->SetBorderSize(0);
+      leg->AddEntry(hColl, "Data", "l");
+      leg->AddEntry(hBc, "MC (scaled)", "l");
+      leg->Draw();
+      c->SaveAs(Form("%s.pdf", fname));
+    };
+
+    hCollBcRatioData->GetYaxis()->SetRangeUser(0, 2.3);
+    hCollBcRatioDataZoom->GetYaxis()->SetRangeUser(0, 1.15);
+    drawRatioCollToBc(hCollBcRatioData, hCollBcRatioMc, 31000, Form("h_ratio_coll_bc%s", key));
+    drawRatioCollToBc(hCollBcRatioDataZoom, hCollBcRatioMcZoom, 1000, Form("h_ratio_coll_bc_zoomed%s", key));
+
+    hColData->SetLineColor(kRed + 1);
+    hColScaledMc->SetLineColor(kRed + 1);
+    hBcData->SetLineColor(kBlue + 1);
+    hBcScaledMc->SetLineColor(kBlue + 1);
+
+    TLegend* legend_master = new TLegend(0.6, 0.7, 0.88, 0.88);
+    legend_master->SetBorderSize(0);
+    legend_master->AddEntry(hColData, "Data Coll", "l");
+    legend_master->AddEntry(hBcData, "Data Bc", "l");
+    legend_master->AddEntry(hColScaledMc, "Mc Coll (scaled)", "l");
+    legend_master->AddEntry(hBcScaledMc, "Mc Bc (scaled)", "l");
+
+    TCanvas* canv_master = new TCanvas(Form("canv_master%s", key), "", 1200, 1000);
+    styleCanvas(canv_master);
+    canv_master->SetLogy();
+    hColData->GetXaxis()->SetRangeUser(0, 35000);
+    hColData->GetYaxis()->SetRangeUser(1e-7, 1e-1);
+    hColData->Draw("hist");
+    hColScaledMc->Draw("hist same");
+    hBcData->Draw("hist same");
+    hBcScaledMc->Draw("hist same");
+    legend_master->Draw();
+    canv_master->SaveAs(Form("h_all%s.pdf", key));
+  } // Histos
 
   TFormula* f1scale = nullptr;
   float parameters[NParams] = { 0.0 };
@@ -224,6 +285,12 @@ struct Histos {
   TH1D* hBcRatioScaledMc = nullptr;
   TH1D* hColRatioScaledMcZoomed = nullptr;
   TH1D* hBcRatioScaledMcZoomed = nullptr;
+
+  // Ratios coll to BCs
+  TH1D* hCollBcRatioData = nullptr;
+  TH1D* hCollBcRatioMc = nullptr;
+  TH1D* hCollBcRatioDataZoom = nullptr;
+  TH1D* hCollBcRatioMcZoom = nullptr;
 };
 
 void drawCalibrationMC()
