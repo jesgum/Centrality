@@ -26,7 +26,14 @@ struct GlauberInfo {
 
     hData = (TH1F*)file->Get("hData");
     hGlauber = (TH1F*)file->Get("hGlauberFine");
-    mAnchorPoint = dynamic_cast<TH1F*>(file->Get("hAnchorPoint"))->GetBinContent(1);
+    TH1F* hAnchorPoint = (TH1F*)file->Get("hAnchorPoint");
+    if (!hAnchorPoint) {
+      throw std::runtime_error(Form("Cannot open histogram: hAnchorPoint for file: %s", path));
+    }
+
+    mAnchorPoint = hAnchorPoint->GetBinContent(1);
+    delete hAnchorPoint;
+
     mColor = color;
 
     if (!hData) {
@@ -333,9 +340,21 @@ void drawLightIonGlauberAnchorPoints()
 
   TCanvas* canvCol = makeCanvas("canvCol");
   drawGlauberSet(canvCol, col, "Collisions", anchorpointPercentage);
+  canvCol->cd();
+  TLatex* latCol = new TLatex();
+  latCol->SetNDC();
+  latCol->SetTextSize(0.04);
+  latCol->SetTextAlign(32);
+  latCol->DrawLatexNDC(0.97, 0.975, "Collisions");
   canvCol->SaveAs("hGlauberCol.pdf");
 
   TCanvas* canvBcs = makeCanvas("canvBcs");
   drawGlauberSet(canvBcs, bcs, "hFT0M_BCs", anchorpointPercentage);
+  canvBcs->cd();
+  TLatex* latBc = new TLatex();
+  latBc->SetNDC();
+  latBc->SetTextSize(0.04);
+  latBc->SetTextAlign(32);
+  latBc->DrawLatexNDC(0.97, 0.975, "Bunch crossings");
   canvBcs->SaveAs("hGlauberBcs.pdf");
 }
