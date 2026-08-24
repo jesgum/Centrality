@@ -36,7 +36,7 @@ OO_2025="${AR_PATH}LHC25ae_pass2/"
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbrw.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbrw\"\)&
 
 
-DO_NPART_NCOLL=kTRUE
+DO_NPART_NCOLL=kFALSE
 
 # root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\",${DO_NPART_NCOLL}\)&
 # root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\",${DO_NPART_NCOLL}\)&
@@ -69,15 +69,39 @@ DO_NPART_NCOLL=kTRUE
 
 #!/bin/bash
 
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,95,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,90,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,80,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,60,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,50,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,95,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,90,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,80,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,95,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,90,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,80,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,60,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,50,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,95,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,90,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,80,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,60,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,50,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+
+
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564356_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564359_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564373_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
 root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,60,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_BCs.root\"\,50,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564387_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564400_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564414_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564430_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564445_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564356_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564359_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564373_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564387_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564400_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564414_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564430_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564445_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
+
+
+wait
+echo "done"

@@ -41,15 +41,29 @@ OO_2025="${AR_PATH}LHC25ae_pass2/"
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbrw\"\)&
 
 ###  OO: Fitting BC vs collisions
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
 root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
-# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
-# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
-# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
-
-# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
-# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
-# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
-# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564387.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564400.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564414.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564430.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564445.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
 
 wait
+pingme "Collisions done"
+
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564387.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564400.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564414.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564430.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564445.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+
+wait
+pingme "Done!"
 echo "Done!"

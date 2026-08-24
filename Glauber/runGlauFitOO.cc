@@ -58,7 +58,7 @@ Double_t GetBoundaryForPercentile( TH1 *histo, Double_t lPercentileRequested ) {
   return lReturnValue;
 }
 
-void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString type = "hNPVContributors", TString histogramName = "hFT0C_BCs", TString nuclearProfile = "Oho2", float omega = 0.3){
+void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString type = "hNPVContributors", TString histogramName = "hFT0C_BCs", TString wagon = "", TString nuclearProfile = "Oho2", float omega = 0.3){
   cout<<"Starting!"<<endl;
   TFile *file = new TFile(lInputFileName.Data(), "READ");
   file->ls();
@@ -120,7 +120,7 @@ void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString 
   
   //hV0Mfine = (TH1F *) file -> Get(Form("centrality-study/Run_564359/%s", "hFT0C_Collisions"));
   // hV0Mfine = (TH1F *) file -> Get(Form("centrality-study/Run_%i/%s", runNumber, type.Data())); // hNPVContributors
-  hV0Mfine = (TH1F *) file -> Get(Form("centrality-study_bc_vtxZ/%s", histogramName.Data()));
+  hV0Mfine = (TH1F *) file -> Get(Form("centrality-study%s/%s", wagon.Data(), histogramName.Data()));
 
   hV0Mfine->SetTitle("");
   
