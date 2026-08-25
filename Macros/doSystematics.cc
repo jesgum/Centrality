@@ -229,8 +229,10 @@ void doSystematics()
   GlauberParameters run564414("LHC25ae_pass2/AR_564414_calibration_hFT0M_Collisions_LightIonDef.root");
   GlauberParameters run564430("LHC25ae_pass2/AR_564430_calibration_hFT0M_Collisions_LightIonDef.root");
   GlauberParameters run564445("LHC25ae_pass2/AR_564445_calibration_hFT0M_Collisions_LightIonDef.root");
-  std::vector<std::vector<float>> systRun = computeSystematics(base, { run564356, run564359, run564373, run564387, run564400, run564414, run564430, run564445 });
-  std::vector<std::vector<float>> relSystRun = computeRelativeSystematics(base, { run564356, run564359, run564373, run564387, run564400, run564414, run564430, run564445 });
+  std::vector<std::vector<float>> systRun = computeSystematics(base, { run564356 });
+  std::vector<std::vector<float>> relSystRun = computeRelativeSystematics(base, { run564356 });
+  // std::vector<std::vector<float>> systRun = computeSystematics(base, { run564356, run564359, run564373, run564387, run564400, run564414, run564430, run564445 });
+  // std::vector<std::vector<float>> relSystRun = computeRelativeSystematics(base, { run564356, run564359, run564373, run564387, run564400, run564414, run564430, run564445 });
 
   std::vector<std::vector<float>> systTotal = combineSystematicsInQuadrature(systAnchor, systBcs, systRun, systFT0C);
   std::vector<std::vector<float>> relSystTotal = combineSystematicsInQuadrature(relSystAnchor, relSystBcs, relSystRun, relSystFT0C);
@@ -368,29 +370,42 @@ void doSystematics()
   doGlauParQA(base.h2dNpart, hNpartFT0M, "BaseNpartFT0M");
   doGlauParQA(base.h2dNcoll, hNcollFT0M, "BaseNcollFT0M");
 
+  std::vector<float> errNpart;
+  std::vector<float> errNcoll;
+
+  const bool publishValues = true;
+  for (int ii = 0; ii < CentBins.size() - 1; ++ii) {
+    errNpart.push_back(NpartVal[ii] * relSystTotal[kNpart][ii]);
+    errNcoll.push_back(NcollVal[ii] * relSystTotal[kNcoll][ii]);
+    if (publishValues) {
+      std::cout << Form("%.f-%.f%% | Npart: %.2f +- %.2f | Ncoll: %.2f +- %.2f", CentBins[ii], CentBins[ii + 1], NpartVal[ii], errNpart[ii], NcollVal[ii], errNcoll[ii]) << std::endl;
+    }
+  }
+
+  TH1F* hOldNpartErr = initGlauParHist(NpartErr, "hOldNpartErr", kBlack);
+  TH1F* hNewNpartErr = initGlauParHist(errNpart, "hNewNpartErr", kBlue);
+  TH1F* hOldNcollErr = initGlauParHist(NcollErr, "hOldNcollErr", kBlack);
+  TH1F* hNewNcollErr = initGlauParHist(errNcoll, "hNewNcollErr", kBlue);
 
   TCanvas* canvNpart = new TCanvas("canvNpart", "", 1200, 1000);
-  hNpartFT0M->SetMaximum(30);
-  hNpartFT0M->Draw("hist same");
-  hNpartAnchor50->Draw("hist same");
-  hNpartAnchor60->Draw("hist same");
-  hNpartAnchor70->Draw("hist same");
-  hNpartAnchor80->Draw("hist same");
-  hNpartAnchor90->Draw("hist same");
-  hNpartBcs->Draw("hist same");
-  hNpartRun->Draw("hist same");
+  styleCanvas(canvNpart);
+  canvNpart->SetRightMargin(0.03);
+  styleHist(hOldNpartErr, "Uncertainty");
+  hOldNpartErr->SetMaximum(1.2);
+  hOldNpartErr->SetMinimum(0);
+  hOldNpartErr->Draw("hist");
+  hNewNpartErr->Draw("hist same");
   canvNpart->SaveAs("qaNpart.pdf");
-
+  
   TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 1000);
-  hNcollFT0M->SetMaximum(50);
-  hNcollFT0M->Draw("hist same");
-  hNcollAnchor50->Draw("hist same");
-  hNcollAnchor60->Draw("hist same");
-  hNcollAnchor70->Draw("hist same");
-  hNcollAnchor80->Draw("hist same");
-  hNcollAnchor90->Draw("hist same");
-  hNcollBcs->Draw("hist same");
-  hNcollRun->Draw("hist same");
+  styleCanvas(canvNcoll);
+  canvNcoll->SetRightMargin(0.03);
+  styleHist(hOldNcollErr, "Uncertainty");
+  hOldNcollErr->SetMaximum(3.3);
+  hOldNcollErr->SetMinimum(0);
+  hOldNcollErr->Draw("hist");
+  hNewNcollErr->Draw("hist same");
   canvNcoll->SaveAs("qaNcoll.pdf");
+
 
 }
