@@ -15,12 +15,11 @@ OO_2025=""
 # root.exe -q -b runGlauFitOO.cc\(\"../AnalysisResults/LHC25ae_pass2/AR_564445.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\,\"_bc_vtxZ\"\)&
 # root.exe -q -b runGlauFitOO.cc\(\"../AnalysisResults/LHC25ae_pass2_systematics/AR_564374.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\,\"\"\)&
 # root.exe -q -b runGlauFitOO.cc\(\"../AnalysisResults/LHC25ae_pass2_extra2/AR_564374.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\,\"\"\)&
-# root.exe -q -b runGlauFitOO.cc\(\"../AnalysisResults/LHC25ae_pass2/AR_564374.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+# root.exe -q -b runGlauFitOO.cc\(\"../AnalysisResults/LHC25ae_pass2/AR_564374.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\,\"\"\)&
 
-
-root.exe -q -b runGlauFitNeNe.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\,\"\"\)&
-root.exe -q -b runGlauFitNeNe.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564472.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\,\"\"\)&
-root.exe -q -b runGlauFitNeNe.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\)&
+# root.exe -q -b runGlauFitNeNe.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\,\"_evsel\"\)&
+# root.exe -q -b runGlauFitNeNe.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564472.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\,\"_evsel\"\)&
+# root.exe -q -b runGlauFitNeNe.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468.root\"\,\"hFT0M_BCs\"\,\"hFT0M_BCs\"\,\"\"\)&
 
 wait
 
@@ -45,11 +44,11 @@ root.exe -q -b runCalibrationLightIon.cc\(\"../AnalysisResults/LHC25af_pass2_sys
 # root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25ae_pass2/AR_564374_glauberNBD_hFT0M_Collisions.root\"\,80,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
 # root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25ae_pass2/AR_564374_glauberNBD_hFT0M_Collisions.root\"\,90,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
 
-root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_Collisions.root\"\,50,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_Collisions.root\"\,60,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_Collisions.root\"\,80,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_Collisions.root\"\,90,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_Collisions.root\"\,50,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_Collisions.root\"\,60,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_Collisions.root\"\,80,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_Collisions.root\"\,90,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
 
 # Comparison to Col with BC selections
 
@@ -60,11 +59,11 @@ root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics
 # root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25ae_pass2_systematics/AR_564374_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
 # root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25ae_pass2_systematics/AR_564374_glauberNBD_hFT0M_BCs.root\"\,80,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
 # root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25ae_pass2_systematics/AR_564374_glauberNBD_hFT0M_BCs.root\"\,90,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_BCs.root\"\,50,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_BCs.root\"\,60,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_BCs.root\"\,80,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
-root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_BCs.root\"\,90,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_BCs.root\"\,50,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_BCs.root\"\,60,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_BCs.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_BCs.root\"\,80,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
+# root.exe -q -b runCalibration.cc\(\"../AnalysisResults/LHC25af_pass2_systematics/AR_564468_glauberNBD_hFT0M_BCs.root\"\,90,200.0,${DO_NPART_NCOLL}\,\"basehistos_Ne_Ne_omega0.3\"\)&
 
 wait 
 echo "done"
