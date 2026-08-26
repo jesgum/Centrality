@@ -15,13 +15,25 @@
 #include "colorManager.h"
 #include "centralityHelper.h"
 
-static const std::vector<float> CentBins = { 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+
+// OO Npart              OO Ncoll      
+// 26.34     0.59        42.31     2.61
+// 24.08     0.69        35.82     2.70
+// 21.03     0.84        28.77     2.73
+// 16.88     0.89        20.58     2.35
+// 13.05     0.75        14.19     1.75
+// 9.88      0.61        9.64      1.22
+// 7.39      0.48        6.51      0.82
+// 5.51      0.36        4.41      0.54
+// 4.15      0.26        3.00      0.35
+// 3.17      0.23        2.07      0.26
+// 2.42      0.16        1.38      0.16
 static const std::vector<float> NpartVal = { 26.34, 24.08, 21.03, 16.88, 13.05, 9.88, 7.39, 5.51, 4.15, 3.17, 2.42 };
 static const std::vector<float> NpartErr = { 0.59, 0.69, 0.84, 0.89, 0.75, 0.61, 0.48, 0.36, 0.26, 0.23, 0.16 };
 static const std::vector<float> NpartRelErr = { 0.022399, 0.028654, 0.039943, 0.052720, 0.057463, 0.061743, 0.064954, 0.065336, 0.062651, 0.072555, 0.066116};
 static const std::vector<float> NcollVal = { 42.31, 35.82, 28.77, 20.58, 14.19, 9.64, 6.51, 4.41, 3.00, 2.07, 1.38 };
 static const std::vector<float> NcollErr = { 2.61, 2.70, 2.73, 2.35, 1.75, 1.22, 0.82, 0.54, 0.35, 0.26, 0.16 };
-static const std::vector<float> NcollRelErr = { 0.061688, 0.075377, 0.094876, 0.114188, 0.123326, 0.126535, 0.125960, 0.122473, 0.116667, 0.125604, 0.115942};
+
 static const std::vector<double> centBinsD(CentBins.begin(), CentBins.end());
 static TH1F* hNpartNcollBase = new TH1F("hhNpartNcollBase", "", static_cast<int>(centBinsD.size()) - 1, centBinsD.data());
 
@@ -193,7 +205,7 @@ void styleHist(TH1F* hist, const char* titleYaxis)
   hist->GetYaxis()->SetTitleOffset(1.45);
 }
 
-void doSystematics()
+void doSystematicsOO()
 {
   gStyle->SetOptStat(0);
   enum GlauberQuantity {
@@ -209,17 +221,26 @@ void doSystematics()
   std::vector<std::vector<float>> systFT0C = { NpartErr, NcollErr };
   std::vector<std::vector<float>> relSystFT0C = { NpartRelErr, NcollRelErr };
 
-  GlauberParameters bcs("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_LightIonDef.root");
-  std::vector<std::vector<float>> systBcs = computeSystematics(base, { bcs });
-  std::vector<std::vector<float>> relSystBcs = computeRelativeSystematics(base, { bcs });
+  GlauberParameters bcAnchor50("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor50.root");
+  GlauberParameters bcAnchor60("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor60.root");
+  GlauberParameters bcAnchor70("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor70.root");
+  GlauberParameters bcAnchor80("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor80.root");
+  GlauberParameters bcAnchor90("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor90.root");
+  // GlauberParameters bcAnchor70("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_LightIonDef.root");
+  std::vector<std::vector<float>> systBcs = computeSystematics(base, { bcAnchor70 });
+  std::vector<std::vector<float>> relSystBcs = computeRelativeSystematics(base, { bcAnchor70 });
+  // std::vector<std::vector<float>> systBcs = computeSystematics(base, { bcAnchor50, bcAnchor60, bcAnchor70, bcAnchor80, bcAnchor90 });
+  // std::vector<std::vector<float>> relSystBcs = computeRelativeSystematics(base, { bcAnchor50, bcAnchor60, bcAnchor70, bcAnchor80, bcAnchor90 });
 
-  GlauberParameters anchor50("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor50.root");
-  GlauberParameters anchor60("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor60.root");
-  GlauberParameters anchor70("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor70.root");
-  GlauberParameters anchor80("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor80.root");
-  GlauberParameters anchor90("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor90.root");
-  std::vector<std::vector<float>> systAnchor = computeSystematics(base, { anchor50, anchor60, anchor70, anchor80, anchor90 });
-  std::vector<std::vector<float>> relSystAnchor = computeRelativeSystematics(base, { anchor50, anchor60, anchor70, anchor80, anchor90 });
+  GlauberParameters colAnchor50("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor50.root");
+  GlauberParameters colAnchor60("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor60.root");
+  GlauberParameters colAnchor70("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor70.root");
+  GlauberParameters colAnchor80("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor80.root");
+  GlauberParameters colAnchor90("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor90.root");
+  std::vector<std::vector<float>> systAnchor = computeSystematics(base, { colAnchor70 });
+  std::vector<std::vector<float>> relSystAnchor = computeRelativeSystematics(base, { colAnchor70 });
+  // std::vector<std::vector<float>> systAnchor = computeSystematics(base, { colAnchor50, colAnchor60, colAnchor70, colAnchor80, colAnchor90 });
+  // std::vector<std::vector<float>> relSystAnchor = computeRelativeSystematics(base, { colAnchor50, colAnchor60, colAnchor70, colAnchor80, colAnchor90 });
 
   GlauberParameters run564356("LHC25ae_pass2/AR_564356_calibration_hFT0M_Collisions_LightIonDef.root");
   GlauberParameters run564359("LHC25ae_pass2/AR_564359_calibration_hFT0M_Collisions_LightIonDef.root");
@@ -272,9 +293,9 @@ void doSystematics()
   leg->SetFillColorAlpha(0, 0);
   leg->AddEntry(hSysTotalNpart, "Total", "l");
   leg->AddEntry(hSysShapeNpart, "Shape", "l");
-  leg->AddEntry(hSysAnchorNpart, "Anchor", "l");
+  leg->AddEntry(hSysAnchorNpart, "AnchCol", "l");
   leg->AddEntry(hSysRunNpart, "Run", "l");
-  leg->AddEntry(hSysBcsNpart, "Bcs", "l");
+  leg->AddEntry(hSysBcsNpart, "AnchBcs", "l");
 
   const bool drawShape = true;
   const bool drawAnchor = true;
@@ -350,22 +371,22 @@ void doSystematics()
   /* Extra QA */
   ColorManager cm2(7);
   TH1F* hNpartFT0M = initGlauParHist(base.npart, "hNpartFT0M", kBlue);
-  TH1F* hNpartAnchor50 = initGlauParHist(anchor50.npart, "hNpartAnchor50", cm2.getColor(0));
-  TH1F* hNpartAnchor60 = initGlauParHist(anchor60.npart, "hNpartAnchor60", cm2.getColor(1));
-  TH1F* hNpartAnchor70 = initGlauParHist(anchor70.npart, "hNpartAnchor70", cm2.getColor(2));
-  TH1F* hNpartAnchor80 = initGlauParHist(anchor80.npart, "hNpartAnchor80", cm2.getColor(3));
-  TH1F* hNpartAnchor90 = initGlauParHist(anchor90.npart, "hNpartAnchor90", cm2.getColor(4));
-  TH1F* hNpartBcs = initGlauParHist(bcs.npart, "hNpartBcs", cm2.getColor(5));
-  TH1F* hNpartRun = initGlauParHist(bcs.npart, "hNpartRun", cm2.getColor(6));
+  TH1F* hNpartAnchor50 = initGlauParHist(colAnchor50.npart, "hNpartAnchor50", cm2.getColor(0));
+  TH1F* hNpartAnchor60 = initGlauParHist(colAnchor60.npart, "hNpartAnchor60", cm2.getColor(1));
+  TH1F* hNpartAnchor70 = initGlauParHist(colAnchor70.npart, "hNpartAnchor70", cm2.getColor(2));
+  TH1F* hNpartAnchor80 = initGlauParHist(colAnchor80.npart, "hNpartAnchor80", cm2.getColor(3));
+  TH1F* hNpartAnchor90 = initGlauParHist(colAnchor90.npart, "hNpartAnchor90", cm2.getColor(4));
+  TH1F* hNpartBcs = initGlauParHist(bcAnchor70.npart, "hNpartBcs", cm2.getColor(5));
+  TH1F* hNpartRun = initGlauParHist(bcAnchor70.npart, "hNpartRun", cm2.getColor(6));
 
   TH1F* hNcollFT0M = initGlauParHist(base.ncoll, "hNcollFT0M", kBlue);
-  TH1F* hNcollAnchor50 = initGlauParHist(anchor50.ncoll, "hNcollAnchor50", cm2.getColor(0));
-  TH1F* hNcollAnchor60 = initGlauParHist(anchor60.ncoll, "hNcollAnchor60", cm2.getColor(1));
-  TH1F* hNcollAnchor70 = initGlauParHist(anchor70.ncoll, "hNcollAnchor70", cm2.getColor(2));
-  TH1F* hNcollAnchor80 = initGlauParHist(anchor80.ncoll, "hNcollAnchor80", cm2.getColor(3));
-  TH1F* hNcollAnchor90 = initGlauParHist(anchor90.ncoll, "hNcollAnchor90", cm2.getColor(4));
-  TH1F* hNcollBcs = initGlauParHist(bcs.ncoll, "hNcollBcs", cm2.getColor(5));
-  TH1F* hNcollRun = initGlauParHist(bcs.ncoll, "hNcollRun", cm2.getColor(6));
+  TH1F* hNcollAnchor50 = initGlauParHist(colAnchor50.ncoll, "hNcollAnchor50", cm2.getColor(0));
+  TH1F* hNcollAnchor60 = initGlauParHist(colAnchor60.ncoll, "hNcollAnchor60", cm2.getColor(1));
+  TH1F* hNcollAnchor70 = initGlauParHist(colAnchor70.ncoll, "hNcollAnchor70", cm2.getColor(2));
+  TH1F* hNcollAnchor80 = initGlauParHist(colAnchor80.ncoll, "hNcollAnchor80", cm2.getColor(3));
+  TH1F* hNcollAnchor90 = initGlauParHist(colAnchor90.ncoll, "hNcollAnchor90", cm2.getColor(4));
+  TH1F* hNcollBcs = initGlauParHist(bcAnchor70.ncoll, "hNcollBcs", cm2.getColor(5));
+  TH1F* hNcollRun = initGlauParHist(bcAnchor70.ncoll, "hNcollRun", cm2.getColor(6));
 
   doGlauParQA(base.h2dNpart, hNpartFT0M, "BaseNpartFT0M");
   doGlauParQA(base.h2dNcoll, hNcollFT0M, "BaseNcollFT0M");
@@ -373,12 +394,16 @@ void doSystematics()
   std::vector<float> errNpart;
   std::vector<float> errNcoll;
 
-  const bool publishValues = true;
+  const bool publishValues = false;
+  const bool publishCrossCheck = true;
   for (int ii = 0; ii < CentBins.size() - 1; ++ii) {
     errNpart.push_back(NpartVal[ii] * relSystTotal[kNpart][ii]);
     errNcoll.push_back(NcollVal[ii] * relSystTotal[kNcoll][ii]);
     if (publishValues) {
       std::cout << Form("%.f-%.f%% | Npart: %.2f +- %.2f | Ncoll: %.2f +- %.2f", CentBins[ii], CentBins[ii + 1], NpartVal[ii], errNpart[ii], NcollVal[ii], errNcoll[ii]) << std::endl;
+    }
+    if (publishCrossCheck) {
+      std::cout << Form("%.f-%.f%% | Npart: %.4f +- %.4f | Ncoll: %.4f +- %.4f", CentBins[ii], CentBins[ii + 1], errNpart[ii], systTotal[kNpart][ii], errNcoll[ii], systTotal[kNcoll][ii]) << std::endl;
     }
   }
 
