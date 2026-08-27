@@ -47,7 +47,6 @@ void doSystematicsOO()
   };
 
   syst::GlauberParameters base("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
-  syst::GlauberParameters baseFT0C("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
   std::vector<std::vector<float>> systFT0C = { NpartErr, NcollErr };
   std::vector<std::vector<float>> relSystFT0C = { NpartRelErr, NcollRelErr };
 
