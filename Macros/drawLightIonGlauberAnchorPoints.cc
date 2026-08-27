@@ -14,11 +14,15 @@
 
 #include "colorManager.h"
 
+static const bool doNeNe = false;
+
 struct GlauberInfo {
   TFile* file = nullptr;
   GlauberInfo(const char* hist, const int anchorPoint, const int color)
   {
-    const char* path = Form("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_%s_Anchor%d.root", hist, anchorPoint);
+    const char* pathOO = Form("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_%s_Anchor%d.root", hist, anchorPoint);
+    const char* pathNeNe = Form("../AnalysisResults/LHC25af_pass2_systematics/AR_564468_calibration_%s_Anchor%d.root", hist, anchorPoint);
+    const char* path = doNeNe ? pathNeNe : pathOO;
     file = TFile::Open(path, "READ");
     if (!file || file->IsZombie()) {
       throw std::runtime_error(std::string("Cannot open file: ") + path);
@@ -68,8 +72,8 @@ struct GlauberInfo {
     hDataClone->Rebin(rebin);
     hInsetGlauberClone->Rebin(rebin);
 
-    hRatio->Divide(hInsetGlauberClone, hDataClone, 1, 1, "B");
-    hInsetRatio->Divide(hInsetGlauber, hInsetData, 1, 1, "B");
+    hRatio->Divide(hDataClone, hInsetGlauberClone, 1, 1, "B");
+    hInsetRatio->Divide(hInsetData, hInsetGlauber, 1, 1, "B");
     delete hDataClone;
     delete hInsetGlauberClone;
   }
@@ -118,13 +122,13 @@ struct GlauberInfo {
 
 void drawGlauberSet(TCanvas* canv, std::vector<GlauberInfo>& info, const char* title, std::vector<int> anchor)
 {
-  const float xmax = 26000;
+  const float xmax = doNeNe ? 32000 : 26000;
   const float ymax = 5e+6;
   const float ratio_ymin = 0.6;
   const float ratio_ymax = 2.5;
 
   canv->cd(1);
-  TLegend* leg = new TLegend(0.76, 0.43, 0.98, 0.94);
+  TLegend* leg = new TLegend(0.76, 0.5, 0.98, 0.96);
   leg->SetBorderSize(0);
   leg->SetFillColorAlpha(0, 0);
 
@@ -199,7 +203,7 @@ void drawGlauberSet(TCanvas* canv, std::vector<GlauberInfo>& info, const char* t
     g.hRatio->GetYaxis()->SetLabelSize(0.05);
 
     g.hRatio->GetXaxis()->SetTitle("FT0M Amplitude");
-    g.hRatio->GetYaxis()->SetTitle("Fit / Data");
+    g.hRatio->GetYaxis()->SetTitle("Data / Fit");
 
     g.hRatio->GetXaxis()->SetTitleSize(0.06);
     g.hRatio->GetYaxis()->SetTitleSize(0.06);
@@ -228,6 +232,16 @@ void drawGlauberSet(TCanvas* canv, std::vector<GlauberInfo>& info, const char* t
   line->SetLineStyle(7);
   line->Draw();
 
+  TLegend* leg2 = new TLegend(0.2, 0.2, 0.45, 0.26);
+  leg2->SetBorderSize(0);
+  leg2->SetFillColorAlpha(0, 0);
+  TH1F* hAnchorLine = new TH1F();
+  hAnchorLine->SetLineColor(kBlack);
+  hAnchorLine->SetLineWidth(2);
+  hAnchorLine->SetLineStyle(7);
+  leg2->AddEntry(hAnchorLine, "Anchor point", "l");
+  leg2->Draw();
+
   TPad* padBot = new TPad("padBot", "", 0.23, 0.4, 0.58, 0.9);
   padBot->SetTopMargin(0.0);
   padBot->SetRightMargin(0.03);
@@ -249,7 +263,7 @@ void drawGlauberSet(TCanvas* canv, std::vector<GlauberInfo>& info, const char* t
     g.hInsetRatio->GetYaxis()->SetLabelSize(0.05);
 
     g.hInsetRatio->GetXaxis()->SetTitle("FT0M Amplitude");
-    g.hInsetRatio->GetYaxis()->SetTitle("Fit / Data");
+    g.hInsetRatio->GetYaxis()->SetTitle("Data / Fit");
 
     g.hInsetRatio->GetXaxis()->SetTitleSize(0.06);
     g.hInsetRatio->GetYaxis()->SetTitleSize(0.06);
@@ -320,8 +334,7 @@ void drawLightIonGlauberAnchorPoints()
   // };
 
   std::vector<int> anchorpointPercentage = {
-    95, 90, 80,
-    70, 60, 50
+    90, 80, 70, 60, 50
   };
   
   ColorManager cm(anchorpointPercentage.size());
@@ -346,7 +359,8 @@ void drawLightIonGlauberAnchorPoints()
   latCol->SetTextSize(0.04);
   latCol->SetTextAlign(32);
   latCol->DrawLatexNDC(0.97, 0.975, "Collisions");
-  canvCol->SaveAs("hGlauberCol.pdf");
+  if (doNeNe) canvCol->SaveAs("hGlauberCol_NeNe.pdf");
+  if (!doNeNe) canvCol->SaveAs("hGlauberCol_OO.pdf");
 
   TCanvas* canvBcs = makeCanvas("canvBcs");
   drawGlauberSet(canvBcs, bcs, "hFT0M_BCs", anchorpointPercentage);
@@ -356,5 +370,6 @@ void drawLightIonGlauberAnchorPoints()
   latBc->SetTextSize(0.04);
   latBc->SetTextAlign(32);
   latBc->DrawLatexNDC(0.97, 0.975, "Bunch crossings");
-  canvBcs->SaveAs("hGlauberBcs.pdf");
+  if (doNeNe) canvBcs->SaveAs("hGlauberBcs_NeNe.pdf");
+  if (!doNeNe) canvBcs->SaveAs("hGlauberBcs_OO.pdf");
 }

@@ -193,7 +193,7 @@ void styleHist(TH1F* hist, const char* titleYaxis)
   hist->GetYaxis()->SetTitleOffset(1.45);
 }
 
-void doSystematics()
+void drawLightIonNpartNcollVsRun()
 {
   gStyle->SetOptStat(0);
   enum GlauberQuantity {

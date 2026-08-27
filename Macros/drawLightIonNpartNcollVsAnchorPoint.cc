@@ -7,244 +7,103 @@
 #include "TLine.h"
 #include "TString.h"
 
+#include <cmath>
 #include <iostream>
 #include <vector>
 #include <string>
 
 #include "colorManager.h"
+#include "centralityHelper.h"
+#include "systematicsHelper.h"
 
-struct GlauberValue {
-  double value;
-  double error;
-};
-
-std::vector<GlauberValue> ooNpart = {
-  { 26.34, 0.59 },
-  { 24.08, 0.69 },
-  { 21.03, 0.84 },
-  { 16.88, 0.89 },
-  { 13.05, 0.75 },
-  { 9.88, 0.61 },
-  { 7.39, 0.48 },
-  { 5.51, 0.36 },
-  { 4.15, 0.26 },
-  { 3.17, 0.23 },
-  { 2.42, 0.16 }
-};
-
-std::vector<GlauberValue> ooNcoll = {
-  { 42.31, 2.61 },
-  { 35.82, 2.70 },
-  { 28.77, 2.73 },
-  { 20.58, 2.35 },
-  { 14.19, 1.75 },
-  { 9.64, 1.22 },
-  { 6.51, 0.82 },
-  { 4.41, 0.54 },
-  { 3.00, 0.35 },
-  { 2.07, 0.26 },
-  { 1.38, 0.16 }
-};
-
-std::vector<TH1F*> doNpartNcoll(const char* name, const int ap)
+void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* leg, const char* outfile, const char* titleYaxis = "<N_{part}>")
 {
-  Bool_t fixedMu = true;
-  Bool_t fixedK = true;
-  Int_t ancesterMode = 2;
-  Bool_t printNpartNcoll = false;
+  std::vector<std::pair<TH1F*, TH1F*>> runPairs;
+  TCanvas* canv = new TCanvas("canv", "", 1200, 800);
+  canv->SetTopMargin(0.0);
+  canv->SetBottomMargin(0.0);
 
-  TString dataset = "LHC25ae_pass2";
-  TString ar = "AR_564374";
-  TString filePath = Form("../AnalysisResults/%s/%s_calibration_%s_Anchor%d.root", dataset.Data(), ar.Data(), name, ap);
-  TFile* infile = new TFile(filePath.Data(), "read");
-
-  if (!infile || infile->IsZombie()) {
-    std::cerr << "Could not find " << filePath << std::endl;
-    return {};
+  TPad* padTop = new TPad("padTop", "", 0, 0.3, 1, 1);
+  padTop->SetTicks(1, 1);
+  padTop->SetTopMargin(0.04);
+  padTop->SetBottomMargin(0.02);
+  padTop->SetLeftMargin(0.1);
+  padTop->SetRightMargin(0.03);
+  padTop->Draw();
+  padTop->cd();
+  hBase->GetXaxis()->SetLabelSize(0);
+  hBase->GetYaxis()->SetLabelSize(0.05);
+  hBase->GetYaxis()->SetTitle(titleYaxis);
+  hBase->GetYaxis()->SetTitleSize(0.07);
+  hBase->GetYaxis()->SetTitleOffset(0.6);
+  hBase->Draw("pe");
+  for (const auto& hist : histos) {
+    hist->Draw("same pe");
+    runPairs.push_back({hist, hBase});
   }
+  leg->Draw();
 
-  TH2F* h2dNpart = dynamic_cast<TH2F*>(infile->Get("h2dNpart"));
-  TH2F* h2dNcoll = dynamic_cast<TH2F*>(infile->Get("h2dNcoll"));
+  canv->cd();
+  TPad* padBot = new TPad("padBot", "", 0, 0, 1, 0.3);
+  padBot->SetTicks(1, 1);
+  padBot->SetTopMargin(0.02);
+  padBot->SetBottomMargin(0.35);
+  padBot->SetLeftMargin(0.1);
+  padBot->SetRightMargin(0.03);
+  padBot->Draw();
+  padBot->cd();
 
-  if (!h2dNpart) {
-    std::cerr << "Error: h2dNpart not found or wrong type!" << std::endl;
-    return {};
-  }
+std::vector<TH1F*> hRatios;
+double globalMin = 1e9, globalMax = -1e9;
 
-  if (!h2dNcoll) {
-    std::cerr << "Error: h2dNcoll not found or wrong type!" << std::endl;
-    return {};
-  }
+  for (int i = 0; i < runPairs.size(); ++i) {
+    TH1F* hRatio = (TH1F*)runPairs[i].first->Clone(Form("hRatioNpart_%d", i));
+    hRatio->Divide(hRatio, runPairs[i].second, 1, 1, "B");
+    hRatio->SetTitle("");
+    hRatio->GetYaxis()->SetTitle("Ratio");
+    hRatio->GetXaxis()->SetTitle("Centrality (%)");
+    hRatio->GetYaxis()->SetNdivisions(505);
+    hRatio->GetYaxis()->SetTitleSize(0.12);
+    hRatio->GetYaxis()->SetTitleOffset(0.4);
+    hRatio->GetYaxis()->SetLabelSize(0.10);
+    hRatio->GetXaxis()->SetTitleSize(0.13);
+    hRatio->GetXaxis()->SetLabelSize(0.11);
 
-  h2dNpart->GetXaxis()->SetTitle("Centrality percentile (FT0M)");
-  h2dNcoll->GetXaxis()->SetTitle("Centrality percentile (FT0M)");
-  h2dNpart->GetXaxis()->SetTitleSize(0.045);
-  h2dNcoll->GetXaxis()->SetTitleSize(0.045);
-  h2dNpart->GetXaxis()->SetTitleOffset(1.05);
-  h2dNcoll->GetXaxis()->SetTitleOffset(1.05);
-  h2dNpart->GetYaxis()->SetTitle("N_{part}");
-  h2dNcoll->GetYaxis()->SetTitle("N_{coll}");
-  h2dNpart->GetYaxis()->SetTitleSize(0.05);
-  h2dNcoll->GetYaxis()->SetTitleSize(0.05);
-  h2dNpart->GetYaxis()->SetTitleOffset(1);
-  h2dNcoll->GetYaxis()->SetTitleOffset(1);
-
-  TH1F* hAvgNpart = new TH1F("hAvgNpart_local", "", 11, 0, 100);
-  TH1F* hAvgNcoll = new TH1F("hAvgNcoll_local", "", 11, 0, 100);
-
-  hAvgNpart->SetDirectory(0);
-  hAvgNcoll->SetDirectory(0);
-
-  hAvgNpart->SetMarkerStyle(kFullCircle);
-  hAvgNpart->SetMarkerColor(kBlack);
-  hAvgNcoll->SetMarkerStyle(kFullCircle);
-  hAvgNcoll->SetMarkerColor(kBlack);
-
-  if (printNpartNcoll) {
-    std::cout << " - - - cent - - - <Npart> - - - <Ncoll> - - - " << std::endl;
-  }
-
-  const std::vector<std::pair<int, int>> centRanges = {
-    { 0, 5 },
-    { 5, 10 },
-    { 10, 20 },
-    { 20, 30 },
-    { 30, 40 },
-    { 40, 50 },
-    { 50, 60 },
-    { 60, 70 },
-    { 70, 80 },
-    { 80, 90 },
-    { 90, 100 }
-  };
-
-  for (size_t icent = 0; icent < centRanges.size(); ++icent) {
-
-    int centMin = centRanges[icent].first;
-    int centMax = centRanges[icent].second;
-
-    // Convert percentile to histogram bins
-    int firstBin = centMin + 1;
-    int lastBin = centMax;
-
-    TH1D* hProjectionNpart = dynamic_cast<TH1D*>(
-      h2dNpart->ProjectionY(
-        Form("hProjectionNpart_%zu", icent),
-        firstBin,
-        lastBin));
-
-    TH1D* hProjectionNcoll = dynamic_cast<TH1D*>(
-      h2dNcoll->ProjectionY(
-        Form("hProjectionNcoll_%zu", icent),
-        firstBin,
-        lastBin));
-
-    hAvgNpart->SetBinContent(icent + 1, hProjectionNpart->GetMean());
-    hAvgNcoll->SetBinContent(icent + 1, hProjectionNcoll->GetMean());
-    hAvgNpart->SetBinError(icent + 1, hProjectionNpart->GetMeanError());
-    hAvgNcoll->SetBinError(icent + 1, hProjectionNcoll->GetMeanError());
-
-    if (printNpartNcoll) {
-      std::cout
-        << centMin << "-" << centMax << "% | "
-        << hProjectionNpart->GetMean() << " ± "
-        << hProjectionNpart->GetMeanError() << " | "
-        << hProjectionNcoll->GetMean() << " ± "
-        << hProjectionNcoll->GetMeanError()
-        << std::endl;
+    // scan bin content +/- error to get the true drawn extent
+    for (int b = 1; b <= hRatio->GetNbinsX(); ++b) {
+      double content = hRatio->GetBinContent(b);
+      double error   = hRatio->GetBinError(b);
+      if (content == 0 && error == 0) continue; // skip empty bins
+      double lo = content - error;
+      double hi = content + error;
+      if (lo < globalMin) globalMin = lo;
+      if (hi > globalMax) globalMax = hi;
     }
 
-    delete hProjectionNpart;
-    delete hProjectionNcoll;
+    hRatios.push_back(hRatio);
   }
 
-  TCanvas* canvNpart = new TCanvas("canvNpart", "", 1200, 800);
-  canvNpart->SetLogz();
-  canvNpart->SetTopMargin(0.03);
-  canvNpart->SetLeftMargin(0.1);
-  canvNpart->SetRightMargin(0.1);
-  canvNpart->SetBottomMargin(0.13);
-  h2dNpart->GetYaxis()->SetRangeUser(0, 35);
-  h2dNpart->Draw("colz");
-  hAvgNpart->Draw("pe same");
-  canvNpart->SaveAs(Form("h2dNpart_%sOO.pdf", name));
+  // add a bit of padding so points/error bars aren't flush with the pad edge
+  double margin = (globalMax - globalMin) * 0.1;
+  if (margin <= 0) margin = 0.01; // fallback in case all values are identical
+  globalMin -= margin;
+  globalMax += margin;
 
-  TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 800);
-  canvNcoll->SetLogz();
-  canvNcoll->SetTopMargin(0.03);
-  canvNcoll->SetLeftMargin(0.1);
-  canvNcoll->SetRightMargin(0.1);
-  canvNcoll->SetBottomMargin(0.13);
-  h2dNcoll->GetYaxis()->SetRangeUser(0, 100);
-  h2dNcoll->Draw("colz");
-  hAvgNcoll->Draw("pe same");
-  canvNcoll->SaveAs(Form("h2dNcoll_%sOO.pdf", name));
+  for (auto* hRatio : hRatios) {
+    hRatio->GetYaxis()->SetRangeUser(globalMin, globalMax);
+  }
 
-  delete canvNpart;
-  delete canvNcoll;
-  delete h2dNpart;
-  delete h2dNcoll;
-  infile->Close();
-  delete infile;
-  std::cout << std::endl;
-  return { hAvgNpart, hAvgNcoll };
+  hRatios[0]->Draw("pe");
+  for (int i = 1; i < runPairs.size(); ++i) hRatios[i]->Draw("pe same");
+
+  canv->SaveAs(outfile);
+  for (auto* hRatio : hRatios) delete hRatio;
+  hRatios.clear();
+  delete canv;
 }
-
-struct Histos {
-  Histos(std::vector<TH1F*> vec, const char* c)
-  {
-    histos = vec;
-    name = c;
-  }
-  void setColor(int color)
-  {
-    for (auto& hist : histos) {
-      hist->SetMarkerColor(color);
-      hist->SetLineColor(color);
-    }
-  }
-  void setMarker(int marker)
-  {
-    for (auto& hist : histos) {
-      hist->SetMarkerStyle(marker);
-    }
-  }
-
-  const char* name;
-  std::vector<TH1F*> histos;
-};
 
 void drawLightIonNpartNcollVsAnchorPoint()
 {
-  int cfgDraw = 0; // 0: BCs, 1: Collisions
-  TH1F* hAvgNpart = new TH1F("hAvgNpart_global", "", 11, 0, 100);
-  hAvgNpart->SetLineColor(kBlack);
-  hAvgNpart->SetMarkerColor(kBlack);
-  hAvgNpart->SetMarkerStyle(kFullCircle);
-  hAvgNpart->GetXaxis()->SetLabelSize(0);
-  hAvgNpart->GetYaxis()->SetLabelSize(0.045);
-  hAvgNpart->GetYaxis()->SetTitleSize(0.05);
-  hAvgNpart->GetYaxis()->SetTitle("Oxygen#minusOxygen <N_{part}>");
-  hAvgNpart->GetYaxis()->SetTitleOffset(0);
-  for (int bin = 0; bin < ooNpart.size(); ++bin) {
-    hAvgNpart->SetBinContent(bin + 1, ooNpart[bin].value);
-    hAvgNpart->SetBinError(bin + 1, ooNpart[bin].error);
-  }
-
-  TH1F* hAvgNcoll = new TH1F("hAvgNcoll_global", "", 11, 0, 100);
-  hAvgNcoll->SetLineColor(kBlack);
-  hAvgNcoll->SetMarkerColor(kBlack);
-  hAvgNcoll->SetMarkerStyle(kFullCircle);
-  hAvgNcoll->GetXaxis()->SetLabelSize(0);
-  hAvgNcoll->GetYaxis()->SetLabelSize(0.045);
-  hAvgNcoll->GetYaxis()->SetTitleSize(0.05);
-  hAvgNcoll->GetYaxis()->SetTitle("Oxygen#minusOxygen <N_{coll}>");
-  hAvgNcoll->GetYaxis()->SetTitleOffset(0);
-  for (int bin = 0; bin < ooNpart.size(); ++bin) {
-    hAvgNcoll->SetBinContent(bin + 1, ooNcoll[bin].value);
-    hAvgNcoll->SetBinError(bin + 1, ooNcoll[bin].error);
-  }
-
   gStyle->SetOptStat(0);
   enum GlauberQuantity {
     kNpart = 0,
@@ -254,191 +113,60 @@ void drawLightIonNpartNcollVsAnchorPoint()
     kB
   };
 
-  std::vector<Histos*> bcs, col;
-  std::vector<int> anchorpointPercentage = { 95, 90, 80, 70, 60, 50 };
+  // syst::GlauberParameters base("LHC25ae_pass2/calibOO.root");
+  syst::GlauberParameters base("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
+  syst::GlauberParameters col50("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor50.root");
+  syst::GlauberParameters col60("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor60.root");
+  syst::GlauberParameters col70("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor70.root");
+  syst::GlauberParameters col80("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor80.root");
+  syst::GlauberParameters col90("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor90.root");
+  syst::GlauberParameters bc50("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor50.root");
+  syst::GlauberParameters bc60("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor60.root");
+  syst::GlauberParameters bc70("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor70.root");
+  syst::GlauberParameters bc80("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor80.root");
+  syst::GlauberParameters bc90("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor90.root");
 
-  for (const auto& ap : anchorpointPercentage) {
-    bcs.push_back(new Histos(doNpartNcoll("hFT0M_BCs", ap), Form("%d", ap)));
-    col.push_back(new Histos(doNpartNcoll("hFT0M_Collisions", ap), Form("%d", ap)));
-  }
+  ColorManager cm3(5);
+  TH1F* hBaseNpart = syst::initGlauParHist(base.npart, "hBaseNpart", kBlack);
+  TH1F* hBaseNcoll = syst::initGlauParHist(base.ncoll, "hBaseNcoll", kBlack);
+  TH1F* hCol50Npart = syst::initGlauParHist(col50.npart, "hCol50Npart", cm3.getColor(0));
+  TH1F* hCol60Npart = syst::initGlauParHist(col60.npart, "hCol60Npart", cm3.getColor(1));
+  TH1F* hCol70Npart = syst::initGlauParHist(col70.npart, "hCol70Npart", cm3.getColor(2));
+  TH1F* hCol80Npart = syst::initGlauParHist(col80.npart, "hCol80Npart", cm3.getColor(3));
+  TH1F* hCol90Npart = syst::initGlauParHist(col90.npart, "hCol90Npart", cm3.getColor(4));
+  TH1F* hBc50Npart = syst::initGlauParHist(bc50.npart, "hBc50Npart", cm3.getColor(0));
+  TH1F* hBc60Npart = syst::initGlauParHist(bc60.npart, "hBc60Npart", cm3.getColor(1));
+  TH1F* hBc70Npart = syst::initGlauParHist(bc70.npart, "hBc70Npart", cm3.getColor(2));
+  TH1F* hBc80Npart = syst::initGlauParHist(bc80.npart, "hBc80Npart", cm3.getColor(3));
+  TH1F* hBc90Npart = syst::initGlauParHist(bc90.npart, "hBc90Npart", cm3.getColor(4));
+  TH1F* hCol50Ncoll = syst::initGlauParHist(col50.ncoll, "hCol50Ncoll", cm3.getColor(0));
+  TH1F* hCol60Ncoll = syst::initGlauParHist(col60.ncoll, "hCol60Ncoll", cm3.getColor(1));
+  TH1F* hCol70Ncoll = syst::initGlauParHist(col70.ncoll, "hCol70Ncoll", cm3.getColor(2));
+  TH1F* hCol80Ncoll = syst::initGlauParHist(col80.ncoll, "hCol80Ncoll", cm3.getColor(3));
+  TH1F* hCol90Ncoll = syst::initGlauParHist(col90.ncoll, "hCol90Ncoll", cm3.getColor(4));
+  TH1F* hBc50Ncoll = syst::initGlauParHist(bc50.ncoll, "hBc50Ncoll", cm3.getColor(0));
+  TH1F* hBc60Ncoll = syst::initGlauParHist(bc60.ncoll, "hBc60Ncoll", cm3.getColor(1));
+  TH1F* hBc70Ncoll = syst::initGlauParHist(bc70.ncoll, "hBc70Ncoll", cm3.getColor(2));
+  TH1F* hBc80Ncoll = syst::initGlauParHist(bc80.ncoll, "hBc80Ncoll", cm3.getColor(3));
+  TH1F* hBc90Ncoll = syst::initGlauParHist(bc90.ncoll, "hBc90Ncoll", cm3.getColor(4));
 
-  ColorManager cm(anchorpointPercentage.size());
-  for (int ii{ 0 }; ii < anchorpointPercentage.size(); ++ii) {
-    bcs[ii]->setColor(cm.getColor(ii));
-    col[ii]->setColor(cm.getColor(ii));
-    bcs[ii]->setMarker(kFullCircle);
-    col[ii]->setMarker(kFullCircle);
-  }
+  std::vector<TH1F*> hColNpart = { hCol50Npart, hCol60Npart, hCol70Npart, hCol80Npart, hCol90Npart };
+  std::vector<TH1F*> hBcNpart = { hBc50Npart, hBc60Npart, hBc70Npart, hBc80Npart, hBc90Npart };
+  std::vector<TH1F*> hColNcoll = { hCol50Ncoll, hCol60Ncoll, hCol70Ncoll, hCol80Ncoll, hCol90Ncoll };
+  std::vector<TH1F*> hBcNcoll = { hBc50Ncoll, hBc60Ncoll, hBc70Ncoll, hBc80Ncoll, hBc90Ncoll };
 
-  // === Canvas: Npart with ratio ===
-  TCanvas* canvNpart = new TCanvas("canvNpart", "", 1200, 800);
-  canvNpart->SetTopMargin(0.0);
-  canvNpart->SetBottomMargin(0.0);
+  TLegend* leg = new TLegend(0.75, 0.35, 0.95, 0.9);
+  leg->SetBorderSize(0);
+  leg->SetFillColorAlpha(0, 0);
+  leg->AddEntry(hBaseNpart, "Reference", "pl");
+  leg->AddEntry(hCol50Npart, "Anchor 50", "pl");
+  leg->AddEntry(hCol60Npart, "Anchor 60", "pl");
+  leg->AddEntry(hCol70Npart, "Anchor 70", "pl");
+  leg->AddEntry(hCol80Npart, "Anchor 80", "pl");
+  leg->AddEntry(hCol90Npart, "Anchor 90", "pl");
 
-  TPad* padNpartTop = new TPad("padNpartTop", "", 0, 0.3, 1, 1);
-  padNpartTop->SetTicks(1, 1);
-  padNpartTop->SetTopMargin(0.04);
-  padNpartTop->SetBottomMargin(0.02);
-  padNpartTop->SetLeftMargin(0.1);
-  padNpartTop->SetRightMargin(0.03);
-  padNpartTop->Draw();
-  padNpartTop->cd();
-  hAvgNpart->Draw("pe");
-  for (int ii{ 0 }; ii < anchorpointPercentage.size(); ++ii) {
-    if (cfgDraw == 0) bcs[ii]->histos[kNpart]->Draw("pe same");
-    if (cfgDraw == 1) col[ii]->histos[kNpart]->Draw("pe same");
-  }
-
-  TLegend* legAnchor = new TLegend(0.8, 0.48, 1.12, 0.94);
-  legAnchor->SetTextFont(42);
-  legAnchor->SetBorderSize(0);
-  legAnchor->SetFillColorAlpha(0, 0);
-  legAnchor->AddEntry(hAvgNpart, "Table", "pl");
-  for (int ii{ 0 }; ii < anchorpointPercentage.size(); ++ii) {
-    legAnchor->AddEntry(bcs[ii]->histos[kNpart], Form("%d%%", anchorpointPercentage[ii]), "pl");
-  }
-
-  TLegend* legHist = new TLegend(0.7, 0.77, 0.91, 0.94);
-  TH1F* hFullCircle = new TH1F();
-  TH1F* hFullSquare = new TH1F();
-  hFullCircle->SetMarkerStyle(kFullCircle);
-  hFullCircle->SetMarkerSize(2);
-  hFullCircle->SetMarkerColor(kBlack);
-  hFullSquare->SetMarkerStyle(kFullSquare);
-  hFullSquare->SetMarkerSize(2);
-  hFullSquare->SetMarkerColor(kBlack);
-  legHist->SetTextFont(42);
-  legHist->SetBorderSize(0);
-  legHist->SetFillColorAlpha(0, 0);
-  legHist->AddEntry(hFullCircle, "Coll", "p");
-  legHist->AddEntry(hFullSquare, "BCs", "p");
-
-  legAnchor->Draw();
-  // legHist->Draw();
-  canvNpart->cd();
-  TPad* padNpartBot = new TPad("padNpartBot", "", 0, 0, 1, 0.3);
-  padNpartBot->SetTicks(1, 1);
-  padNpartBot->SetTopMargin(0.02);
-  padNpartBot->SetBottomMargin(0.35);
-  padNpartBot->SetLeftMargin(0.1);
-  padNpartBot->SetRightMargin(0.03);
-  padNpartBot->Draw();
-  padNpartBot->cd();
-
-  bool first = true;
-  for (int ii{ 0 }; ii < anchorpointPercentage.size(); ++ii) {
-    TH1F* hRatioBcs = (TH1F*)bcs[ii]->histos[kNpart]->Clone(Form("hPartRatioBcs_%d", ii));
-    TH1F* hRatioCol = (TH1F*)col[ii]->histos[kNpart]->Clone(Form("hPartRatioCol_%d", ii));
-    hRatioBcs->Divide(hRatioBcs, hAvgNpart, 1, 1, "B");
-    hRatioCol->Divide(hRatioCol, hAvgNpart, 1, 1, "B");
-
-    if (first) {
-      hRatioBcs->SetTitle("");
-      hRatioBcs->GetYaxis()->SetTitle("");
-      hRatioBcs->GetYaxis()->SetNdivisions(505);
-      hRatioBcs->GetYaxis()->SetTitleSize(0.12);
-      hRatioBcs->GetYaxis()->SetRangeUser(0.89, 1.11);
-      hRatioBcs->GetYaxis()->SetTitleOffset(0.4);
-      hRatioBcs->GetXaxis()->SetTitle("FT0M Amplitude");
-      hRatioBcs->GetYaxis()->SetLabelSize(0.10);
-      hRatioBcs->GetXaxis()->SetTitleSize(0.13);
-      hRatioBcs->GetXaxis()->SetLabelSize(0.11);
-      hRatioCol->SetTitle("");
-      hRatioCol->GetYaxis()->SetTitle("");
-      hRatioCol->GetYaxis()->SetNdivisions(505);
-      hRatioCol->GetYaxis()->SetTitleSize(0.12);
-      hRatioCol->GetYaxis()->SetRangeUser(0.89, 1.11);
-      hRatioCol->GetYaxis()->SetTitleOffset(0.4);
-      hRatioCol->GetXaxis()->SetTitle("FT0M Amplitude");
-      hRatioCol->GetYaxis()->SetLabelSize(0.10);
-      hRatioCol->GetXaxis()->SetTitleSize(0.13);
-      hRatioCol->GetXaxis()->SetLabelSize(0.11);
-      if (cfgDraw == 0) hRatioBcs->Draw("pe");
-      if (cfgDraw == 1) hRatioCol->Draw("pe");
-      first = false;
-    } else {
-      if (cfgDraw == 0) hRatioBcs->Draw("pe same");
-      if (cfgDraw == 1) hRatioCol->Draw("pe same");
-    }
-  }
-  TLine* line = new TLine(0, 1, 100, 1);
-  line->SetLineColor(kGray+2);
-  line->SetLineStyle(7);
-  line->Draw();
-
-  // === Canvas: Ncoll with ratio ===
-  TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 800);
-  canvNcoll->SetTopMargin(0.0);
-  canvNcoll->SetBottomMargin(0.0);
-
-  TPad* padNcollTop = new TPad("padNcollTop", "", 0, 0.3, 1, 1);
-  padNcollTop->SetTicks(1, 1);
-  padNcollTop->SetTopMargin(0.04);
-  padNcollTop->SetBottomMargin(0.02);
-  padNcollTop->SetLeftMargin(0.1);
-  padNcollTop->SetRightMargin(0.03);
-  padNcollTop->Draw();
-  padNcollTop->cd();
-  hAvgNcoll->Draw("pe");
-  for (int ii{ 0 }; ii < anchorpointPercentage.size(); ++ii) {
-    if (cfgDraw == 0) bcs[ii]->histos[kNcoll]->Draw("pe same");
-    if (cfgDraw == 1) col[ii]->histos[kNcoll]->Draw("pe same");
-  }
-  legAnchor->Draw();
-
-  canvNcoll->cd();
-  TPad* padNcollBot = new TPad("padNcollBot", "", 0, 0, 1, 0.3);
-  padNcollBot->SetTicks(1, 1);
-  padNcollBot->SetTopMargin(0.02);
-  padNcollBot->SetBottomMargin(0.35);
-  padNcollBot->SetLeftMargin(0.1);
-  padNcollBot->SetRightMargin(0.03);
-  padNcollBot->Draw();
-  padNcollBot->cd();
-
-  first = true;
-  for (int ii{ 0 }; ii < anchorpointPercentage.size(); ++ii) {
-    TH1F* hRatioBcs = (TH1F*)bcs[ii]->histos[kNcoll]->Clone(Form("hCollRatioBcs_%d", ii));
-    TH1F* hRatioCol = (TH1F*)col[ii]->histos[kNcoll]->Clone(Form("hCollRatioCol_%d", ii));
-    hRatioBcs->Divide(hRatioBcs, hAvgNcoll, 1, 1, "B");
-    hRatioCol->Divide(hRatioCol, hAvgNcoll, 1, 1, "B");
-
-    if (first) {
-      hRatioBcs->SetTitle("");
-      hRatioBcs->GetYaxis()->SetTitle("");
-      hRatioBcs->GetYaxis()->SetNdivisions(505);
-      hRatioBcs->GetYaxis()->SetTitleSize(0.12);
-      hRatioBcs->GetYaxis()->SetRangeUser(0.81, 1.19);
-      hRatioBcs->GetYaxis()->SetTitleOffset(0.4);
-      hRatioBcs->GetXaxis()->SetTitle("FT0M Amplitude");
-      hRatioBcs->GetYaxis()->SetLabelSize(0.10);
-      hRatioBcs->GetXaxis()->SetTitleSize(0.13);
-      hRatioBcs->GetXaxis()->SetLabelSize(0.11);
-      hRatioCol->SetTitle("");
-      hRatioCol->GetYaxis()->SetTitle("");
-      hRatioCol->GetYaxis()->SetNdivisions(505);
-      hRatioCol->GetYaxis()->SetTitleSize(0.12);
-      hRatioCol->GetYaxis()->SetRangeUser(0.81, 1.19);
-      hRatioCol->GetYaxis()->SetTitleOffset(0.4);
-      hRatioCol->GetXaxis()->SetTitle("FT0M Amplitude");
-      hRatioCol->GetYaxis()->SetLabelSize(0.10);
-      hRatioCol->GetXaxis()->SetTitleSize(0.13);
-      hRatioCol->GetXaxis()->SetLabelSize(0.11);
-      if (cfgDraw == 0) hRatioBcs->Draw("pe");
-      if (cfgDraw == 1) hRatioCol->Draw("pe");
-      first = false;
-    } else {
-      if (cfgDraw == 0) hRatioBcs->Draw("pe same");
-      if (cfgDraw == 1) hRatioCol->Draw("pe same");
-    }
-  }
-  line->Draw();
-  if (cfgDraw == 0) {
-    canvNpart->SaveAs("hBCsAnchoredNpartOO.pdf");
-    canvNcoll->SaveAs("hBCsAnchoredNcollOO.pdf");
-  }
-  if (cfgDraw == 1) {
-    canvNpart->SaveAs("hColAnchoredNpartOO.pdf");
-    canvNcoll->SaveAs("hColAnchoredNcollOO.pdf");
-  }
+  doNpartNCollVsAnchorPoint(hBaseNpart, hColNpart, leg, "hColNpart.pdf", "<N_{part}>");
+  doNpartNCollVsAnchorPoint(hBaseNpart, hBcNpart, leg, "hBcNpart.pdf", "<N_{part}>");
+  doNpartNCollVsAnchorPoint(hBaseNcoll, hColNcoll, leg, "hColNcoll.pdf", "<N_{coll}>");
+  doNpartNCollVsAnchorPoint(hBaseNcoll, hBcNcoll, leg, "hBcNcoll.pdf", "<N_{coll}>");
 }
