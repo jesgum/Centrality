@@ -33,8 +33,13 @@ static const std::vector<float> NpartErr = { 0.70, 1.04, 1.07, 0.74, 0.51, 0.48,
 static const std::vector<float> NpartRelErr = { 0.021807, 0.035387, 0.042209, 0.037298, 0.034068, 0.043399, 0.053284, 0.051020, 0.034562, 0.046012, 0.057143 };
 static const std::vector<float> NcollVal = { 53.86, 45.18, 35.40, 24.36, 16.26, 10.73, 7.07, 4.68, 3.14, 2.13, 1.41 };
 static const std::vector<float> NcollErr = { 4.82, 4.42, 3.49, 2.21, 1.48, 1.08, 0.73, 0.43, 0.22, 0.18, 0.14 };
-
 static const std::vector<float> NcollRelErr = { 0.061688, 0.075377, 0.094876, 0.114188, 0.123326, 0.126535, 0.125960, 0.122473, 0.116667, 0.125604, 0.115942};
+// static const std::vector<float> NpartVal = { 12.60 };
+// static const std::vector<float> NpartErr = { 0.54 };
+// static const std::vector<float> NpartRelErr = { NpartErr[0] / NpartVal[0] };
+// static const std::vector<float> NcollVal = { 15.47 };
+// static const std::vector<float> NcollErr = { 1.43 };
+// static const std::vector<float> NcollRelErr = { NcollErr[0] / NcollVal[0] };
 
 
 void doSystematicsNeNe()
@@ -110,7 +115,7 @@ void doSystematicsNeNe()
   TH1F* hNcollFT0C = syst::initGlauParHist(NcollVal, "hNpartFT0C", kBlack);
 
 
-  TLegend* leg = new TLegend(0.82, 0.36, 1.12, 0.64);
+  TLegend* leg = new TLegend(0.18, 0.66, 0.43, 0.94);
   leg->SetBorderSize(0);
   leg->SetFillColorAlpha(0, 0);
   leg->AddEntry(hSysTotalNpart, "Total", "l");
@@ -141,6 +146,11 @@ void doSystematicsNeNe()
   const int canvWidth = 1600;
   const int canvHeight = 1000;
   
+  hRelSysTotalNpartCopy->SetMaximum(0.12);
+  hRelSysTotalNcollCopy->SetMaximum(0.2);
+  hRelSysTotalNpartCopy->SetMinimum(0);
+  hRelSysTotalNcollCopy->SetMinimum(0);
+
   TCanvas* canvNpartSystematics = new TCanvas("canvNpartSystematics", "", canvWidth, canvHeight);
   syst::styleCanvas(canvNpartSystematics);
   syst::styleHist(hSysTotalNpartCopy, "<N_{part}> systematic uncertainty");
@@ -216,8 +226,8 @@ void doSystematicsNeNe()
   std::vector<float> errNpart;
   std::vector<float> errNcoll;
 
-  const bool publishValues = false;
-  const bool publishCrossCheck = true;
+  const bool publishValues = true;
+  const bool publishCrossCheck = false;
   for (int ii = 0; ii < syst::CentBins.size() - 1; ++ii) {
     const float errNpartFT0C = NpartVal[ii] * relSystTotal[kNpart][ii];
     const float errNcollFT0C = NcollVal[ii] * relSystTotal[kNcoll][ii];
