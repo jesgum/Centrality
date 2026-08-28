@@ -12,9 +12,9 @@
 #include <vector>
 #include <string>
 
-#include "colorManager.h"
-#include "centralityHelper.h"
-#include "systematicsHelper.h"
+#include "Includes/colorManager.h"
+#include "Includes/centralityHelper.h"
+#include "Includes/systematicsHelper.h"
 
 //  NeNe Npart            NeNe Ncoll
 //  32.10    0.70         53.86    4.82
@@ -119,10 +119,10 @@ void doSystematicsNeNe()
   leg->SetBorderSize(0);
   leg->SetFillColorAlpha(0, 0);
   leg->AddEntry(hSysTotalNpart, "Total", "l");
-  leg->AddEntry(hSysShapeNpart, "Shape", "l");
-  leg->AddEntry(hSysAnchorNpart, "AnchCol", "l");
+  leg->AddEntry(hSysShapeNpart, "Nuclei shape", "l");
+  leg->AddEntry(hSysAnchorNpart, "Coll anchor 70%", "l");
+  leg->AddEntry(hSysBcsNpart, "Bc anchor 70%", "l");
   leg->AddEntry(hSysRunNpart, "Run", "l");
-  leg->AddEntry(hSysBcsNpart, "AnchBcs", "l");
 
   const bool drawShape = true;
   const bool drawAnchor = true;
@@ -185,7 +185,7 @@ void doSystematicsNeNe()
   if (drawBcs) hRelSysBcsNpart->Draw("hist same");
   if (drawTotal) hRelSysTotalNpart->Draw("hist same");
   leg->Draw();
-  canvRelNpartSystematics->SaveAs("hNpartRelSystematics_NeNe.pdf");
+  canvRelNpartSystematics->SaveAs("FiguresSystematics/hNpartRelSystematics_NeNe.pdf");
 
   TCanvas* canvRelNcollSystematics = new TCanvas("canvRelNcollSystematics", "", canvWidth, canvHeight);
   syst::styleCanvas(canvRelNcollSystematics);
@@ -197,7 +197,7 @@ void doSystematicsNeNe()
   if (drawBcs) hRelSysBcsNcoll->Draw("hist same");
   if (drawTotal) hRelSysTotalNcoll->Draw("hist same");
   leg->Draw();
-  canvRelNcollSystematics->SaveAs("hNcollRelSystematics_NeNe.pdf");
+  canvRelNcollSystematics->SaveAs("FiguresSystematics/hNcollRelSystematics_NeNe.pdf");
 
 
   /* Extra QA */

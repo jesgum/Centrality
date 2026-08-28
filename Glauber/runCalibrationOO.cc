@@ -1,5 +1,5 @@
 // void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root")
-void runCalibrationLightIon(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root", Bool_t doNpartNcoll = kFALSE) {
+void runCalibrationOO(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root", Bool_t doNpartNcoll = kFALSE) {
   TString nuclearProfile = "Oho2";
   // TString nuclearProfile = "Ne";
   float omega = 0.3;

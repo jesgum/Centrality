@@ -12,9 +12,9 @@
 #include <vector>
 #include <string>
 
-#include "colorManager.h"
-#include "centralityHelper.h"
-#include "systematicsHelper.h"
+#include "Includes/colorManager.h"
+#include "Includes/centralityHelper.h"
+#include "Includes/systematicsHelper.h"
 
 // OO Npart              OO Ncoll      
 // 26.34     0.59        42.31     2.61
@@ -193,7 +193,7 @@ void doSystematicsOO()
   if (drawBcs) hRelSysBcsNpart->Draw("hist same");
   if (drawTotal) hRelSysTotalNpart->Draw("hist same");
   leg->Draw();
-  canvRelNpartSystematics->SaveAs("hNpartRelSystematics_OO.pdf");
+  canvRelNpartSystematics->SaveAs("FiguresSystematics/hNpartRelSystematics_OO.pdf");
 
   TCanvas* canvRelNcollSystematics = new TCanvas("canvRelNcollSystematics", "", canvWidth, canvHeight);
   syst::styleCanvas(canvRelNcollSystematics);
@@ -205,7 +205,7 @@ void doSystematicsOO()
   if (drawBcs) hRelSysBcsNcoll->Draw("hist same");
   if (drawTotal) hRelSysTotalNcoll->Draw("hist same");
   leg->Draw();
-  canvRelNcollSystematics->SaveAs("hNcollRelSystematics_OO.pdf");
+  canvRelNcollSystematics->SaveAs("FiguresSystematics/hNcollRelSystematics_OO.pdf");
 
 
   /* Extra QA */

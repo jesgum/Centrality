@@ -12,9 +12,9 @@
 #include <vector>
 #include <string>
 
-#include "colorManager.h"
-#include "centralityHelper.h"
-#include "systematicsHelper.h"
+#include "Includes/colorManager.h"
+#include "Includes/centralityHelper.h"
+#include "Includes/systematicsHelper.h"
 
 void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* leg, const char* outfile, const char* titleYaxis = "<N_{part}>")
 {
@@ -126,17 +126,27 @@ void drawLightIonNpartNcollVsAnchorPoint()
   syst::GlauberParameters bc80("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor80.root");
   syst::GlauberParameters bc90("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor90.root");
 
-  syst::GlauberParameters baseNeNe("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
-  syst::GlauberParameters col50NeNe("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor50.root");
-  syst::GlauberParameters col60NeNe("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor60.root");
-  syst::GlauberParameters col70NeNe("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor70.root");
-  syst::GlauberParameters col80NeNe("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor80.root");
-  syst::GlauberParameters col90NeNe("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor90.root");
-  syst::GlauberParameters bc50NeNe("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor50.root");
-  syst::GlauberParameters bc60NeNe("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor60.root");
-  syst::GlauberParameters bc70NeNe("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor70.root");
-  syst::GlauberParameters bc80NeNe("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor80.root");
-  syst::GlauberParameters bc90NeNe("LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_Anchor90.root");
+  syst::GlauberParameters baseNeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_LightIonDef.root");
+  syst::GlauberParameters col50NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor50.root");
+  syst::GlauberParameters col60NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor60.root");
+  syst::GlauberParameters col70NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor70.root");
+  syst::GlauberParameters col80NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor80.root");
+  syst::GlauberParameters col90NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor90.root");
+  syst::GlauberParameters col91NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor91.root");
+  syst::GlauberParameters col92NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor92.root");
+  syst::GlauberParameters col93NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor93.root");
+  syst::GlauberParameters col94NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor94.root");
+  syst::GlauberParameters col95NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor95.root");
+  syst::GlauberParameters col96NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor96.root");
+  syst::GlauberParameters col97NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor97.root");
+  syst::GlauberParameters col98NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor98.root");
+  syst::GlauberParameters col99NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_Collisions_Anchor99.root");
+
+  syst::GlauberParameters bc50NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_BCs_Anchor50.root");
+  syst::GlauberParameters bc60NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_BCs_Anchor60.root");
+  syst::GlauberParameters bc70NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_BCs_Anchor70.root");
+  syst::GlauberParameters bc80NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_BCs_Anchor80.root");
+  syst::GlauberParameters bc90NeNe("LHC25af_pass2_systematics/AR_564468_calibration_hFT0M_BCs_Anchor90.root");
 
   ColorManager cm3(5);
   TH1F* hBaseNpart = syst::initGlauParHist(base.npart, "hBaseNpart", kBlack);
@@ -203,12 +213,69 @@ void drawLightIonNpartNcollVsAnchorPoint()
   leg->AddEntry(hCol80Npart, "Anchor 80", "pl");
   leg->AddEntry(hCol90Npart, "Anchor 90", "pl");
 
-  doNpartNCollVsAnchorPoint(hBaseNpart, hColNpart, leg, "hColNpart.pdf", "<N_{part}>");
-  doNpartNCollVsAnchorPoint(hBaseNpart, hBcNpart, leg, "hBcNpart.pdf", "<N_{part}>");
-  doNpartNCollVsAnchorPoint(hBaseNcoll, hColNcoll, leg, "hColNcoll.pdf", "<N_{coll}>");
-  doNpartNCollVsAnchorPoint(hBaseNcoll, hBcNcoll, leg, "hBcNcoll.pdf", "<N_{coll}>");
-  doNpartNCollVsAnchorPoint(hBaseNpartNeNe, hColNpartNeNe, leg, "hColNpartNeNe.pdf", "<N_{part}>");
-  doNpartNCollVsAnchorPoint(hBaseNpartNeNe, hBcNpartNeNe, leg, "hBcNpartNeNe.pdf", "<N_{part}>");
-  doNpartNCollVsAnchorPoint(hBaseNcollNeNe, hColNcollNeNe, leg, "hColNcollNeNe.pdf", "<N_{coll}>");
-  doNpartNCollVsAnchorPoint(hBaseNcollNeNe, hBcNcollNeNe, leg, "hBcNcollNeNe.pdf", "<N_{coll}>");
+  doNpartNCollVsAnchorPoint(hBaseNpart, hColNpart, leg, "FiguresSystematics/hColNpart.pdf", "<N_{part}>");
+  doNpartNCollVsAnchorPoint(hBaseNpart, hBcNpart, leg, "FiguresSystematics/hBcNpart.pdf", "<N_{part}>");
+  doNpartNCollVsAnchorPoint(hBaseNcoll, hColNcoll, leg, "FiguresSystematics/hColNcoll.pdf", "<N_{coll}>");
+  doNpartNCollVsAnchorPoint(hBaseNcoll, hBcNcoll, leg, "FiguresSystematics/hBcNcoll.pdf", "<N_{coll}>");
+  doNpartNCollVsAnchorPoint(hBaseNpartNeNe, hColNpartNeNe, leg, "FiguresSystematics/hColNpartNeNe.pdf", "<N_{part}>");
+  doNpartNCollVsAnchorPoint(hBaseNpartNeNe, hBcNpartNeNe, leg, "FiguresSystematics/hBcNpartNeNe.pdf", "<N_{part}>");
+  doNpartNCollVsAnchorPoint(hBaseNcollNeNe, hColNcollNeNe, leg, "FiguresSystematics/hColNcollNeNe.pdf", "<N_{coll}>");
+  doNpartNCollVsAnchorPoint(hBaseNcollNeNe, hBcNcollNeNe, leg, "FiguresSystematics/hBcNcollNeNe.pdf", "<N_{coll}>");
+
+  ColorManager cm4(14);
+  TH1F* hCol50NpartNeNeExtra = syst::initGlauParHist(col50NeNe.npart, "hCol50NpartNeNeExtra", cm4.getColor(0));
+  TH1F* hCol60NpartNeNeExtra = syst::initGlauParHist(col60NeNe.npart, "hCol60NpartNeNeExtra", cm4.getColor(1));
+  TH1F* hCol70NpartNeNeExtra = syst::initGlauParHist(col70NeNe.npart, "hCol70NpartNeNeExtra", cm4.getColor(2));
+  TH1F* hCol80NpartNeNeExtra = syst::initGlauParHist(col80NeNe.npart, "hCol80NpartNeNeExtra", cm4.getColor(3));
+  TH1F* hCol90NpartNeNeExtra = syst::initGlauParHist(col90NeNe.npart, "hCol90NpartNeNeExtra", cm4.getColor(4));
+  TH1F* hCol91NpartNeNeExtra = syst::initGlauParHist(col91NeNe.npart, "hCol91NpartNeNeExtra", cm4.getColor(5));
+  TH1F* hCol92NpartNeNeExtra = syst::initGlauParHist(col92NeNe.npart, "hCol92NpartNeNeExtra", cm4.getColor(6));
+  TH1F* hCol93NpartNeNeExtra = syst::initGlauParHist(col93NeNe.npart, "hCol93NpartNeNeExtra", cm4.getColor(7));
+  TH1F* hCol94NpartNeNeExtra = syst::initGlauParHist(col94NeNe.npart, "hCol94NpartNeNeExtra", cm4.getColor(8));
+  TH1F* hCol95NpartNeNeExtra = syst::initGlauParHist(col95NeNe.npart, "hCol95NpartNeNeExtra", cm4.getColor(9));
+  TH1F* hCol96NpartNeNeExtra = syst::initGlauParHist(col96NeNe.npart, "hCol96NpartNeNeExtra", cm4.getColor(10));
+  TH1F* hCol97NpartNeNeExtra = syst::initGlauParHist(col97NeNe.npart, "hCol97NpartNeNeExtra", cm4.getColor(11));
+  TH1F* hCol98NpartNeNeExtra = syst::initGlauParHist(col98NeNe.npart, "hCol98NpartNeNeExtra", cm4.getColor(12));
+  TH1F* hCol99NpartNeNeExtra = syst::initGlauParHist(col99NeNe.npart, "hCol99NpartNeNeExtra", cm4.getColor(13));
+
+  TH1F* hCol50NcollNeNeExtra = syst::initGlauParHist(col50NeNe.ncoll, "hCol50NcollNeNeExtra", cm4.getColor(0));
+  TH1F* hCol60NcollNeNeExtra = syst::initGlauParHist(col60NeNe.ncoll, "hCol60NcollNeNeExtra", cm4.getColor(1));
+  TH1F* hCol70NcollNeNeExtra = syst::initGlauParHist(col70NeNe.ncoll, "hCol70NcollNeNeExtra", cm4.getColor(2));
+  TH1F* hCol80NcollNeNeExtra = syst::initGlauParHist(col80NeNe.ncoll, "hCol80NcollNeNeExtra", cm4.getColor(3));
+  TH1F* hCol90NcollNeNeExtra = syst::initGlauParHist(col90NeNe.ncoll, "hCol90NcollNeNeExtra", cm4.getColor(4));
+  TH1F* hCol91NcollNeNeExtra = syst::initGlauParHist(col91NeNe.ncoll, "hCol91NcollNeNeExtra", cm4.getColor(5));
+  TH1F* hCol92NcollNeNeExtra = syst::initGlauParHist(col92NeNe.ncoll, "hCol92NcollNeNeExtra", cm4.getColor(6));
+  TH1F* hCol93NcollNeNeExtra = syst::initGlauParHist(col93NeNe.ncoll, "hCol93NcollNeNeExtra", cm4.getColor(7));
+  TH1F* hCol94NcollNeNeExtra = syst::initGlauParHist(col94NeNe.ncoll, "hCol94NcollNeNeExtra", cm4.getColor(8));
+  TH1F* hCol95NcollNeNeExtra = syst::initGlauParHist(col95NeNe.ncoll, "hCol95NcollNeNeExtra", cm4.getColor(9));
+  TH1F* hCol96NcollNeNeExtra = syst::initGlauParHist(col96NeNe.ncoll, "hCol96NcollNeNeExtra", cm4.getColor(10));
+  TH1F* hCol97NcollNeNeExtra = syst::initGlauParHist(col97NeNe.ncoll, "hCol97NcollNeNeExtra", cm4.getColor(11));
+  TH1F* hCol98NcollNeNeExtra = syst::initGlauParHist(col98NeNe.ncoll, "hCol98NcollNeNeExtra", cm4.getColor(12));
+  TH1F* hCol99NcollNeNeExtra = syst::initGlauParHist(col99NeNe.ncoll, "hCol99NcollNeNeExtra", cm4.getColor(13));
+
+
+  TLegend* leg2 = new TLegend(0.75, 0.35, 0.95, 0.9);
+  leg2->SetBorderSize(0);
+  leg2->SetFillColorAlpha(0, 0);
+  leg2->AddEntry(hBaseNpart, "Reference", "pl");
+  leg2->AddEntry(hCol50NpartNeNeExtra, "Anchor 50", "pl");
+  leg2->AddEntry(hCol60NpartNeNeExtra, "Anchor 60", "pl");
+  leg2->AddEntry(hCol70NpartNeNeExtra, "Anchor 70", "pl");
+  leg2->AddEntry(hCol80NpartNeNeExtra, "Anchor 80", "pl");
+  leg2->AddEntry(hCol90NpartNeNeExtra, "Anchor 90", "pl");
+  leg2->AddEntry(hCol91NpartNeNeExtra, "Anchor 91", "pl");
+  leg2->AddEntry(hCol92NpartNeNeExtra, "Anchor 92", "pl");
+  leg2->AddEntry(hCol93NpartNeNeExtra, "Anchor 93", "pl");
+  leg2->AddEntry(hCol94NpartNeNeExtra, "Anchor 94", "pl");
+  leg2->AddEntry(hCol95NpartNeNeExtra, "Anchor 95", "pl");
+  leg2->AddEntry(hCol96NpartNeNeExtra, "Anchor 96", "pl");
+  leg2->AddEntry(hCol97NpartNeNeExtra, "Anchor 97", "pl");
+  leg2->AddEntry(hCol98NpartNeNeExtra, "Anchor 98", "pl");
+  leg2->AddEntry(hCol99NpartNeNeExtra, "Anchor 99", "pl");
+
+  std::vector<TH1F*> hColNpartNeNeExtra = { hCol50NpartNeNeExtra, hCol60NpartNeNeExtra, hCol70NpartNeNeExtra, hCol80NpartNeNeExtra, hCol90NpartNeNeExtra, hCol91NpartNeNeExtra, hCol92NpartNeNeExtra, hCol93NpartNeNeExtra, hCol94NpartNeNeExtra, hCol95NpartNeNeExtra, hCol96NpartNeNeExtra, hCol97NpartNeNeExtra, hCol98NpartNeNeExtra, hCol99NpartNeNeExtra };
+  std::vector<TH1F*> hColNcollNeNeExtra = { hCol50NcollNeNeExtra, hCol60NcollNeNeExtra, hCol70NcollNeNeExtra, hCol80NcollNeNeExtra, hCol90NcollNeNeExtra, hCol91NcollNeNeExtra, hCol92NcollNeNeExtra, hCol93NcollNeNeExtra, hCol94NcollNeNeExtra, hCol95NcollNeNeExtra, hCol96NcollNeNeExtra, hCol97NcollNeNeExtra, hCol98NcollNeNeExtra, hCol99NcollNeNeExtra };
+
+  doNpartNCollVsAnchorPoint(hBaseNpartNeNe, hColNpartNeNeExtra, leg2, "hColNcollNeNeExtra.pdf", "<N_{coll}>");
+  doNpartNCollVsAnchorPoint(hBaseNcollNeNe, hColNcollNeNeExtra, leg2, "hcolNpartNeNeExtra.pdf", "<N_{part}>");
 }

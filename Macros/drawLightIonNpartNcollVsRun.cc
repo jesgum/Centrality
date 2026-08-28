@@ -12,9 +12,9 @@
 #include <vector>
 #include <string>
 
-#include "colorManager.h"
-#include "centralityHelper.h"
-#include "systematicsHelper.h"
+#include "Includes/colorManager.h"
+#include "Includes/centralityHelper.h"
+#include "Includes/systematicsHelper.h"
 
 static const std::vector<float> NpartVal = { 26.34, 24.08, 21.03, 16.88, 13.05, 9.88, 7.39, 5.51, 4.15, 3.17, 2.42 };
 static const std::vector<float> NpartErr = { 0.59, 0.69, 0.84, 0.89, 0.75, 0.61, 0.48, 0.36, 0.26, 0.23, 0.16 };
@@ -183,9 +183,9 @@ void drawLightIonNpartNcollVsRun()
   legRunNeNe->AddEntry(hRun564468Npart, "564468 (Ref)", "pl");
   legRunNeNe->AddEntry(hRun564472Npart, "564472", "pl");
 
-  doNpartNCollVsAnchorPoint(hRun564374Npart, hColNpart, legRun, "hNpartOOVsRun.pdf", "<N_{part}>");
-  doNpartNCollVsAnchorPoint(hRun564374Ncoll, hColNcoll, legRun, "hNcollOOVsRun.pdf", "<N_{coll}>");
-  doNpartNCollVsAnchorPoint(hRun564468Npart, hColNpartNeNe, legRunNeNe, "hNpartNeNeVsRun.pdf", "<N_{part}>");
-  doNpartNCollVsAnchorPoint(hRun564468Ncoll, hColNcollNeNe, legRunNeNe, "hNcollNeNeVsRun.pdf", "<N_{coll}>");
+  doNpartNCollVsAnchorPoint(hRun564374Npart, hColNpart, legRun, "FiguresSystematics/hNpartOOVsRun.pdf", "<N_{part}>");
+  doNpartNCollVsAnchorPoint(hRun564374Ncoll, hColNcoll, legRun, "FiguresSystematics/hNcollOOVsRun.pdf", "<N_{coll}>");
+  doNpartNCollVsAnchorPoint(hRun564468Npart, hColNpartNeNe, legRunNeNe, "FiguresSystematics/hNpartNeNeVsRun.pdf", "<N_{part}>");
+  doNpartNCollVsAnchorPoint(hRun564468Ncoll, hColNcollNeNe, legRunNeNe, "FiguresSystematics/hNcollNeNeVsRun.pdf", "<N_{coll}>");
   
 }

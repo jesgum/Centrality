@@ -12,9 +12,9 @@
 #include <vector>
 #include <string>
 
-#include "colorManager.h"
+#include "Includes/colorManager.h"
 
-static const bool doNeNe = false;
+static bool doNeNe = false;
 
 struct GlauberInfo {
   TFile* file = nullptr;
@@ -316,8 +316,9 @@ TCanvas* makeCanvas(const char* title)
   return canv;
 }
 
-void drawLightIonGlauberAnchorPoints()
+void drawLightIonGlauberAnchorPoints(bool isNeNe = false)
 {
+  doNeNe = isNeNe;
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(0);
 
@@ -359,8 +360,8 @@ void drawLightIonGlauberAnchorPoints()
   latCol->SetTextSize(0.04);
   latCol->SetTextAlign(32);
   latCol->DrawLatexNDC(0.97, 0.975, "Collisions");
-  if (doNeNe) canvCol->SaveAs("hGlauberCol_NeNe.pdf");
-  if (!doNeNe) canvCol->SaveAs("hGlauberCol_OO.pdf");
+  if (doNeNe) canvCol->SaveAs("FiguresSystematics/hGlauberCol_NeNe.pdf");
+  if (!doNeNe) canvCol->SaveAs("FiguresSystematics/hGlauberCol_OO.pdf");
 
   TCanvas* canvBcs = makeCanvas("canvBcs");
   drawGlauberSet(canvBcs, bcs, "hFT0M_BCs", anchorpointPercentage);
@@ -370,6 +371,6 @@ void drawLightIonGlauberAnchorPoints()
   latBc->SetTextSize(0.04);
   latBc->SetTextAlign(32);
   latBc->DrawLatexNDC(0.97, 0.975, "Bunch crossings");
-  if (doNeNe) canvBcs->SaveAs("hGlauberBcs_NeNe.pdf");
-  if (!doNeNe) canvBcs->SaveAs("hGlauberBcs_OO.pdf");
+  if (doNeNe) canvBcs->SaveAs("FiguresSystematics/hGlauberBcs_NeNe.pdf");
+  if (!doNeNe) canvBcs->SaveAs("FiguresSystematics/hGlauberBcs_OO.pdf");
 }
