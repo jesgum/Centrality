@@ -25,3 +25,10 @@ https://cernbox.cern.ch/s/II69QOGcUaIUICu
   - [Improved Monte Carlo Glauber predictions at present and future nuclear colliders](https://arxiv.org/abs/1710.07098)
   - [Improved version of the PHOBOS Glauber Monte Carlo](https://arxiv.org/abs/1408.2549)
   - [The PHOBOS Glauber Monte Carlo](https://arxiv.org/abs/0805.4411)
+  - [User documentation](https://tglaubermc.hepforge.org/)
+  - [GitHub page](https://github.com/matplo/TGlauberMC)
+
+### Trento documentation links
+  - [Alternative ansatz to wounded nucleon and binary collision scaling in high-energy nuclear collisions](https://journals.aps.org/prc/abstract/10.1103/PhysRevC.92.011901)
+  - [User documentation](http://qcd.phy.duke.edu/trento/index.html)
+  - [GitHub page](https://github.com/Duke-QCD/trento)
