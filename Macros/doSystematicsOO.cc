@@ -34,6 +34,12 @@ static const std::vector<float> NpartRelErr = { 0.022399, 0.028654, 0.039943, 0.
 static const std::vector<float> NcollVal = { 42.31, 35.82, 28.77, 20.58, 14.19, 9.64, 6.51, 4.41, 3.00, 2.07, 1.38 };
 static const std::vector<float> NcollErr = { 2.61, 2.70, 2.73, 2.35, 1.75, 1.22, 0.82, 0.54, 0.35, 0.26, 0.16 };
 static const std::vector<float> NcollRelErr = { 0.061688, 0.075377, 0.094876, 0.114188, 0.123326, 0.126535, 0.125960, 0.122473, 0.116667, 0.125604, 0.115942};
+// static const std::vector<float> NpartVal = { 10.87 };
+// static const std::vector<float> NpartErr = { 0.62 };
+// static const std::vector<float> NpartRelErr = { NpartErr[0] / NpartVal[0] };
+// static const std::vector<float> NcollVal = { 12.96 };
+// static const std::vector<float> NcollErr = { 1.47 };
+// static const std::vector<float> NcollRelErr = { NcollErr[0] / NcollVal[0] };
 
 void doSystematicsOO()
 {
@@ -93,15 +99,15 @@ void doSystematicsOO()
   TH1F* hRelSysShapeNpart = syst::initGlauParHist(relSystFT0C[kNpart], "hRelSysShapeNpart", cm1.getColor(0));
   TH1F* hRelSysShapeNcoll = syst::initGlauParHist(relSystFT0C[kNcoll], "hRelSysShapeNcoll", cm1.getColor(0));
 
-  TH1F* hSysBcsNpart = syst::initGlauParHist(systBcs[kNpart], "hSysBcsNpart", cm1.getColor(1));
-  TH1F* hSysBcsNcoll = syst::initGlauParHist(systBcs[kNcoll], "hSysBcsNcoll", cm1.getColor(1));
-  TH1F* hRelSysBcsNpart = syst::initGlauParHist(relSystBcs[kNpart], "hRelSysBcsNpart", cm1.getColor(1));
-  TH1F* hRelSysBcsNcoll = syst::initGlauParHist(relSystBcs[kNcoll], "hRelSysBcsNcoll", cm1.getColor(1));
+  TH1F* hSysAnchorNpart = syst::initGlauParHist(systAnchor[kNpart], "hSysAnchorNpart", cm1.getColor(1));
+  TH1F* hSysAnchorNcoll = syst::initGlauParHist(systAnchor[kNcoll], "hSysAnchorNcoll", cm1.getColor(1));
+  TH1F* hRelSysAnchorNpart = syst::initGlauParHist(relSystAnchor[kNpart], "hRelSysAnchorNpart", cm1.getColor(1));
+  TH1F* hRelSysAnchorNcoll = syst::initGlauParHist(relSystAnchor[kNcoll], "hRelSysAnchorNcoll", cm1.getColor(1));
 
-  TH1F* hSysAnchorNpart = syst::initGlauParHist(systAnchor[kNpart], "hSysAnchorNpart", cm1.getColor(2));
-  TH1F* hSysAnchorNcoll = syst::initGlauParHist(systAnchor[kNcoll], "hSysAnchorNcoll", cm1.getColor(2));
-  TH1F* hRelSysAnchorNpart = syst::initGlauParHist(relSystAnchor[kNpart], "hRelSysAnchorNpart", cm1.getColor(2));
-  TH1F* hRelSysAnchorNcoll = syst::initGlauParHist(relSystAnchor[kNcoll], "hRelSysAnchorNcoll", cm1.getColor(2));
+  TH1F* hSysBcsNpart = syst::initGlauParHist(systBcs[kNpart], "hSysBcsNpart", cm1.getColor(2));
+  TH1F* hSysBcsNcoll = syst::initGlauParHist(systBcs[kNcoll], "hSysBcsNcoll", cm1.getColor(2));
+  TH1F* hRelSysBcsNpart = syst::initGlauParHist(relSystBcs[kNpart], "hRelSysBcsNpart", cm1.getColor(2));
+  TH1F* hRelSysBcsNcoll = syst::initGlauParHist(relSystBcs[kNcoll], "hRelSysBcsNcoll", cm1.getColor(2));
 
   TH1F* hSysRunNpart = syst::initGlauParHist(systRun[kNpart], "hSysRunNpart", cm1.getColor(3));
   TH1F* hSysRunNcoll = syst::initGlauParHist(systRun[kNcoll], "hSysRunNcoll", cm1.getColor(3));
@@ -117,19 +123,19 @@ void doSystematicsOO()
   TH1F* hNcollFT0C = syst::initGlauParHist(NcollVal, "hNpartFT0C", kBlack);
 
 
-  TLegend* leg = new TLegend(0.82, 0.36, 1.12, 0.64);
+  TLegend* leg = new TLegend(0.18, 0.66, 0.43, 0.94);
   leg->SetBorderSize(0);
   leg->SetFillColorAlpha(0, 0);
   leg->AddEntry(hSysTotalNpart, "Total", "l");
-  leg->AddEntry(hSysShapeNpart, "Shape", "l");
-  leg->AddEntry(hSysAnchorNpart, "AnchCol", "l");
+  leg->AddEntry(hSysShapeNpart, "Nuclei shape", "l");
+  leg->AddEntry(hSysAnchorNpart, "Coll anchor 70%", "l");
+  leg->AddEntry(hSysBcsNpart, "Bc anchor 70%", "l");
   leg->AddEntry(hSysRunNpart, "Run", "l");
-  leg->AddEntry(hSysBcsNpart, "AnchBcs", "l");
 
   const bool drawShape = true;
   const bool drawAnchor = true;
-  const bool drawRun = true;
   const bool drawBcs = true;
+  const bool drawRun = true;
   const bool drawTotal = true;
 
   TH1F* hSysTotalNpartCopy = dynamic_cast<TH1F*>(hSysTotalNpart->Clone("hSysTotalNpartCopy"));
@@ -148,6 +154,11 @@ void doSystematicsOO()
   const int canvWidth = 1600;
   const int canvHeight = 1000;
   
+  hRelSysTotalNpartCopy->SetMaximum(0.12);
+  hRelSysTotalNcollCopy->SetMaximum(0.2);
+  hRelSysTotalNpartCopy->SetMinimum(0);
+  hRelSysTotalNcollCopy->SetMinimum(0);
+
   TCanvas* canvNpartSystematics = new TCanvas("canvNpartSystematics", "", canvWidth, canvHeight);
   syst::styleCanvas(canvNpartSystematics);
   syst::styleHist(hSysTotalNpartCopy, "<N_{part}> systematic uncertainty");
@@ -223,8 +234,8 @@ void doSystematicsOO()
   std::vector<float> errNpart;
   std::vector<float> errNcoll;
 
-  const bool publishValues = false;
-  const bool publishCrossCheck = true;
+  const bool publishValues = true;
+  const bool publishCrossCheck = false;
   for (int ii = 0; ii < syst::CentBins.size() - 1; ++ii) {
     const float errNpartFT0C = NpartVal[ii] * relSystTotal[kNpart][ii];
     const float errNcollFT0C = NcollVal[ii] * relSystTotal[kNcoll][ii];
@@ -246,6 +257,12 @@ void doSystematicsOO()
   TH1F* hOldNcollErr = syst::initGlauParHist(NcollErr, "hOldNcollErr", kBlack);
   TH1F* hNewNcollErr = syst::initGlauParHist(errNcoll, "hNewNcollErr", kBlue);
 
+  TLegend* legSystematics = new TLegend(0.66, 0.7, 0.96, 0.9);
+  legSystematics->SetBorderSize(0);
+  legSystematics->SetFillColorAlpha(0, 0);
+  legSystematics->AddEntry(hOldNpartErr, "Previous", "l");
+  legSystematics->AddEntry(hNewNpartErr, "New", "l");
+
   TCanvas* canvNpart = new TCanvas("canvNpart", "", 1200, 1000);
   syst::styleCanvas(canvNpart);
   canvNpart->SetRightMargin(0.03);
@@ -254,6 +271,7 @@ void doSystematicsOO()
   hOldNpartErr->SetMinimum(0);
   hOldNpartErr->Draw("hist");
   hNewNpartErr->Draw("hist same");
+  legSystematics->Draw();
   canvNpart->SaveAs("qaNpart_OO.pdf");
   
   TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 1000);
@@ -264,5 +282,6 @@ void doSystematicsOO()
   hOldNcollErr->SetMinimum(0);
   hOldNcollErr->Draw("hist");
   hNewNcollErr->Draw("hist same");
+  legSystematics->Draw();
   canvNcoll->SaveAs("qaNcoll_OO.pdf");
 }

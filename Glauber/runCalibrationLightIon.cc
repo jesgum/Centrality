@@ -1,6 +1,7 @@
 // void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root")
 void runCalibrationLightIon(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root", Bool_t doNpartNcoll = kFALSE) {
-  TString nuclearProfile = "Ne";
+  TString nuclearProfile = "Oho2";
+  // TString nuclearProfile = "Ne";
   float omega = 0.3;
   TFile *file = new TFile(lInputFileName.Data(), "READ");
   file->ls();
@@ -26,41 +27,43 @@ void runCalibrationLightIon(TString lInputFileName = "results/AR_544122_glauberN
   c1->SetFrameFillStyle(0);
   c1->SetFillStyle(0);
   
-  double matchRange = 50; // first guess
-  cout<<"Data bin width: "<<hData->GetBinWidth(1)<<endl;
-  cout<<"Fit bin width: "<<hFit->GetBinWidth(1)<<endl;
-  cout<<"Match range to use: "<<matchRange<<endl;
-  
-  double anchorPoint = -1;
-  
-  // doing partial integration up to certain point for anchor point
-  for(int ii=1; ii<hData->GetNbinsX()+1; ii++){
-    // renormalize data curve
-    int bin1 = ii+1;
-    int bin2 = hData->FindBin( hData->GetBinLowEdge(ii+1) + matchRange + 1e-3 );
-    double matchRangeData = hData -> Integral( bin1, bin2);
-    double matchRangeFit = hFit -> Integral( bin1, bin2);
+  /*
+    double matchRange = 50; // first guess
+    cout<<"Data bin width: "<<hData->GetBinWidth(1)<<endl;
+    cout<<"Fit bin width: "<<hFit->GetBinWidth(1)<<endl;
+    cout<<"Match range to use: "<<matchRange<<endl;
     
-    hFit->Scale(matchRangeData/matchRangeFit);
+    double anchorPoint = -1;
     
-    double integralFit = hFit->Integral(1,ii);
-    double integralData = hData->Integral(ii+1,hData->GetNbinsX()+1);
-    double integralAll = integralFit+integralData;
-    
-    cout<<"at bin #"<<ii<<", integrated up to "<<hData->GetBinLowEdge(ii+1)<<" fraction above this value is: "<<integralData/integralAll<<endl;
-    anchorPoint = hData->GetBinLowEdge(ii+1);
+    // doing partial integration up to certain point for anchor point
+    for(int ii=1; ii<hData->GetNbinsX()+1; ii++){
+      // renormalize data curve
+      int bin1 = ii+1;
+      int bin2 = hData->FindBin( hData->GetBinLowEdge(ii+1) + matchRange + 1e-3 );
+      double matchRangeData = hData -> Integral( bin1, bin2);
+      double matchRangeFit = hFit -> Integral( bin1, bin2);
+      
+      hFit->Scale(matchRangeData/matchRangeFit);
+      
+      double integralFit = hFit->Integral(1,ii);
+      double integralData = hData->Integral(ii+1,hData->GetNbinsX()+1);
+      double integralAll = integralFit+integralData;
+      
+      cout<<"at bin #"<<ii<<", integrated up to "<<hData->GetBinLowEdge(ii+1)<<" fraction above this value is: "<<integralData/integralAll<<endl;
+      anchorPoint = hData->GetBinLowEdge(ii+1);
 
-    if(integralData/integralAll<.9) break;
-  }
-  
-  for(int ii=1; ii<hData->GetNbinsX()+1; ii++){
-    // renormalize data curve
-    if( hData->GetBinCenter(ii) < anchorPoint) hStitched->SetBinContent(ii, hFit->GetBinContent(ii));
-  }
-  
-  cout<<"Anchor point determined to be: "<<anchorPoint<<endl;
-  cout<<"Preparing stitched histogram ... "<<endl;
-  
+      if(integralData/integralAll<.9) break;
+    }
+    
+    for(int ii=1; ii<hData->GetNbinsX()+1; ii++){
+      // renormalize data curve
+      if( hData->GetBinCenter(ii) < anchorPoint) hStitched->SetBinContent(ii, hFit->GetBinContent(ii));
+    }
+    
+    cout<<"Anchor point determined to be: "<<anchorPoint<<endl;
+    cout<<"Preparing stitched histogram ... "<<endl;
+  */
+
   hFit->SetLineColor(kRed);
   hStitched->SetLineColor(kBlue);
   

@@ -21,6 +21,7 @@
 namespace syst {
 
 static const std::vector<float> CentBins = { 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+// static const std::vector<float> CentBins = { 0, 100 };
 static const std::vector<double> centBinsD(CentBins.begin(), CentBins.end());
 static TH1F* hNpartNcollBase = new TH1F("hhNpartNcollBase", "", static_cast<int>(centBinsD.size()) - 1, centBinsD.data());
 
@@ -174,7 +175,7 @@ void styleCanvas(TCanvas* canv)
   canv->SetTicks(1, 1);
   canv->SetTopMargin(0.03);
   canv->SetLeftMargin(0.14);
-  canv->SetRightMargin(0.18);
+  canv->SetRightMargin(0.03);
   canv->SetBottomMargin(0.13);
 }
 

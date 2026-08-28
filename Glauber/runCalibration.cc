@@ -147,6 +147,12 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
   hCalib->Write();
   hStitched->Write();
   hFit->Write();
+  TH1F* hMatchRange = new TH1F("hMatchRange", "", 1, 0, 1);
+  TH1F* hAnchorPoint = new TH1F("hAnchorPoint", "", 1, 0, 1);
+  hMatchRange->SetBinContent(1, matchRange);
+  hMatchRange->Write();
+  hAnchorPoint->SetBinContent(1, anchorPoint);
+  hAnchorPoint->Write();
 
   if (doNpartNcoll) {
     cout << "Will now attempt to calculate % -> Np, Nc map..." << endl;
@@ -187,12 +193,5 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
     h2dNpart->Write();
     h2dNcoll->Write();
   }
-
-  TH1F* hMatchRange = new TH1F("hMatchRange", "", 1, 0, 1);
-  TH1F* hAnchorPoint = new TH1F("hAnchorPoint", "", 1, 0, 1);
-  hMatchRange->SetBinContent(1, matchRange);
-  hMatchRange->Write();
-  hAnchorPoint->SetBinContent(1, anchorPoint);
-  hAnchorPoint->Write();
   fileCalib->Write();
 }
