@@ -12,12 +12,12 @@
 #include <vector>
 #include <string>  
 
-#include "colorManager.h"
+#include "Includes/colorManager.h"
 
 struct GlauberInfo
 {
   TFile* file = nullptr;
-  GlauberInfo(const char* path)
+  GlauberInfo(const char* path, const int colour = kBlack)
   {
     file = TFile::Open(path, "READ");
     if (!file || file->IsZombie()) {
@@ -34,14 +34,30 @@ struct GlauberInfo
     TH1F* hDataClone = (TH1F*)hData->Clone("hDataClone");
     TH1F* hInsetGlauberClone = (TH1F*)hInsetGlauber->Clone("hInsetGlauberClone");
 
-    const int rebin = 100;
+    const int rebin = 20;
     hRatio->Rebin(rebin);
     hDataClone->Rebin(rebin);
     hInsetGlauberClone->Rebin(rebin);
 
-    hRatio->Divide(hInsetGlauberClone, hDataClone, 1, 1, "B");
-    hInsetRatio->Divide(hInsetGlauber, hInsetData, 1, 1, "B");
+    hData->Scale(rebin);
+    hDataClone->Scale(rebin);
+    hInsetData->Scale(rebin);
+    hRatio->Divide(hDataClone, hInsetGlauberClone, 1, 1, "B");
+    hInsetRatio->Divide(hInsetData, hInsetGlauber, 1, 1, "B");
     delete hDataClone; delete hInsetGlauberClone;
+
+    hData->SetLineColor(kBlack);
+    hInsetData->SetLineColor(kBlack);
+    hGlauber->SetLineColor(colour);
+    hRatio->SetLineColor(colour);
+    hInsetGlauber->SetLineColor(colour);
+    hInsetRatio->SetLineColor(colour);
+    hData->SetMarkerColor(kBlack);
+    hInsetData->SetMarkerColor(kBlack);
+    hGlauber->SetMarkerColor(colour);
+    hRatio->SetMarkerColor(colour);
+    hInsetGlauber->SetMarkerColor(colour);
+    hInsetRatio->SetMarkerColor(colour);
   }
 
   ~GlauberInfo()
@@ -56,16 +72,15 @@ struct GlauberInfo
   TH1F* hData = nullptr;
   TH1F* hGlauber = nullptr;
   TH1F* hRatio = nullptr;
-
   TH1F* hInsetData = nullptr;
   TH1F* hInsetGlauber = nullptr;
   TH1F* hInsetRatio = nullptr;
 };
 
 
-
-void drawLightIonGlauberFit()
+void doColVsBc()
 {
+
   const float xmax = 34000;
   const float ymax = 3e+9;
   const float insetXmax = 2000;
@@ -74,46 +89,17 @@ void drawLightIonGlauberFit()
   const float legY = 0.7;
   const float legWidth = 0.2;
   const float legHeight = 0.2;
+   GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_BCs_Anchor90.root", kBlue + 1);
+  GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor90.root", kRed + 1);
+  // GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_LightIonDef.root");
+  // GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
+  // GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_0_LightIonDef.root", kBlue + 1);
+  // GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root", kRed + 1);
 
-  gStyle->SetOptStat(0);
-  // GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_BCs_Anchor90.root");
-  // GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor90.root");
-  GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_LightIonDef.root");
-  GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
+  TCanvas* canvColVsBc = new TCanvas("canvColVsBc", "", 1200, 1400);
+  canvColVsBc->SetTopMargin(0.0);
+  canvColVsBc->SetBottomMargin(0.0);
 
-  TCanvas* canvGlauber = new TCanvas("canvGlauber", "", 1200, 1400);
-  canvGlauber->SetTopMargin(0.0);
-  canvGlauber->SetBottomMargin(0.0);
-
-  bcs.hData->SetLineColor(kBlack);
-  coll.hData->SetLineColor(kBlack);
-  bcs.hInsetData->SetLineColor(kBlack);
-  coll.hInsetData->SetLineColor(kBlack);
-
-  bcs.hGlauber->SetLineColor(kBlue+1);
-  coll.hGlauber->SetLineColor(kRed+1);
-  bcs.hRatio->SetLineColor(kBlue+1);
-  coll.hRatio->SetLineColor(kRed+1);
-
-  bcs.hInsetGlauber->SetLineColor(kBlue+1);
-  coll.hInsetGlauber->SetLineColor(kRed+1);
-  bcs.hInsetRatio->SetLineColor(kBlue+1);
-  coll.hInsetRatio->SetLineColor(kRed+1);
-
-  bcs.hData->SetMarkerColor(kBlack);
-  coll.hData->SetMarkerColor(kBlack);
-  bcs.hInsetData->SetMarkerColor(kBlack);
-  coll.hInsetData->SetMarkerColor(kBlack);
-
-  bcs.hGlauber->SetMarkerColor(kBlue+1);
-  coll.hGlauber->SetMarkerColor(kRed+1);
-  bcs.hRatio->SetMarkerColor(kBlue+1);
-  coll.hRatio->SetMarkerColor(kRed+1);
-
-  bcs.hInsetGlauber->SetMarkerColor(kBlue+1);
-  coll.hInsetGlauber->SetMarkerColor(kRed+1);
-  bcs.hInsetRatio->SetMarkerColor(kBlue+1);
-  coll.hInsetRatio->SetMarkerColor(kRed+1);
   bcs.hData->GetXaxis()->SetRangeUser(0, xmax);
   coll.hData->GetXaxis()->SetRangeUser(0, xmax);
 
@@ -168,7 +154,7 @@ void drawLightIonGlauberFit()
 
   // Return up the chain
   padTop->cd();
-  canvGlauber->cd();
+  canvColVsBc->cd();
   TPad* padMid = new TPad("padMid", "", 0, 0.3, 1, 0.64);
   padMid->SetTicks(1, 1);
   padMid->SetTopMargin(0.0);
@@ -220,7 +206,7 @@ void drawLightIonGlauberFit()
 
   // Return up the chain
   padMid->cd();
-  canvGlauber->cd();
+  canvColVsBc->cd();
   TPad* padBot = new TPad("padBot", "", 0, 0, 1, 0.3);
   padBot->Draw();
   padBot->SetTopMargin(0.0);
@@ -231,7 +217,7 @@ void drawLightIonGlauberFit()
   padBot->Draw();
   padBot->cd();
 
-  coll.hRatio->GetYaxis()->SetRangeUser(0.6, 3.2);
+  coll.hRatio->GetYaxis()->SetRangeUser(0.4, 3.2);
   coll.hRatio->GetXaxis()->SetRangeUser(0, xmax);
   coll.hRatio->GetYaxis()->SetLabelSize(0.045);
   coll.hRatio->GetXaxis()->SetLabelSize(0.05);
@@ -240,7 +226,7 @@ void drawLightIonGlauberFit()
   coll.hRatio->GetXaxis()->SetTitle("FT0M Amplitude");
   coll.hRatio->GetYaxis()->SetTitleOffset(0.6);
   coll.hRatio->GetXaxis()->SetTitleOffset(1.1);
-  coll.hRatio->GetYaxis()->SetTitle("Fit / Data");
+  coll.hRatio->GetYaxis()->SetTitle("Data / Fit");
 
   coll.hRatio->Draw("hist same");
   bcs.hRatio->Draw("hist same");
@@ -250,9 +236,9 @@ void drawLightIonGlauberFit()
   legBot->SetBorderSize(0);
   legBot->SetTextFont(42);
   legBot->SetFillColorAlpha(0, 0);
-  legBot->AddEntry(coll.hRatio, "Coll ratio", "l");
-  legBot->AddEntry(bcs.hRatio, "BC ratio", "l");
-  legBot->Draw();
+  legBot->AddEntry(coll.hRatio, "ratio", "l");
+  legBot->AddEntry(bcs.hRatio, "ratio", "l");
+  // legBot->Draw();
 
   TLine* line = new TLine(0, 1, xmax, 1);
   line->SetLineColor(kBlack);
@@ -270,7 +256,7 @@ void drawLightIonGlauberFit()
   insetBot->Draw();
   insetBot->cd();
 
-  bcs.hInsetRatio->GetYaxis()->SetRangeUser(0.5, 1.5);
+  bcs.hInsetRatio->GetYaxis()->SetRangeUser(0.4, 1.5);
   bcs.hInsetRatio->GetXaxis()->SetRangeUser(0, insetXmax);
   bcs.hInsetRatio->GetYaxis()->SetLabelSize(0.045);
   bcs.hInsetRatio->GetXaxis()->SetLabelSize(0.05);
@@ -290,6 +276,175 @@ void drawLightIonGlauberFit()
 
   // Return up the chain
   padBot->cd();
+  canvColVsBc->cd();
+  canvColVsBc->SaveAs("hGlauberColVsBc.pdf");
+}
+
+void doGlauber()
+{
+  const float xmax = 34000;
+  const float ymax = 3e+9;
+  const float insetXmax = 800;
+  const float insetYmin = 5e+4;
+  const float insetYmax = 5e+7;
+
+  float legX = 0.12;
+  const float legY = 0.65;
+  const float legWidth = 0.25;
+  const float legHeight = 0.25;
+
+  GlauberInfo mode0("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_0_LightIonDef.root", kRed + 1);
+  GlauberInfo mode1("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_1_LightIonDef.root", kBlue + 1);
+  GlauberInfo mode2("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root", kGreen + 2);
+
+  TCanvas* canvGlauber = new TCanvas("canvGlauber", "", 1200, 1400);
+  canvGlauber->SetTopMargin(0.0);
+  canvGlauber->SetBottomMargin(0.0);
+
+  mode2.hData->GetXaxis()->SetRangeUser(0, xmax);
+
+  TPad* padTop = new TPad("padTop", "", 0, 0.5, 1, 1);
+  padTop->SetTicks(1, 1);
+  padTop->SetBottomMargin(0.0);
+  padTop->SetRightMargin(0.03);
+  padTop->SetLeftMargin(0.08);
+  padTop->SetTopMargin(0.05);
+  padTop->Draw();
+  padTop->cd();
+  padTop->SetLogy();
+  mode2.hData->SetMaximum(ymax);
+  mode2.hData->GetYaxis()->SetTitleOffset(0.7);
+  mode2.hData->GetXaxis()->SetTitleOffset(1.2);
+  mode2.hData->GetYaxis()->SetTitle("Count");
+  mode2.hData->Draw("hist");
+  mode2.hGlauber->Draw("hist same");
+  mode1.hGlauber->Draw("hist same");
+  mode0.hGlauber->Draw("hist same");
+
+  TLegend* legTop = new TLegend(legX, legY, legX + legWidth, legY + legHeight);
+  legTop->SetBorderSize(0);
+  legTop->SetFillColorAlpha(0, 0);
+  legTop->SetTextFont(42);
+  legTop->AddEntry(mode2.hData, "Data");
+  legTop->AddEntry(mode0.hGlauber, "Mode 0");
+  legTop->AddEntry(mode1.hGlauber, "Mode 1");
+  legTop->AddEntry(mode2.hGlauber, "Mode 2");
+  legTop->Draw();
+
+  padTop->cd();
+  // Coordinates are relative to padTop: (xlow, ylow, xhigh, yhigh)
+  TPad* insetTop = new TPad("insetTop", "", 0.53, 0.44, 0.93, 0.88);
+  insetTop->SetLogy();
+  insetTop->SetTicks(1, 1);
+  insetTop->SetRightMargin(0.02);
+  insetTop->SetTopMargin(0.02);
+  insetTop->SetLeftMargin(0.12);
+  insetTop->SetBottomMargin(0.12);
+  insetTop->Draw();
+  insetTop->cd();
+
+  // mode2.hInsetData->GetYaxis()->SetRangeUser(2e+5, 6e+7);
+  mode2.hInsetData->GetXaxis()->SetRangeUser(0, insetXmax);
+  mode2.hInsetData->GetYaxis()->SetRangeUser(insetYmin, insetYmax);
+  mode2.hInsetData->GetYaxis()->SetLabelSize(0.045);
+  mode2.hInsetData->GetXaxis()->SetLabelSize(0.05);
+  mode2.hInsetData->GetYaxis()->SetTitleSize(0.06);
+  mode2.hInsetData->GetXaxis()->SetTitleSize(0.06);
+  mode2.hInsetData->GetXaxis()->SetTitle("FT0M Amplitude");
+  mode2.hInsetData->GetYaxis()->SetTitleOffset(0.6);
+  mode2.hInsetData->GetXaxis()->SetTitleOffset(1.1);
+  mode2.hInsetData->GetYaxis()->SetTitle("Count");
+  mode2.hInsetData->Draw("hist");
+  mode2.hInsetGlauber->Draw("hist same");
+  mode1.hInsetGlauber->Draw("hist same");
+  mode0.hInsetGlauber->Draw("hist same");
+
+  // Return up the chain
+  padTop->cd();
+  canvGlauber->cd();
+  TPad* padBot = new TPad("padBot", "", 0, 0, 1, 0.5);
+  padBot->Draw();
+  padBot->SetTopMargin(0.0);
+  padBot->SetRightMargin(0.03);
+  padBot->SetLeftMargin(0.08);
+  padBot->SetBottomMargin(0.15);
+  padBot->SetTicks(1, 1);
+  padBot->Draw();
+  padBot->cd();
+
+  mode2.hRatio->GetYaxis()->SetRangeUser(0.4, 3.2);
+  mode2.hRatio->GetXaxis()->SetRangeUser(0, xmax);
+  mode2.hRatio->GetYaxis()->SetLabelSize(0.045);
+  mode2.hRatio->GetXaxis()->SetLabelSize(0.05);
+  mode2.hRatio->GetYaxis()->SetTitleSize(0.06);
+  mode2.hRatio->GetXaxis()->SetTitleSize(0.06);
+  mode2.hRatio->GetXaxis()->SetTitle("FT0M Amplitude");
+  mode2.hRatio->GetYaxis()->SetTitleOffset(0.6);
+  mode2.hRatio->GetXaxis()->SetTitleOffset(1.1);
+  mode2.hRatio->GetYaxis()->SetTitle("Data / Fit");
+
+  mode2.hRatio->Draw("hist same");
+  mode1.hRatio->Draw("hist same");
+  mode0.hRatio->Draw("hist same");
+
+  legX = 0.75;
+  TLegend* legBot = new TLegend(legX, 0.5, legX + legWidth, 0.5 + legHeight);
+  legBot->SetBorderSize(0);
+  legBot->SetTextFont(42);
+  legBot->SetFillColorAlpha(0, 0);
+  legBot->AddEntry(mode2.hRatio, "ratio", "l");
+  // legBot->AddEntry(bcs.hRatio, "ratio", "l");
+  // legBot->Draw();
+
+  TLine* line = new TLine(0, 1, xmax, 1);
+  line->SetLineColor(kBlack);
+  line->SetLineStyle(7);
+  line->Draw();
+
+  padBot->cd();
+  // Coordinates are relative to padTop: (xlow, ylow, xhigh, yhigh)
+  TPad* insetBot = new TPad("insetBot", "", 0.13, 0.46, 0.53, 0.9);
+  insetBot->SetTicks(1, 1);
+  insetBot->SetRightMargin(0.02);
+  insetBot->SetTopMargin(0.02);
+  insetBot->SetLeftMargin(0.12);
+  insetBot->SetBottomMargin(0.12);
+  insetBot->Draw();
+  insetBot->cd();
+
+  mode2.hInsetRatio->GetYaxis()->SetRangeUser(0.4, 1.5);
+  mode2.hInsetRatio->GetXaxis()->SetRangeUser(0, insetXmax);
+  mode2.hInsetRatio->GetYaxis()->SetLabelSize(0.045);
+  mode2.hInsetRatio->GetXaxis()->SetLabelSize(0.05);
+  mode2.hInsetRatio->GetYaxis()->SetTitleSize(0.06);
+  mode2.hInsetRatio->GetXaxis()->SetTitleSize(0.06);
+  mode2.hInsetRatio->GetXaxis()->SetTitle("FT0M Amplitude");
+  mode2.hInsetRatio->GetYaxis()->SetTitleOffset(0.6);
+  mode2.hInsetRatio->GetXaxis()->SetTitleOffset(1.1);
+  mode2.hInsetRatio->GetYaxis()->SetTitle("Count");
+  mode2.hInsetRatio->Draw("hist");
+  mode1.hInsetRatio->Draw("hist same");
+  mode0.hInsetRatio->Draw("hist same");
+
+  TLine* lineInset = new TLine(0, 1, insetXmax, 1);
+  lineInset->SetLineColor(kBlack);
+  lineInset->SetLineStyle(7);
+  lineInset->Draw();
+
+  // Return up the chain
+  padBot->cd();
   canvGlauber->cd();
   canvGlauber->SaveAs("hGlauber.pdf");
+}
+
+
+void drawLightIonGlauberFit()
+{
+
+
+  gStyle->SetOptStat(0);
+  // doColVsBc();
+  doGlauber();
+
+  
 }

@@ -90,10 +90,23 @@ void doSystematicsOO()
   // std::vector<std::vector<float>> systRun = syst::computeSystematics(base, { run564356, run564359, run564373, run564387, run564400, run564414, run564430, run564445 });
   // std::vector<std::vector<float>> relSystRun = syst::computeRelativeSystematics(base, { run564356, run564359, run564373, run564387, run564400, run564414, run564430, run564445 });
 
+  syst::GlauberParameters ancestorMode0("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_0_LightIonDef.root");
+  syst::GlauberParameters ancestorMode1("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_1_LightIonDef.root");
+  std::vector<std::vector<float>> systAncestorMode0 = syst::computeSystematics(base, { ancestorMode0 });
+  std::vector<std::vector<float>> systAncestorMode1 = syst::computeSystematics(base, { ancestorMode1 });
+  std::vector<std::vector<float>> systAncestorModeComb = syst::computeSystematics(base, { ancestorMode0, ancestorMode1 });
+  
+  // std::vector<std::vector<float>> relSystAncestorMode0 = syst::computeSystematics(base, { ancestorMode0 });
+  std::vector<std::vector<float>> relSystAncestorMode0 = syst::computeRelativeSystematics(base, { ancestorMode0 });
+
+  std::vector<std::vector<float>> relSystAncestorMode1 = syst::computeRelativeSystematics(base, { ancestorMode1 });
+  std::vector<std::vector<float>> relSystAncestorModeComb = syst::computeRelativeSystematics(base, { ancestorMode0, ancestorMode1 });
+
+
   std::vector<std::vector<float>> systTotal = syst::combineSystematicsInQuadrature(systAnchor, systBcs, systRun, systFT0C);
   std::vector<std::vector<float>> relSystTotal = syst::combineSystematicsInQuadrature(relSystAnchor, relSystBcs, relSystRun, relSystFT0C);
 
-  ColorManager cm1(4);
+  ColorManager cm1(7);
   TH1F* hSysShapeNpart = syst::initGlauParHist(systFT0C[kNpart], "hSysShapeNpart", cm1.getColor(0));
   TH1F* hSysShapeNcoll = syst::initGlauParHist(systFT0C[kNcoll], "hSysShapeNcoll", cm1.getColor(0));
   TH1F* hRelSysShapeNpart = syst::initGlauParHist(relSystFT0C[kNpart], "hRelSysShapeNpart", cm1.getColor(0));
@@ -114,6 +127,21 @@ void doSystematicsOO()
   TH1F* hRelSysRunNpart = syst::initGlauParHist(relSystRun[kNpart], "hRelSysRunNpart", cm1.getColor(3));
   TH1F* hRelSysRunNcoll = syst::initGlauParHist(relSystRun[kNcoll], "hRelSysRunNcoll", cm1.getColor(3));
 
+  TH1F* hSystAncestorMode0kNpart = syst::initGlauParHist(systAncestorMode0[kNpart], "hSystAncestorMode0kNpart", cm1.getColor(4));
+  TH1F* hSystAncestorMode0kNcoll = syst::initGlauParHist(systAncestorMode0[kNcoll], "hSystAncestorMode0kNcoll", cm1.getColor(4));
+  TH1F* hRelSystAncestorMode0kNpart = syst::initGlauParHist(relSystAncestorMode0[kNpart], "hRelSystAncestorMode0", cm1.getColor(4));
+  TH1F* hRelSystAncestorMode0kNcoll = syst::initGlauParHist(relSystAncestorMode0[kNcoll], "hRelSystAncestorMode0", cm1.getColor(4));
+
+  TH1F* hSystAncestorMode1kNpart = syst::initGlauParHist(systAncestorMode1[kNpart], "hSystAncestorMode1kNpart", cm1.getColor(5));
+  TH1F* hSystAncestorMode1kNcoll = syst::initGlauParHist(systAncestorMode1[kNcoll], "hSystAncestorMode1kNcoll", cm1.getColor(5));
+  TH1F* hRelSystAncestorMode1kNpart = syst::initGlauParHist(relSystAncestorMode1[kNpart], "hRelSystAncestorMode1", cm1.getColor(5));
+  TH1F* hRelSystAncestorMode1kNcoll = syst::initGlauParHist(relSystAncestorMode1[kNcoll], "hRelSystAncestorMode1", cm1.getColor(5));
+
+  TH1F* hSystAncestorModeCombkNpart = syst::initGlauParHist(systAncestorModeComb[kNpart], "hSystAncestorModeComb", cm1.getColor(6));
+  TH1F* hSystAncestorModeCombkNcoll = syst::initGlauParHist(systAncestorModeComb[kNcoll], "hSystAncestorModeComb", cm1.getColor(6));
+  TH1F* hRelSystAncestorModeCombkNpart = syst::initGlauParHist(relSystAncestorModeComb[kNpart], "hRelSystAncestorModeComb", cm1.getColor(6));
+  TH1F* hRelSystAncestorModeCombkNcoll = syst::initGlauParHist(relSystAncestorModeComb[kNcoll], "hRelSystAncestorModeComb", cm1.getColor(6));
+
   TH1F* hSysTotalNpart = syst::initGlauParHist(systTotal[kNpart], "hSysTotalNpart", kBlack);
   TH1F* hSysTotalNcoll = syst::initGlauParHist(systTotal[kNcoll], "hSysTotalNcoll", kBlack);
   TH1F* hRelSysTotalNpart = syst::initGlauParHist(relSystTotal[kNpart], "hRelSysTotalNpart", kBlack);
@@ -121,22 +149,6 @@ void doSystematicsOO()
 
   TH1F* hNpartFT0C = syst::initGlauParHist(NpartVal, "hNpartFT0C", kBlack);
   TH1F* hNcollFT0C = syst::initGlauParHist(NcollVal, "hNpartFT0C", kBlack);
-
-
-  TLegend* leg = new TLegend(0.18, 0.66, 0.43, 0.94);
-  leg->SetBorderSize(0);
-  leg->SetFillColorAlpha(0, 0);
-  leg->AddEntry(hSysTotalNpart, "Total", "l");
-  leg->AddEntry(hSysShapeNpart, "Nuclei shape", "l");
-  leg->AddEntry(hSysAnchorNpart, "Coll anchor 70%", "l");
-  leg->AddEntry(hSysBcsNpart, "Bc anchor 70%", "l");
-  leg->AddEntry(hSysRunNpart, "Run", "l");
-
-  const bool drawShape = true;
-  const bool drawAnchor = true;
-  const bool drawBcs = true;
-  const bool drawRun = true;
-  const bool drawTotal = true;
 
   TH1F* hSysTotalNpartCopy = dynamic_cast<TH1F*>(hSysTotalNpart->Clone("hSysTotalNpartCopy"));
   hSysTotalNpartCopy->SetMarkerColorAlpha(0, 0);
@@ -154,10 +166,30 @@ void doSystematicsOO()
   const int canvWidth = 1600;
   const int canvHeight = 1000;
   
-  hRelSysTotalNpartCopy->SetMaximum(0.12);
+  hRelSysTotalNpartCopy->SetMaximum(0.16);
   hRelSysTotalNcollCopy->SetMaximum(0.2);
   hRelSysTotalNpartCopy->SetMinimum(0);
   hRelSysTotalNcollCopy->SetMinimum(0);
+
+  const bool drawShape = true;
+  const bool drawAnchor = true;
+  const bool drawBcs = true;
+  const bool drawRun = true;
+  const bool drawMode0 = true;
+  const bool drawMode1 = false;
+  const bool drawModeComb = false;
+  const bool drawTotal = true;
+
+  TLegend* leg = new TLegend(0.18, 0.66, 0.43, 0.94);
+  leg->SetBorderSize(0);
+  leg->SetFillColorAlpha(0, 0);
+  leg->AddEntry(hSysTotalNpart, "Total", "l");
+  leg->AddEntry(hSysShapeNpart, "Nuclei shape", "l");
+  leg->AddEntry(hSysAnchorNpart, "Coll anchor 70%", "l");
+  leg->AddEntry(hSysBcsNpart, "Bc anchor 70%", "l");
+  leg->AddEntry(hSysRunNpart, "Run", "l");
+  leg->AddEntry(hSystAncestorMode0kNpart, "Mode 0", "l");
+  // leg->AddEntry(hSystAncestorMode1kNpart, "Mode 1", "l");
 
   TCanvas* canvNpartSystematics = new TCanvas("canvNpartSystematics", "", canvWidth, canvHeight);
   syst::styleCanvas(canvNpartSystematics);
@@ -167,6 +199,9 @@ void doSystematicsOO()
   if (drawAnchor) hSysAnchorNpart->Draw("hist same");
   if (drawRun) hSysRunNpart->Draw("hist same");
   if (drawBcs) hSysBcsNpart->Draw("hist same");
+  if (drawMode0) hSystAncestorMode0kNpart->Draw("hist same");
+  if (drawMode1) hSystAncestorMode1kNpart->Draw("hist same");
+  if (drawModeComb) hSystAncestorModeCombkNpart->Draw("hist same");
   if (drawTotal) hSysTotalNpart->Draw("hist same");
   leg->Draw();
   canvNpartSystematics->SaveAs("hNpartSystematics_OO.pdf");
@@ -179,6 +214,9 @@ void doSystematicsOO()
   if (drawAnchor) hSysAnchorNcoll->Draw("hist same");
   if (drawRun) hSysRunNcoll->Draw("hist same");
   if (drawBcs) hSysBcsNcoll->Draw("hist same");
+  if (drawMode0) hSystAncestorMode0kNcoll->Draw("hist same");
+  if (drawMode1) hSystAncestorMode1kNcoll->Draw("hist same");
+  if (drawModeComb) hSystAncestorModeCombkNcoll->Draw("hist same");
   if (drawTotal) hSysTotalNcoll->Draw("hist same");
   leg->Draw();
   canvNcollSystematics->SaveAs("hNcollSystematics_OO.pdf");
@@ -191,6 +229,9 @@ void doSystematicsOO()
   if (drawAnchor) hRelSysAnchorNpart->Draw("hist same");
   if (drawRun) hRelSysRunNpart->Draw("hist same");
   if (drawBcs) hRelSysBcsNpart->Draw("hist same");
+  if (drawMode0) hRelSystAncestorMode0kNpart->Draw("hist same");
+  if (drawMode1) hRelSystAncestorMode1kNpart->Draw("hist same");
+  if (drawModeComb) hRelSystAncestorModeCombkNpart->Draw("hist same");
   if (drawTotal) hRelSysTotalNpart->Draw("hist same");
   leg->Draw();
   canvRelNpartSystematics->SaveAs("FiguresSystematics/hNpartRelSystematics_OO.pdf");
@@ -203,6 +244,9 @@ void doSystematicsOO()
   if (drawAnchor) hRelSysAnchorNcoll->Draw("hist same");
   if (drawRun) hRelSysRunNcoll->Draw("hist same");
   if (drawBcs) hRelSysBcsNcoll->Draw("hist same");
+  if (drawMode0) hRelSystAncestorMode0kNcoll->Draw("hist same");
+  if (drawMode1) hRelSystAncestorMode1kNcoll->Draw("hist same");
+  if (drawModeComb) hRelSystAncestorModeCombkNcoll->Draw("hist same");
   if (drawTotal) hRelSysTotalNcoll->Draw("hist same");
   leg->Draw();
   canvRelNcollSystematics->SaveAs("FiguresSystematics/hNcollRelSystematics_OO.pdf");

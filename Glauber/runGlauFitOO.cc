@@ -58,7 +58,7 @@ Double_t GetBoundaryForPercentile( TH1 *histo, Double_t lPercentileRequested ) {
   return lReturnValue;
 }
 
-void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString type = "hNPVContributors", TString histogramName = "hFT0C_BCs", TString wagon = "", TString nuclearProfile = "Oho2", float omega = 0.3){
+void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString type = "hNPVContributors", TString histogramName = "hFT0C_BCs", TString wagon = "", int ancestorMode = 2, TString nuclearProfile = "Oho2", float omega = 0.3){
   cout<<"Starting!"<<endl;
   TFile *file = new TFile(lInputFileName.Data(), "READ");
   file->ls();
@@ -117,11 +117,7 @@ void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString 
     XaxisLabel = "FV0A amplitude";
   }
   
-  
-  //hV0Mfine = (TH1F *) file -> Get(Form("centrality-study/Run_564359/%s", "hFT0C_Collisions"));
-  // hV0Mfine = (TH1F *) file -> Get(Form("centrality-study/Run_%i/%s", runNumber, type.Data())); // hNPVContributors
   hV0Mfine = (TH1F *) file -> Get(Form("centrality-study%s/%s", wagon.Data(), histogramName.Data()));
-
   hV0Mfine->SetTitle("");
   
   // disregard bin zero
@@ -133,7 +129,6 @@ void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString 
   cout<<"Counts: "<<hV0Mfine->GetEntries()<<endl;
   cout<<"NbinsX: "<<hV0Mfine->GetNbinsX()<<endl;
   cout<<"MaxX: "<<hV0Mfine->GetBinLowEdge(hV0Mfine->GetNbinsX()+1)<<endl;
-  
 
   cout<<"Creating rebinned histogram with rebin factor: "<<rebinFactor<<endl;
   TH1F *hV0M = (TH1F*) hV0Mfine->Clone("hV0M");
@@ -202,13 +197,17 @@ void runGlauFitOO(TString lInputFileName = "AnalysisResults-25ae.root", TString 
   
   TString lProcessedFileName = lInputFileName.Data();
   lProcessedFileName.ReplaceAll("ARs/", "results/");
-  lProcessedFileName.ReplaceAll(".root", Form("_glauberNBD_%s.root", histogramName.Data()));
+  if (ancestorMode != 2) {
+    lProcessedFileName.ReplaceAll(".root", Form("_glauberNBD_%s_%d.root", histogramName.Data(), ancestorMode));
+  } else {
+    lProcessedFileName.ReplaceAll(".root", Form("_glauberNBD_%s.root", histogramName.Data()));
+  }
   TFile *fOutput = new TFile(lProcessedFileName.Data(), "RECREATE");
 
   
   //Stand back! Imma gonna do GLAUBER FITTIN'
   multGlauberNBDFitter *g = new multGlauberNBDFitter("lglau");
-  g->SetAncestorMode(2);
+  g->SetAncestorMode(ancestorMode);
   
   //Step 1: open the (Npart, Ncoll) pair information, provide
   TFile *fbasefile = new TFile(baseHistoIdentifier.Data(),"READ");
