@@ -13,7 +13,7 @@
 #include <vector>
 #include <string>
 
-#include "colorManager.h"
+#include "Includes/colorManager.h"
 
 static std::array<int, 2> normRange = { 2000, 12000 };
 
@@ -63,20 +63,38 @@ void styleCanvas(TCanvas* canv, bool log = true)
 }
 
 struct CentralityStudy {
-  CentralityStudy(const char* subwagon, int col0, int col1)
+  CentralityStudy(const char* path, const char* subwagon, int col0, int col1)
   {
-    TFile file("../AnalysisResults/LHC25ae_pass2_extra2/AR_564374.root", "READ");
+    TFile file(path, "READ");
     if (file.IsZombie()) {
       std::cerr << "Could not open file!" << std::endl;
       return;
     }
 
-    auto* histCol = (TH1F*)file.Get(Form("centrality-study%s/hFT0M_Collisions", subwagon));
-    auto* histBCs = (TH1F*)file.Get(Form("centrality-study%s/hFT0M_BCs", subwagon));
+    auto* histColOriginal = (TH1F*)file.Get(Form("centrality-study%s/hFT0M_Collisions", subwagon));
+    histColOriginal->SetDirectory(0);
+    file.Close();
+
+    TFile fileBC("../AnalysisResults/LHC25ae_pass2/AR_564374.root", "READ");
+    auto* histBCsOriginal = (TH1F*)fileBC.Get("centrality-study/hFT0M_BCs");
+    histBCsOriginal->SetDirectory(0);
+    fileBC.Close();
+
+    // Create a histogram with range 0–70000
+    auto* histBCs = new TH1F(Form("histBCs%s", subwagon), histBCsOriginal->GetTitle(), 70000, 0, 70000);
+    auto* histCol = new TH1F(Form("histCols%s", subwagon), histBCsOriginal->GetTitle(), 70000, 0, 70000);
+
+    // Copy the contents
+    for (int bin = 1; bin <= 70000; ++bin) {
+      histBCs->SetBinContent(bin, histBCsOriginal->GetBinContent(bin));
+      histBCs->SetBinError(bin, histBCsOriginal->GetBinError(bin));
+      histCol->SetBinContent(bin, histColOriginal->GetBinContent(bin));
+      histCol->SetBinError(bin, histColOriginal->GetBinError(bin));
+    }
 
     if (!histCol || !histBCs) {
       std::cout << Form("centrality-study%s/hFT0M_Collisions", subwagon) << std::endl;
-      std::cout << Form("centrality-study%s/hFT0M_BCs", subwagon) << std::endl;
+      std::cout << Form("centrality-study/hFT0M_BCs") << std::endl;
       throw std::runtime_error(Form("Could not find histograms for \"%s\"", subwagon));
     }
 
@@ -93,8 +111,8 @@ struct CentralityStudy {
     styleHistogram(hBCs);
     styleHistogram(hCol);
 
-    TH1F* hBCs_copy = (TH1F*)hBCs->Clone(Form("copy_%s", subwagon));
-    TH1F* hCol_copy = (TH1F*)hCol->Clone(Form("copy_%s", subwagon));
+    TH1F* hBCs_copy = (TH1F*)hBCs->Clone(Form("bccopy_%s", subwagon));
+    TH1F* hCol_copy = (TH1F*)hCol->Clone(Form("colcopy_%s", subwagon));
     hBCs_copy->Rebin(20);
     hCol_copy->Rebin(20);
 
@@ -122,23 +140,24 @@ struct CentralityStudy {
 void drawLightIonSameSelections()
 {
   gStyle->SetOptStat(0);
-  ColorManager cm(6);
-  CentralityStudy base("", kBlack, cm.getColor(0));
-  CentralityStudy nobc("_rejectnobc", kBlack, cm.getColor(1));
-  CentralityStudy pileup("_rejectpileup", kBlack, cm.getColor(2));
-  CentralityStudy nobcpileup("_rejectnobc_rejectpileup", kBlack, cm.getColor(3));
-  CentralityStudy vtxZ("_vtxZ", kBlack, cm.getColor(4));
-  CentralityStudy nobcvtxZ("_rejectnobc_vtxZ", kBlack, cm.getColor(5));
+  ColorManager cm(3);
+  CentralityStudy base("../AnalysisResults/LHC25ae_pass2/AR_564374.root", "", kBlack, cm.getColor(0));
+  CentralityStudy pileup("../AnalysisResults/LHC25ae_pass2_extra2/AR_564374.root", "_rejectpileup", kBlack, cm.getColor(1));
+  CentralityStudy vtxZ("../AnalysisResults/LHC25ae_pass2_extra2/AR_564374.root", "_vtxZ", kBlack, cm.getColor(2));
+  CentralityStudy nobc("../AnalysisResults/LHC25ae_pass2_extra2/AR_564374.root", "_rejectnobc", kBlack, cm.getColor(0));
+  CentralityStudy nobcpileup("../AnalysisResults/LHC25ae_pass2_extra2/AR_564374.root", "_rejectnobc_rejectpileup", kBlack, cm.getColor(1));
+  CentralityStudy nobcvtxZ("../AnalysisResults/LHC25ae_pass2_extra2/AR_564374.root", "_rejectnobc_vtxZ", kBlack, cm.getColor(2));
 
   TLegend* leg = new TLegend(0.8, 0.35, 1.1, 0.65);
   leg->SetBorderSize(0);
   leg->SetFillColorAlpha(0, 0);
+  leg->AddEntry(base.hBCs, "BCs", "l");
   leg->AddEntry(base.hCol, "base", "l");
-  leg->AddEntry(nobc.hCol, "nobc", "l");
   leg->AddEntry(pileup.hCol, "pileup", "l");
-  leg->AddEntry(nobcpileup.hCol, "nobcpileup", "l");
   leg->AddEntry(vtxZ.hCol, "vtxZ", "l");
-  leg->AddEntry(nobcvtxZ.hCol, "nobcvtxZ", "l");
+  // leg->AddEntry(nobc.hCol, "nobc", "l");
+  // leg->AddEntry(nobcpileup.hCol, "nobcpileup", "l");
+  // leg->AddEntry(nobcvtxZ.hCol, "nobcvtxZ", "l");
 
   TCanvas* canv_base = new TCanvas("canv_base", "", 1600, 1000);
   styleCanvas(canv_base);
@@ -152,7 +171,7 @@ void drawLightIonSameSelections()
   nobc.hBCs->Draw("hist");
   nobc.hCol->Draw("hist same");
   leg->Draw();
-  canv_nobc->SaveAs("h_data_nobc.pdf");
+  // canv_nobc->SaveAs("h_data_nobc.pdf");
 
   TCanvas* canv_pileup = new TCanvas("canv_pileup", "", 1600, 1000);
   styleCanvas(canv_pileup);
@@ -166,7 +185,7 @@ void drawLightIonSameSelections()
   nobcpileup.hBCs->Draw("hist");
   nobcpileup.hCol->Draw("hist same");
   leg->Draw();
-  canv_nobcpileup->SaveAs("h_data_nobcpileup.pdf");
+  // canv_nobcpileup->SaveAs("h_data_nobcpileup.pdf");
 
   TCanvas* canv_vtxZ = new TCanvas("canv_vtxZ", "", 1600, 1000);
   styleCanvas(canv_vtxZ);
@@ -180,18 +199,18 @@ void drawLightIonSameSelections()
   nobcvtxZ.hBCs->Draw("hist");
   nobcvtxZ.hCol->Draw("hist same");
   leg->Draw();
-  canv_nobcvtxZ->SaveAs("h_data_nobcvtxZ.pdf");
+  // canv_nobcvtxZ->SaveAs("h_data_nobcvtxZ.pdf");
 
   TCanvas* canv_ratio = new TCanvas("canv_ratio", "", 1600, 1000);
   styleCanvas(canv_ratio, false);
-  base.hRatio->GetYaxis()->SetRangeUser(0, 2);
+  // base.hRatio->GetYaxis()->SetRangeUser(0, 2);
   base.hRatio->GetYaxis()->SetTitle("Collisions / BCs");
   base.hRatio->Draw("hist");
-  nobc.hRatio->Draw("hist same");
   pileup.hRatio->Draw("hist same");
-  nobcpileup.hRatio->Draw("hist same");
   vtxZ.hRatio->Draw("hist same");
-  nobcvtxZ.hRatio->Draw("hist same");
+  // nobc.hRatio->Draw("hist same");
+  // nobcpileup.hRatio->Draw("hist same");
+  // nobcvtxZ.hRatio->Draw("hist same");
   leg->Draw();
   canv_ratio->SaveAs("h_data_ratio.pdf");
 
@@ -205,10 +224,10 @@ void drawLightIonSameSelections()
   base.hRatio_Zoom->GetYaxis()->SetTitle("Collisions / BCs");
   base.hRatio_Zoom->Draw("hist");
   nobc.hRatio_Zoom->Draw("hist same");
-  pileup.hRatio_Zoom->Draw("hist same");
-  nobcpileup.hRatio_Zoom->Draw("hist same");
   vtxZ.hRatio_Zoom->Draw("hist same");
-  nobcvtxZ.hRatio_Zoom->Draw("hist same");
+  // pileup.hRatio_Zoom->Draw("hist same");
+  // nobcpileup.hRatio_Zoom->Draw("hist same");
+  // nobcvtxZ.hRatio_Zoom->Draw("hist same");
   leg->Draw();
   canv_ratio_zoom->SaveAs("h_data_ratio_zoom.pdf");
 }

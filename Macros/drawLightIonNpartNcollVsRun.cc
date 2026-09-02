@@ -156,15 +156,17 @@ void drawLightIonNpartNcollVsRun()
   TH1F* hRun564430Ncoll = syst::initGlauParHist(run564430.ncoll, "hRun564430Ncoll", cm3.getColor(6));
   TH1F* hRun564445Ncoll = syst::initGlauParHist(run564445.ncoll, "hRun564445Ncoll", cm3.getColor(7));
 
-  TH1F* hBaseNpart2 = syst::initGlauParHist(base.npart, "hBaseNpart", kBlack);
-  TH1F* hBaseNcoll2 = syst::initGlauParHist(base.ncoll, "hBaseNcoll", kBlack);
+  TH1F* hBaseNpart2 = syst::initGlauParHist(base.npart, "hBaseNpart", kBlue + 1);
+  TH1F* hBaseNcoll2 = syst::initGlauParHist(base.ncoll, "hBaseNcoll", kBlue + 1);
   TH1F* hBaseNpart0 = syst::initGlauParHist(base0.npart, "hBaseNpart", kRed + 1);
   TH1F* hBaseNpart1 = syst::initGlauParHist(base1.npart, "hBaseNpart", kBlue + 1);
   TH1F* hBaseNcoll0 = syst::initGlauParHist(base0.ncoll, "hBaseNcoll", kRed + 1);
   TH1F* hBaseNcoll1 = syst::initGlauParHist(base1.ncoll, "hBaseNcoll", kBlue + 1);
 
-  std::vector<TH1F*> hColNpart = { hRun564374Npart, hRun564356Npart, hRun564359Npart, hRun564373Npart, hRun564387Npart, hRun564400Npart, hRun564414Npart, hRun564430Npart, hRun564445Npart };
-  std::vector<TH1F*> hColNcoll = { hRun564374Ncoll, hRun564356Ncoll, hRun564359Ncoll, hRun564373Ncoll, hRun564387Ncoll, hRun564400Ncoll, hRun564414Ncoll, hRun564430Ncoll, hRun564445Ncoll };
+  std::vector<TH1F*> hColNpart = { hRun564356Npart, hRun564359Npart, hRun564373Npart, hRun564387Npart, hRun564400Npart, hRun564414Npart, hRun564430Npart, hRun564445Npart };
+  // std::vector<TH1F*> hColNpart = { hRun564374Npart, hRun564356Npart, hRun564359Npart, hRun564373Npart, hRun564387Npart, hRun564400Npart, hRun564414Npart, hRun564430Npart, hRun564445Npart };
+  std::vector<TH1F*> hColNcoll = { hRun564356Ncoll, hRun564359Ncoll, hRun564373Ncoll, hRun564387Ncoll, hRun564400Ncoll, hRun564414Ncoll, hRun564430Ncoll, hRun564445Ncoll };
+  // std::vector<TH1F*> hColNcoll = { hRun564374Ncoll, hRun564356Ncoll, hRun564359Ncoll, hRun564373Ncoll, hRun564387Ncoll, hRun564400Ncoll, hRun564414Ncoll, hRun564430Ncoll, hRun564445Ncoll };
 
   TH1F* hRun564468Npart = syst::initGlauParHist(baseNeNe.npart, "hRun564468Npart", kBlack);
   TH1F* hRun564468Ncoll = syst::initGlauParHist(baseNeNe.ncoll, "hRun564468Ncoll", kBlack);
@@ -193,14 +195,14 @@ void drawLightIonNpartNcollVsRun()
   legRunNeNe->AddEntry(hRun564472Npart, "564472", "pl");
 
 
-  std::vector<TH1F*> hBaseNpart = {hBaseNpart0, hBaseNpart1};
-  std::vector<TH1F*> hBaseNcoll = {hBaseNcoll0, hBaseNcoll1};
+  std::vector<TH1F*> hBaseNpart = {hBaseNpart0};
+  std::vector<TH1F*> hBaseNcoll = {hBaseNcoll0};
 
   TLegend* legBase = new TLegend(0.75, 0.55, 0.95, 0.9);
   legBase->SetBorderSize(0);
   legBase->SetFillColorAlpha(0, 0);
   legBase->AddEntry(hBaseNpart0, "Mode 0", "pl");
-  legBase->AddEntry(hBaseNpart1, "Mode 1", "pl");
+  // legBase->AddEntry(hBaseNpart1, "Mode 1", "pl");
   legBase->AddEntry(hBaseNcoll2, "Mode 2 (Ref)", "pl");
 
   doNpartNCollVsAnchorPoint(hRun564374Npart, hColNpart, legRun, "FiguresSystematics/hNpartOOVsRun.pdf", "<N_{part}>");

@@ -95,10 +95,7 @@ void doSystematicsOO()
   std::vector<std::vector<float>> systAncestorMode0 = syst::computeSystematics(base, { ancestorMode0 });
   std::vector<std::vector<float>> systAncestorMode1 = syst::computeSystematics(base, { ancestorMode1 });
   std::vector<std::vector<float>> systAncestorModeComb = syst::computeSystematics(base, { ancestorMode0, ancestorMode1 });
-  
-  // std::vector<std::vector<float>> relSystAncestorMode0 = syst::computeSystematics(base, { ancestorMode0 });
   std::vector<std::vector<float>> relSystAncestorMode0 = syst::computeRelativeSystematics(base, { ancestorMode0 });
-
   std::vector<std::vector<float>> relSystAncestorMode1 = syst::computeRelativeSystematics(base, { ancestorMode1 });
   std::vector<std::vector<float>> relSystAncestorModeComb = syst::computeRelativeSystematics(base, { ancestorMode0, ancestorMode1 });
 
@@ -106,7 +103,7 @@ void doSystematicsOO()
   std::vector<std::vector<float>> systTotal = syst::combineSystematicsInQuadrature(systAnchor, systBcs, systRun, systFT0C);
   std::vector<std::vector<float>> relSystTotal = syst::combineSystematicsInQuadrature(relSystAnchor, relSystBcs, relSystRun, relSystFT0C);
 
-  ColorManager cm1(7);
+  ColorManager cm1(5);
   TH1F* hSysShapeNpart = syst::initGlauParHist(systFT0C[kNpart], "hSysShapeNpart", cm1.getColor(0));
   TH1F* hSysShapeNcoll = syst::initGlauParHist(systFT0C[kNcoll], "hSysShapeNcoll", cm1.getColor(0));
   TH1F* hRelSysShapeNpart = syst::initGlauParHist(relSystFT0C[kNpart], "hRelSysShapeNpart", cm1.getColor(0));
@@ -167,7 +164,7 @@ void doSystematicsOO()
   const int canvHeight = 1000;
   
   hRelSysTotalNpartCopy->SetMaximum(0.16);
-  hRelSysTotalNcollCopy->SetMaximum(0.2);
+  hRelSysTotalNcollCopy->SetMaximum(0.22);
   hRelSysTotalNpartCopy->SetMinimum(0);
   hRelSysTotalNcollCopy->SetMinimum(0);
 
@@ -175,12 +172,12 @@ void doSystematicsOO()
   const bool drawAnchor = true;
   const bool drawBcs = true;
   const bool drawRun = true;
-  const bool drawMode0 = true;
+  const bool drawMode0 = false;
   const bool drawMode1 = false;
   const bool drawModeComb = false;
   const bool drawTotal = true;
 
-  TLegend* leg = new TLegend(0.18, 0.66, 0.43, 0.94);
+  TLegend* leg = new TLegend(0.18, 0.61, 0.43, 0.94);
   leg->SetBorderSize(0);
   leg->SetFillColorAlpha(0, 0);
   leg->AddEntry(hSysTotalNpart, "Total", "l");
@@ -188,8 +185,7 @@ void doSystematicsOO()
   leg->AddEntry(hSysAnchorNpart, "Coll anchor 70%", "l");
   leg->AddEntry(hSysBcsNpart, "Bc anchor 70%", "l");
   leg->AddEntry(hSysRunNpart, "Run", "l");
-  leg->AddEntry(hSystAncestorMode0kNpart, "Mode 0", "l");
-  // leg->AddEntry(hSystAncestorMode1kNpart, "Mode 1", "l");
+  leg->AddEntry(hSystAncestorMode0kNpart, "Truncation", "l");
 
   TCanvas* canvNpartSystematics = new TCanvas("canvNpartSystematics", "", canvWidth, canvHeight);
   syst::styleCanvas(canvNpartSystematics);

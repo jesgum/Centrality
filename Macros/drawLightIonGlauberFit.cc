@@ -295,9 +295,9 @@ void doGlauber()
 
   GlauberInfo mode0("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_0_LightIonDef.root", kRed + 1);
   GlauberInfo mode1("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_1_LightIonDef.root", kBlue + 1);
-  GlauberInfo mode2("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root", kGreen + 2);
+  GlauberInfo mode2("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root", kBlue + 1);
 
-  TCanvas* canvGlauber = new TCanvas("canvGlauber", "", 1200, 1400);
+  TCanvas* canvGlauber = new TCanvas("canvGlauber", "", 1600, 1600);
   canvGlauber->SetTopMargin(0.0);
   canvGlauber->SetBottomMargin(0.0);
 
@@ -327,7 +327,7 @@ void doGlauber()
   legTop->SetTextFont(42);
   legTop->AddEntry(mode2.hData, "Data");
   legTop->AddEntry(mode0.hGlauber, "Mode 0");
-  legTop->AddEntry(mode1.hGlauber, "Mode 1");
+  // legTop->AddEntry(mode1.hGlauber, "Mode 1");
   legTop->AddEntry(mode2.hGlauber, "Mode 2");
   legTop->Draw();
 
@@ -356,7 +356,7 @@ void doGlauber()
   mode2.hInsetData->GetYaxis()->SetTitle("Count");
   mode2.hInsetData->Draw("hist");
   mode2.hInsetGlauber->Draw("hist same");
-  mode1.hInsetGlauber->Draw("hist same");
+  // mode1.hInsetGlauber->Draw("hist same");
   mode0.hInsetGlauber->Draw("hist same");
 
   // Return up the chain
@@ -384,7 +384,7 @@ void doGlauber()
   mode2.hRatio->GetYaxis()->SetTitle("Data / Fit");
 
   mode2.hRatio->Draw("hist same");
-  mode1.hRatio->Draw("hist same");
+  // mode1.hRatio->Draw("hist same");
   mode0.hRatio->Draw("hist same");
 
   legX = 0.75;
@@ -423,7 +423,7 @@ void doGlauber()
   mode2.hInsetRatio->GetXaxis()->SetTitleOffset(1.1);
   mode2.hInsetRatio->GetYaxis()->SetTitle("Count");
   mode2.hInsetRatio->Draw("hist");
-  mode1.hInsetRatio->Draw("hist same");
+  // mode1.hInsetRatio->Draw("hist same");
   mode0.hInsetRatio->Draw("hist same");
 
   TLine* lineInset = new TLine(0, 1, insetXmax, 1);

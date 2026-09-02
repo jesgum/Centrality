@@ -8,6 +8,14 @@
 namespace cent
 {
 
+enum GlauberQuantity {
+  kNpart = 0,
+  kNcoll,
+  kNanc,
+  kEcc,
+  kB
+};
+
 // Returns the value X such that lPercentileRequested% of entries lie above X.
 inline double getBoundaryForPercentile(TH1* histo, double lPercentileRequested)
 {
