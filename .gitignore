@@ -3,6 +3,7 @@
 !basehistos*
 .vscode
 *.pdf
+*.txt
 *.png
 
 glaubernew
