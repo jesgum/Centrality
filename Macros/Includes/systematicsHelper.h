@@ -15,6 +15,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <initializer_list>
 
 #include "centralityHelper.h"
 
@@ -23,25 +24,52 @@ namespace syst {
 static const std::vector<float> CentBins = { 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
 // static const std::vector<float> CentBins = { 0, 100 };
 static const std::vector<double> centBinsD(CentBins.begin(), CentBins.end());
-static TH1F* hNpartNcollBase = new TH1F("hhNpartNcollBase", "", static_cast<int>(centBinsD.size()) - 1, centBinsD.data());
 
+// Hist1D is a template parameter (rather than a fixed TH1F/TH1D) because
+// GlauberParameters is filled from ROOT files that store these histograms
+// with different precisions depending on their origin (see below).
+template <typename Hist1D = TH1F>
+inline Hist1D* initGlauParHist(const std::vector<float>& vals, const char* title, const int color)
+{
+  const bool oldAddDirStatus = TH1::AddDirectoryStatus();
+  TH1::AddDirectory(kFALSE);
+  Hist1D* hist = new Hist1D(title, "", static_cast<int>(centBinsD.size()) - 1, centBinsD.data());
+  TH1::AddDirectory(oldAddDirStatus);
+  hist->SetMarkerStyle(kFullCircle);
+  hist->SetMarkerColor(color);
+  hist->SetLineColor(color);
+  for (int ibin = 0; ibin < hist->GetNbinsX(); ++ibin) {
+    hist->SetBinContent(ibin + 1, vals[ibin]);
+    hist->SetBinError(ibin + 1, 1e-4);
+  }
+  return hist;
+}
 
+// Hist2D/Hist1D let callers pick TH2F/TH1F or TH2D/TH1D to match the actual
+// type of h2dNpart/h2dNcoll in the source file: the Glauber calibration files
+// (Glauber/runCalibration*.cc) write TH2F, while the Trento calibration file
+// (Trento/runTrentoCalib.cc) writes TH2D. Defaults match the Glauber files.
+template <typename Hist2D = TH2F, typename Hist1D = TH1F>
 struct GlauberParameters {
-  TH2F* h2dNpart = nullptr;
-  TH2F* h2dNcoll = nullptr;
+  Hist2D* h2dNpart = nullptr;
+  Hist2D* h2dNcoll = nullptr;
+  Hist1D* hNpart = nullptr;
+  Hist1D* hNcoll = nullptr;
   std::vector<float> npart, ncoll;
-  GlauberParameters(const char* path);
+  GlauberParameters(const char* path, const bool useFullPath = false);
 };
 
-GlauberParameters::GlauberParameters(const char* path)
+template <typename Hist2D, typename Hist1D>
+GlauberParameters<Hist2D, Hist1D>::GlauberParameters(const char* path, const bool useFullPath)
 {
-  TFile* infile = new TFile(Form("../AnalysisResults/%s", path), "read");
+  const char* fullpath = useFullPath ? path : Form("../AnalysisResults/%s", path);
+  TFile* infile = new TFile(fullpath, "read");
   if (!infile || infile->IsZombie()) {
     std::cerr << "Error: file not found!" << std::endl;
   }
 
-  h2dNpart = dynamic_cast<TH2F*>(infile->Get("h2dNpart"));
-  h2dNcoll = dynamic_cast<TH2F*>(infile->Get("h2dNcoll"));
+  h2dNpart = dynamic_cast<Hist2D*>(infile->Get("h2dNpart"));
+  h2dNcoll = dynamic_cast<Hist2D*>(infile->Get("h2dNcoll"));
 
   if (!h2dNpart) {
     std::cerr << "Error: h2dNpart not found!" << std::endl;
@@ -53,15 +81,13 @@ GlauberParameters::GlauberParameters(const char* path)
 
   h2dNpart->SetDirectory(0);
   h2dNcoll->SetDirectory(0);
-  h2dNpart->GetYaxis()->SetRangeUser(0, 40);
-  h2dNcoll->GetYaxis()->SetRangeUser(0, 100);
 
   infile->Close();
   delete infile;
 
   for (int icent{ 0 }; icent < h2dNcoll->GetNbinsX(); ++icent) {
-    TH1D* hProjectionNpart = dynamic_cast<TH1D*>(h2dNpart->ProjectionY(Form("hProjectionNpart_%d", icent + 1), icent + 1, icent + 1));
-    TH1D* hProjectionNcoll = dynamic_cast<TH1D*>(h2dNcoll->ProjectionY(Form("hProjectionNcoll_%d", icent + 1), icent + 1, icent + 1));
+    TH1D* hProjectionNpart = (TH1D*)h2dNpart->ProjectionY(Form("hProjectionNpart_%d", icent + 1), icent + 1, icent + 1);
+    TH1D* hProjectionNcoll = (TH1D*)h2dNcoll->ProjectionY(Form("hProjectionNcoll_%d", icent + 1), icent + 1, icent + 1);
     npart.push_back(hProjectionNpart->GetMean());
     ncoll.push_back(hProjectionNcoll->GetMean());
     delete hProjectionNpart;
@@ -91,22 +117,17 @@ GlauberParameters::GlauberParameters(const char* path)
 
   rebinInPlace(npart, CentBins);
   rebinInPlace(ncoll, CentBins);
+
+  TString histName(path);
+  histName.ReplaceAll(".root", "");
+  histName.ReplaceAll("/", "_");
+
+  hNpart = initGlauParHist<Hist1D>(npart, Form("hNpart_%s", histName.Data()), kBlack);
+  hNcoll = initGlauParHist<Hist1D>(ncoll, Form("hNcoll_%s", histName.Data()), kBlack);
 }
 
-inline TH1F* initGlauParHist(const std::vector<float>& vals, const char* title, const int color)
-{
-  TH1F* hist = dynamic_cast<TH1F*>(hNpartNcollBase->Clone(title));
-  hist->SetMarkerStyle(kFullCircle);
-  hist->SetMarkerColor(color);
-  hist->SetLineColor(color);
-  for (int ibin = 0; ibin < hist->GetNbinsX(); ++ibin) {
-    hist->SetBinContent(ibin + 1, vals[ibin]);
-    hist->SetBinError(ibin + 1, 1e-4);
-  }
-  return hist;
-}
-
-inline void doGlauParQA(TH2F* h2d, TH1F* h1d, const char* name)
+template <typename Hist2D, typename Hist1D>
+inline void doGlauParQA(Hist2D* h2d, Hist1D* h1d, const char* name)
 {
   TCanvas* canv = new TCanvas(Form("canv%s", name), "", 1200, 1000);
   canv->SetLogz();
@@ -116,7 +137,8 @@ inline void doGlauParQA(TH2F* h2d, TH1F* h1d, const char* name)
   delete canv;
 }
 
-inline std::vector<std::vector<float>> computeSystematics(GlauberParameters base, const std::vector<GlauberParameters>& variations)
+template <typename GPBase, typename GPVar>
+inline std::vector<std::vector<float>> computeSystematics(GPBase base, std::initializer_list<GPVar> variations)
 {
   std::vector<std::vector<float>> variationsNpart;
   std::vector<std::vector<float>> variationsNcoll;
@@ -128,7 +150,8 @@ inline std::vector<std::vector<float>> computeSystematics(GlauberParameters base
   return { cent::averageOverVariations(variationsNpart), cent::averageOverVariations(variationsNcoll) };
 }
 
-inline std::vector<std::vector<float>> computeRelativeSystematics(GlauberParameters base, const std::vector<GlauberParameters>& variations)
+template <typename GPBase, typename GPVar>
+inline std::vector<std::vector<float>> computeRelativeSystematics(GPBase base, std::initializer_list<GPVar> variations)
 {
   std::vector<std::vector<float>> variationsNpart;
   std::vector<std::vector<float>> variationsNcoll;
@@ -179,7 +202,8 @@ void styleCanvas(TCanvas* canv)
   canv->SetBottomMargin(0.13);
 }
 
-void styleHist(TH1F* hist, const char* titleYaxis)
+template <typename Hist1D>
+inline void styleHist(Hist1D* hist, const char* titleYaxis)
 {
   hist->SetMinimum(0);
 
