@@ -71,11 +71,12 @@ void runTrentoFit(Double_t lFitRange = 132.5, Double_t lPlotXrange = 54000)
   //+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   // Acquire data to start
   //+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  TFile* file = new TFile("AR_572183.root", "READ");
+  TFile* file = new TFile("../AnalysisResults/LHC23_pass5/AR_544122.root", "READ");
   TH1D* hV0M = (TH1D*)file->Get("centrality-study/hFT0C_BCs");
+  TH1D* hV0MUltraFine = (TH1D*)hV0M->Clone("hV0MUltraFine");
   hV0M->SetName("hData");
-  hV0M->Rebin(20);
   hV0M->SetMinimum(2e-1);
+  hV0M->Rebin(20);
 
   TCanvas* c1 = new TCanvas("c1", "", 1600, 1200);
   c1->Divide(1, 2);
@@ -113,7 +114,7 @@ void runTrentoFit(Double_t lFitRange = 132.5, Double_t lPlotXrange = 54000)
 
   // Get Entropy, please
 
-  TFile* fileTrento = new TFile("outfile.root", "READ");
+  TFile* fileTrento = new TFile("outfileJesper.root", "READ");
   TH1D* hEntropy = (TH1D*)fileTrento->Get("hEntropy");
 
   gStyle->SetOptStat(0);
@@ -172,8 +173,8 @@ void runTrentoFit(Double_t lFitRange = 132.5, Double_t lPlotXrange = 54000)
   }
 
   // Do a ratio plot
-  TH1D* hGlauber = (TH1D*)hV0M->Clone("hGlauber");
-  TH1D* hRatio = (TH1D*)hV0M->Clone("hRatio");
+  TH1D* hGlauber = (TH1D*)hV0MUltraFine->Clone("hGlauber");
+  TH1D* hRatio = (TH1D*)hV0MUltraFine->Clone("hRatio");
   hGlauber->Reset();
 
   cout<<"Calculating glauber function histogram with the same binning as data input... please wait..."<<endl;
@@ -263,6 +264,7 @@ void runTrentoFit(Double_t lFitRange = 132.5, Double_t lPlotXrange = 54000)
 
   TFile* outfile = new TFile("trentofit.root", "recreate");
   hV0M->Write();
+  hV0MUltraFine->Write();
   hGlauber->Write();
   hRatio->Write();
 
