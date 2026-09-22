@@ -136,7 +136,13 @@ Double_t GetBoundaryForPercentile( TH1 *histo, Double_t lPercentileRequested ) {
   return lReturnValue;
 }
 
-int runGlauFit(TString lInputFileName = "AnalysisResultsLHC24ar.root", Double_t lFitRange = /*350*/500., TString histogramName = "hFT0C_BCs", int ancestorMode = 2, Bool_t lFreek = kFALSE, Bool_t use_dMu_dNanc = kFALSE, Bool_t lFreef = kFALSE, Float_t lfvalue = 0.800) {
+int runGlauFit(TString lInputFileName = "AnalysisResultsLHC24ar.root", Double_t lFitRange = /*350*/500., TString histogramName = "hFT0C_BCs", TString lBaseHistName = "basehistos") {
+  int ancestorMode = 2;
+  Bool_t lFreek = kFALSE;
+  Bool_t use_dMu_dNanc = kFALSE;
+  Bool_t lFreef = kFALSE;
+  Float_t lfvalue = 0.800;
+
   gStyle->SetLineScalePS(1);
   gStyle->SetOptStat(0);
   //  cout<<"Loading library..."<<endl;
@@ -149,16 +155,16 @@ int runGlauFit(TString lInputFileName = "AnalysisResultsLHC24ar.root", Double_t 
   if(!file) cout<<"Problem with file!"<<endl;
   TH1F *hV0Mfine = 0x0; 
 
-  // hV0Mfine = (TH1F *) file -> Get(Form("centrality-study/%s", histogramName.Data()));
+  hV0Mfine = (TH1F *) file -> Get(Form("centrality-study/%s", histogramName.Data()));
   // hV0Mfine = (TH1F *) file -> Get(Form("centrality-study_selectFV0OrA/%s", histogramName.Data()));
-  hV0Mfine = (TH1F *) file -> Get(Form("centrality-study_rejectpileup/%s", histogramName.Data()));
+  // hV0Mfine = (TH1F *) file -> Get(Form("centrality-study_rejectpileup/%s", histogramName.Data()));
 
   // disregard bin zero
   cout<<"Received bin zero content: "<< hV0Mfine ->GetBinContent(0)<<", will set to zero..."<<endl; 
   hV0Mfine ->SetBinContent(0, 0); 
 
   if(!hV0Mfine) cout<<"Problem with histogram!"<<endl; 
-  
+
   cout<<"Input histogram has been received successfully! Information: "<<endl; 
 
   cout<<"Counts: "<<hV0Mfine->GetEntries()<<endl;
@@ -174,6 +180,7 @@ int runGlauFit(TString lInputFileName = "AnalysisResultsLHC24ar.root", Double_t 
   
   lProcessedFileName.ReplaceAll("ARs/", "results/");
   lProcessedFileName.ReplaceAll(".root", Form("_glauberNBD_ancestorMode%i_%s_%s_%s.root",ancestorMode, lkMode.Data(), lSaturationMode.Data(), histogramName.Data()));
+  lProcessedFileName.ReplaceAll(".root", Form("_%s.root", lBaseHistName.Data()));
   TFile *fOutput = new TFile(lProcessedFileName.Data(), "RECREATE");
 
   TH1F *hV0M = (TH1F*) hV0Mfine->Clone("hV0M");
@@ -249,7 +256,7 @@ int runGlauFit(TString lInputFileName = "AnalysisResultsLHC24ar.root", Double_t 
   g->SetAncestorMode(ancestorMode);
   
   //Step 1: open the (Npart, Ncoll) pair information, provide
-  TFile *fbasefile = new TFile("basehistos.root","READ");
+  TFile *fbasefile = new TFile(Form("%s.root", lBaseHistName.Data()),"READ");
   TH2D *hNpNc = (TH2D*) fbasefile->Get("hNpNc");
   
   if(!hNpNc){

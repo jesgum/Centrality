@@ -35,6 +35,17 @@ OO_2025="${AR_PATH}LHC25ae_pass2/"
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbpnrw.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbpnrw\"\)&
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2025}AR_568117_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbrw.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbrw\"\)&
 
+root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb.root\"\,90.5,200.0,kTRUE\,\"basehistos_Pb\"\)&
+root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb.root\"\,89.5,200.0,kTRUE\,\"basehistos_Pb\"\)&
+root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb.root\"\,91.0,200.0,kTRUE\,\"basehistos_Pb\"\)&
+root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb.root\"\,89.0,200.0,kTRUE\,\"basehistos_Pb\"\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pb\"\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_PbHN.root\"\,90.0,200.0,kTRUE\,\"basehistos_PbHN\"\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbpn.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbpn\"\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbstar.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbstar\"\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbpnrw.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbpnrw\"\)&
+# root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbrw.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbrw\"\)&
+
 DO_NPART_NCOLL=kTRUE
 
 # root.exe -q -b runCalibrationLightIon.cc\(\"${OO_2025}AR_564374_glauberNBD_hFT0M_Collisions.root\",${DO_NPART_NCOLL}\)&
@@ -102,9 +113,9 @@ DO_NPART_NCOLL=kTRUE
 # root.exe -q -b runCalibration.cc\(\"${OO_2025}AR_564445_glauberNBD_hFT0M_Collisions.root\"\,70,200.0,${DO_NPART_NCOLL}\,\"basehistos_Oho2_Oho2_omega0.3\"\)&
 
 
-root.exe -q -b runCalibrationOO.cc\(\"../AnalysisResults/LHC25ae_pass2_extra2/AR_564374_glauberNBD_hFT0M_Collisions_vtxZ.root\",${DO_NPART_NCOLL}\)&
-root.exe -q -b runCalibrationOO.cc\(\"../AnalysisResults/LHC25ae_pass2_extra2/AR_564374_glauberNBD_hFT0M_Collisions_nopileup.root\",${DO_NPART_NCOLL}\)&
-root.exe -q -b runCalibrationOO.cc\(\"../AnalysisResults/LHC25ae_pass2_extra2/AR_564374_glauberNBD_hFT0M_Collisions_nosel.root\",${DO_NPART_NCOLL}\)&
+# root.exe -q -b runCalibrationOO.cc\(\"../AnalysisResults/LHC25ae_pass2_extra2/AR_564374_glauberNBD_hFT0M_Collisions_vtxZ.root\",${DO_NPART_NCOLL}\)&
+# root.exe -q -b runCalibrationOO.cc\(\"../AnalysisResults/LHC25ae_pass2_extra2/AR_564374_glauberNBD_hFT0M_Collisions_nopileup.root\",${DO_NPART_NCOLL}\)&
+# root.exe -q -b runCalibrationOO.cc\(\"../AnalysisResults/LHC25ae_pass2_extra2/AR_564374_glauberNBD_hFT0M_Collisions_nosel.root\",${DO_NPART_NCOLL}\)&
 
 
 wait

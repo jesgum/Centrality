@@ -40,6 +40,23 @@ OO_2025="${AR_PATH}LHC25ae_pass2/"
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpnrw\"\)&
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2025}AR_568117.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbrw\"\)&
 
+###  Basehistos for 2023
+# TString lInputFileName = "AnalysisResultsLHC24ar.root"
+# Double_t lFitRange = /*350*/500.
+# TString histogramName = "hFT0C_BCs"
+# int ancestorMode = 2
+# Bool_t lFreek = kFALSE
+# Bool_t use_dMu_dNanc = kFALSE
+# Bool_t lFreef = kFALSE
+# Float_t lfvalue = 0.800
+
+root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pb\"\)&
+root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_PbHN\"\)&
+root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpn\"\)&
+root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbstar\"\)&
+root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpnrw\"\)&
+root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbrw\"\)&
+
 ###  OO: Fitting BC vs collisions
 # root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
 # root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
@@ -52,7 +69,7 @@ OO_2025="${AR_PATH}LHC25ae_pass2/"
 # root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564445.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
 
 
-root.exe -q -b runGlauFitOO.cc\(\"../AnalysisResults/LHC25ae_pass2_extra2/AR_564374.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\,\"\"\)&
+# root.exe -q -b runGlauFitOO.cc\(\"../AnalysisResults/LHC25ae_pass2_extra2/AR_564374.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\,\"\"\)&
 # root.exe -q -b runGlauFitOO.cc\(\"../AnalysisResults/LHC25ae_pass2_extra/AR_564374.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\,\"_bc_vtxZ\"\)&
 wait
 echo "Done!"

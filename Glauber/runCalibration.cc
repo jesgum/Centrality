@@ -31,6 +31,9 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
   hData->SetName("hData");
   TH1F* hStitched = (TH1F*)hData->Clone("hStitched");
   TH1F* hFit = (TH1F*)file->Get("hGlauberFine");
+  if (!hFit) {
+    hFit = (TH1F*)file->Get("hGlauber");
+  }
 
   TCanvas* c1 = new TCanvas("c1", "", 800, 600);
   c1->SetLeftMargin(0.17);
@@ -118,7 +121,7 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
 
   TString calibFileName = lInputFileName.Data();
   calibFileName.ReplaceAll("glauberNBD", "calibration");
-  calibFileName.ReplaceAll(".root", Form("_Anchor%.0f.root", anchorPointPercentage));
+  calibFileName.ReplaceAll(".root", Form("_Anchor%.1f.root", anchorPointPercentage));
   TFile* fileCalib = new TFile(calibFileName.Data(), "RECREATE");
   // TFile* fileCalib = new TFile(outfile, "RECREATE");
 
