@@ -19,15 +19,24 @@
 static const std::vector<float> NpartVal = { 382.6, 330.6, 265.0, 194.5, 138.8, 94.7, 60.1, 34.5, 17.4, 7.8, 3.4 };
 static const std::vector<float> NcollVal = { 1780.9, 1387.0, 988.2, 618.0, 369.9, 206.1, 103.7, 46.1, 18.1, 6.5, 2.3 };
 
+// Run 2 reference, one entry per syst::CentBins interval (0-5, 5-10, 10-20, ..., 90-100).
+// No value is available for 10-20%, so it is set to -1 and not drawn.
+static const std::vector<float> NpartValRun1 = { 381.5, 327.8, 259.3, 186.5, 130.1, 86.69, 54.28, 31.04, 15.81, 7.011, 2.788 };
+static const std::vector<float> NpartValRun2 = { 383.4, 331.2, 262.0, 187.9, 130.8, 87.14, 54.34, 30.97, 15.72, 6.973, 2.785 };
+
+static const std::vector<float> NcollValRun1 = { 1619.0, 1269.0, 897.7, 553.7, 325.0, 176.6, 88.21, 39.74, 15.96, 5.657, 1.709 };
+static const std::vector<float> NcollValRun2 = { 1763.0, 1382.0, 973.4, 592.7, 343.8, 185.7, 91.41, 40.50, 16.12, 5.667, 1.708 };
+
+static const std::vector<float> NpartErrRun1 = { 1.700, 2.80, 2.70, 2.40, 2.20, 2.000, 1.900, 1.30, 0.780, 0.3300, 0.1200 };
+static const std::vector<float> NpartErrRun2 = { 0.568, 1.03, 1.15, 1.34, 1.33, 0.928, 0.802, 0.57, 0.241, 0.0729, 0.0497 };
+
+static const std::vector<float> NcollErrRun1 = { 31.0, 27.0, 21.0, 14.0, 9.70, 6.00, 4.00, 2.40, 0.930, 0.31, 0.0990 };
+static const std::vector<float> NcollErrRun2 = { 19.4, 15.7, 11.3, 8.21, 5.76, 3.33, 2.11, 1.03, 0.341, 0.10, 0.0474 };
+
 void doSystematicsPbPb()
 {
   gStyle->SetOptStat(0);
   syst::GlauberParameters base("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.root");
-
-  syst::GlauberParameters anchor89("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor89.root");
-  syst::GlauberParameters anchor89p5("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor89.5.root");
-  syst::GlauberParameters anchor90p5("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.5.root");
-  syst::GlauberParameters anchor91("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor91.root");
 
   syst::GlauberParameters pbHN("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_PbHN_Anchor90.root");
   syst::GlauberParameters pbpn("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbpn_Anchor90.root");
@@ -37,131 +46,44 @@ void doSystematicsPbPb()
 
   syst::GlauberParameters<TH2D> trento("../Trento/trentofit_calib.root", true);
 
-  std::vector<std::vector<float>> systShape = syst::computeSystematics(base, {pbHN, pbpn, pbpnrw, pbrw, pbstar});
-  std::vector<std::vector<float>> relSystShape = syst::computeRelativeSystematics(base ,{pbHN, pbpn, pbpnrw, pbrw, pbstar});
+  syst::GlauberParameters anchor89("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor89.root");
+  syst::GlauberParameters anchor89p5("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor89.5.root");
+  syst::GlauberParameters anchor90p5("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.5.root");
+  syst::GlauberParameters anchor91("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor91.root");
 
-  std::vector<std::vector<float>> systAnchorShift0p5 = syst::computeSystematics(base, {anchor89p5, anchor90p5});
-  std::vector<std::vector<float>> relSystAnchorShift0p5 = syst::computeRelativeSystematics(base ,{anchor89p5, anchor90p5});
-  std::vector<std::vector<float>> systAnchorShift1p0 = syst::computeSystematics(base, {anchor89, anchor91});
-  std::vector<std::vector<float>> relSystAnchorShift1p0 = syst::computeRelativeSystematics(base ,{anchor89, anchor91});
-  
-  std::vector<std::vector<float>> systTrento = syst::computeSystematics(base, {trento});
-  std::vector<std::vector<float>> relSystTrento = syst::computeRelativeSystematics(base, {trento});
+  syst::GlauberParameters nancestor0("LHC23_pass5/AR_544122_calibration_ancestorMode0_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.0.root");
+  syst::GlauberParameters nancestor1("LHC23_pass5/AR_544122_calibration_ancestorMode1_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.0.root");
+  syst::GlauberParameters globalNorm("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_var1_Anchor90.0.root");
 
-  std::vector<std::vector<float>> systTotal = syst::combineSystematicsInQuadrature(systShape, systTrento, systAnchorShift0p5);
-  std::vector<std::vector<float>> relSystTotal = syst::combineSystematicsInQuadrature(relSystShape, relSystTrento, relSystAnchorShift0p5);
+  syst::GlauberParameters collisions("LHC23_pass5_small/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_Collisions_basehistos_Pb_Anchor90.0.root");
+  syst::GlauberParameters runDeviation("LHC25_pass1/AR_567905_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root");
 
-  ColorManager cm(6);
+  ColorManager cm(9);
+  std::vector<syst::SystSource> sources = {
+    syst::makeSystSource("Nuclei shape", cm.getColor(0),    /*draw*/ false,    /*includeInTotal*/ true,       base, { pbHN, pbpn, pbpnrw, pbrw, pbstar }),
+    syst::makeSystSource("Trento", cm.getColor(1),          /*draw*/ false,    /*includeInTotal*/ true,       base, { trento }),
+    syst::makeSystSource("0.5% shift", cm.getColor(2),      /*draw*/ false,    /*includeInTotal*/ false,      base, { anchor89p5, anchor90p5 }),
+    syst::makeSystSource("1.0% AP shift", cm.getColor(3),   /*draw*/ false,    /*includeInTotal*/ true,       base, { anchor89, anchor91 }),
+    syst::makeSystSource("Variant1", cm.getColor(4),        /*draw*/ false,    /*includeInTotal*/ false,      base, { globalNorm }),
+    syst::makeSystSource("Variant2", cm.getColor(5),        /*draw*/ false,    /*includeInTotal*/ false,      base, { nancestor0 }),
+    syst::makeSystSource("Nanc Rounded", cm.getColor(5),    /*draw*/ false,    /*includeInTotal*/ false,      base, { nancestor1 }),
+    syst::makeSystSource("Collisions", cm.getColor(7),      /*draw*/ false,    /*includeInTotal*/ true,       base, { collisions }),
+    syst::makeSystSource("Run deviation", cm.getColor(8),   /*draw*/ false,    /*includeInTotal*/ true,       base, { runDeviation }),
+  };
 
-  TH1F* hSysTotalNpart = syst::initGlauParHist(systTotal[cent::kNpart], "hSysTotalNpart", kBlack);
-  TH1F* hSysTotalNcoll = syst::initGlauParHist(systTotal[cent::kNcoll], "hSysTotalNcoll", kBlack);
-  TH1F* hRelSysTotalNpart = syst::initGlauParHist(relSystTotal[cent::kNpart], "hRelSysTotalNpart", kBlack);
-  TH1F* hRelSysTotalNcoll = syst::initGlauParHist(relSystTotal[cent::kNcoll], "hRelSysTotalNcoll", kBlack);
+  syst::SystSource run1 = syst::makeReferenceSource("Run 1", kBlue, NpartValRun1, NpartErrRun1, NcollValRun1, NcollErrRun1);
+  run1.marker = kFullCircle;
+  syst::SystSource run2 = syst::makeReferenceSource("Run 2", kRed, NpartValRun2, NpartErrRun2, NcollValRun2, NcollErrRun2);
+  run2.marker = kFullSquare;
 
-  TH1F* hSysShapeNpart = syst::initGlauParHist(systShape[cent::kNpart], "hSysShapeNpart", cm.getColor(0));
-  TH1F* hSysShapeNcoll = syst::initGlauParHist(systShape[cent::kNcoll], "hSysShapeNcoll", cm.getColor(0));
-  TH1F* hRelSysShapeNpart = syst::initGlauParHist(relSystShape[cent::kNpart], "hRelSysShapeNpart", cm.getColor(0));
-  TH1F* hRelSysShapeNcoll = syst::initGlauParHist(relSystShape[cent::kNcoll], "hRelSysShapeNcoll", cm.getColor(0));
+  sources.push_back(run1);
+  sources.push_back(run2);
 
-  TH1F* hSysTrentoNpart = syst::initGlauParHist(systTrento[cent::kNpart], "hSysTrentoNpart", cm.getColor(1));
-  TH1F* hSysTrentoNcoll = syst::initGlauParHist(systTrento[cent::kNcoll], "hSysTrentoNcoll", cm.getColor(1));
-  TH1F* hRelSysTrentoNpart = syst::initGlauParHist(relSystTrento[cent::kNpart], "hRelSysTrentoNpart", cm.getColor(1));
-  TH1F* hRelSysTrentoNcoll = syst::initGlauParHist(relSystTrento[cent::kNcoll], "hRelSysTrentoNcoll", cm.getColor(1));
+  syst::SystSource total = syst::combineSourcesInTotal("Total with TRENTo", kBlack, /*draw*/ true, sources);
+  total.print(cent::kNpart);
 
-  TH1F* hSysAnchorShift0p5Npart = syst::initGlauParHist(systAnchorShift0p5[cent::kNpart], "hSysAnchorShift0p5Npart", cm.getColor(2));
-  TH1F* hSysAnchorShift0p5Ncoll = syst::initGlauParHist(systAnchorShift0p5[cent::kNcoll], "hSysAnchorShift0p5Ncoll", cm.getColor(2));
-  TH1F* hRelSysAnchorShift0p5Npart = syst::initGlauParHist(relSystAnchorShift0p5[cent::kNpart], "hRelSysAnchorShift0p5Npart", cm.getColor(2));
-  TH1F* hRelSysAnchorShift0p5Ncoll = syst::initGlauParHist(relSystAnchorShift0p5[cent::kNcoll], "hRelSysAnchorShift0p5Ncoll", cm.getColor(2));
-
-  TH1F* hSysAnchorShift1p0Npart = syst::initGlauParHist(systAnchorShift1p0[cent::kNpart], "hSysAnchorShift1p0Npart", cm.getColor(3));
-  TH1F* hSysAnchorShift1p0Ncoll = syst::initGlauParHist(systAnchorShift1p0[cent::kNcoll], "hSysAnchorShift1p0Ncoll", cm.getColor(3));
-  TH1F* hRelSysAnchorShift1p0Npart = syst::initGlauParHist(relSystAnchorShift1p0[cent::kNpart], "hRelSysAnchorShift1p0Npart", cm.getColor(3));
-  TH1F* hRelSysAnchorShift1p0Ncoll = syst::initGlauParHist(relSystAnchorShift1p0[cent::kNcoll], "hRelSysAnchorShift1p0Ncoll", cm.getColor(3));
-
-
-  TH1F* hSysTotalNpartCopy = dynamic_cast<TH1F*>(hSysTotalNpart->Clone("hSysTotalNpartCopy"));
-  hSysTotalNpartCopy->SetMarkerColorAlpha(0, 0);
-  hSysTotalNpartCopy->SetLineColorAlpha(0, 0);
-  TH1F* hSysTotalNcollCopy = dynamic_cast<TH1F*>(hSysTotalNcoll->Clone("hSysTotalNcollCopy"));
-  hSysTotalNcollCopy->SetMarkerColorAlpha(0, 0);
-  hSysTotalNcollCopy->SetLineColorAlpha(0, 0);
-  TH1F* hRelSysTotalNpartCopy = dynamic_cast<TH1F*>(hRelSysTotalNpart->Clone("hRelSysTotalNpartCopy"));
-  hRelSysTotalNpartCopy->SetMarkerColorAlpha(0, 0);
-  hRelSysTotalNpartCopy->SetLineColorAlpha(0, 0);
-  TH1F* hRelSysTotalNcollCopy = dynamic_cast<TH1F*>(hRelSysTotalNcoll->Clone("hRelSysTotalNcollCopy"));
-  hRelSysTotalNcollCopy->SetMarkerColorAlpha(0, 0);
-  hRelSysTotalNcollCopy->SetLineColorAlpha(0, 0);
-
-  hSysTotalNpartCopy->SetMinimum(1e-2);
-  hSysTotalNcollCopy->SetMinimum(1e-2);
-  hRelSysTotalNcollCopy->SetMinimum(1e-2);
-  hRelSysTotalNpartCopy->SetMinimum(1e-2);
-
-  const int canvWidth = 1600;
-  const int canvHeight = 1000;
-  const bool drawShape = true;
-  const bool drawTrento = true;
-  const bool drawSysAnchorShift0p5 = true;
-  const bool drawSysAnchorShift1p0 = true;
-  const bool drawTotal = false;
-
-  TLegend* leg = new TLegend(0.18, 0.61, 0.43, 0.94);
-  leg->SetBorderSize(0);
-  leg->SetFillColorAlpha(0, 0);
-  leg->AddEntry(hSysTotalNpart, "Total", "l");
-  leg->AddEntry(hSysShapeNpart, "Nuclei shape", "l");
-  leg->AddEntry(hSysTrentoNpart, "Trento", "l");
-  leg->AddEntry(hSysAnchorShift0p5Npart, "0.5% shift", "l");
-  leg->AddEntry(hSysAnchorShift1p0Npart, "1.0% shift", "l");
-
-  // hRelSysTotalNpartCopy->SetMaximum(1);
-  // hRelSysTotalNcollCopy->SetMaximum(1);
-
-  TCanvas* canvNpartSystematics = new TCanvas("canvNpartSystematics", "", canvWidth, canvHeight);
-  syst::styleCanvas(canvNpartSystematics);
-  syst::styleHist(hSysTotalNpartCopy, "<N_{part}> systematic uncertainty");
-  hSysTotalNpartCopy->Draw("");
-  if (drawShape) hSysShapeNpart->Draw("hist same");
-  if (drawTrento) hSysTrentoNpart->Draw("hist same");
-  if (drawSysAnchorShift0p5) hSysAnchorShift0p5Npart->Draw("hist same");
-  if (drawSysAnchorShift1p0) hSysAnchorShift1p0Npart->Draw("hist same");
-  if (drawTotal) hSysTotalNpart->Draw("hist same");
-  leg->Draw();
-  canvNpartSystematics->SaveAs("hNpartSystematics_PbPb.pdf");
-
-  TCanvas* canvNcollSystematics = new TCanvas("canvNcollSystematics", "", canvWidth, canvHeight);
-  syst::styleCanvas(canvNcollSystematics);
-  syst::styleHist(hSysTotalNcollCopy, "<N_{coll}> systematic uncertainty");
-  hSysTotalNcollCopy->Draw("");
-  if (drawShape) hSysShapeNcoll->Draw("hist same");
-  if (drawTrento) hSysTrentoNcoll->Draw("hist same");
-  if (drawSysAnchorShift0p5) hSysAnchorShift0p5Ncoll->Draw("hist same");
-  if (drawSysAnchorShift1p0) hSysAnchorShift1p0Ncoll->Draw("hist same");
-  if (drawTotal) hSysTotalNcoll->Draw("hist same");
-  leg->Draw();
-  canvNcollSystematics->SaveAs("hNcollSystematics_PbPb.pdf");
-
-  TCanvas* canvRelNpartSystematics = new TCanvas("canvRelNpartSystematics", "", canvWidth, canvHeight);
-  syst::styleCanvas(canvRelNpartSystematics);
-  syst::styleHist(hRelSysTotalNpartCopy, "<N_{part}> relative systematic uncertainty");
-  hRelSysTotalNpartCopy->Draw("");
-  if (drawShape) hRelSysShapeNpart->Draw("hist same");
-  if (drawTrento) hRelSysTrentoNpart->Draw("hist same");
-  if (drawSysAnchorShift0p5) hRelSysAnchorShift0p5Npart->Draw("hist same");
-  if (drawSysAnchorShift1p0) hRelSysAnchorShift1p0Npart->Draw("hist same");
-  if (drawTotal) hRelSysTotalNpart->Draw("hist same");
-  leg->Draw();
-  canvRelNpartSystematics->SaveAs("hNpartRelSystematics_PbPb.pdf");
-
-  TCanvas* canvRelNcollSystematics = new TCanvas("canvRelNcollSystematics", "", canvWidth, canvHeight);
-  syst::styleCanvas(canvRelNcollSystematics);
-  syst::styleHist(hRelSysTotalNcollCopy, "<N_{coll}> relative systematic uncertainty");
-  hRelSysTotalNcollCopy->Draw("");
-  if (drawShape) hRelSysShapeNcoll->Draw("hist same");
-  if (drawTrento) hRelSysTrentoNcoll->Draw("hist same");
-  if (drawSysAnchorShift0p5) hRelSysAnchorShift0p5Ncoll->Draw("hist same");
-  if (drawSysAnchorShift1p0) hRelSysAnchorShift1p0Ncoll->Draw("hist same");
-  if (drawTotal) hRelSysTotalNcoll->Draw("hist same");
-  leg->Draw();
-  canvRelNcollSystematics->SaveAs("hNcollRelSystematics_PbPb.pdf");
+  // syst::drawSystematics(sources, total, cent::kNpart, /*relative*/ false, "<N_{part}> systematic uncertainty", "hNpartSystematics_PbPb.pdf", 2e-6, 8e-1);
+  // syst::drawSystematics(sources, total, cent::kNcoll, /*relative*/ false, "<N_{coll}> systematic uncertainty", "hNcollSystematics_PbPb.pdf", 2e-6, 8e-1);
+  syst::drawSystematics(sources, total, cent::kNpart, /*relative*/ true, "<N_{part}> relative systematic uncertainty", "hNpartRelSystematics_PbPb.pdf", 5e-4, 3e+0);
+  syst::drawSystematics(sources, total, cent::kNcoll, /*relative*/ true, "<N_{coll}> relative systematic uncertainty", "hNcollRelSystematics_PbPb.pdf", 5e-3, 3e+1);
 }

@@ -11,7 +11,7 @@
 #include <vector>
 #include <string>  
 
-#include "colorManager.h"
+#include "Includes/colorManager.h"
 
 std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, TString basehistos, const char* name)
 {
@@ -153,9 +153,9 @@ void drawTGlauberMC()
   ColorManager cm(6);
   pbpb25_568117->setColor(cm.getColor(-1));
   pbpb25_568117_Pb->setColor(cm.getColor(0));
-  pbpb25_568117_PbHN->setColor(cm.getColor(1));
+  pbpb25_568117_Pbstar->setColor(cm.getColor(1));
   pbpb25_568117_Pbpn->setColor(cm.getColor(2));
-  pbpb25_568117_Pbstar->setColor(cm.getColor(3));
+  pbpb25_568117_PbHN->setColor(cm.getColor(3));
   pbpb25_568117_Pbrw->setColor(cm.getColor(4));
   pbpb25_568117_Pbpnrw->setColor(cm.getColor(5));
 
@@ -164,11 +164,11 @@ void drawTGlauberMC()
   legend->SetFillColorAlpha(0, 0);
   legend->AddEntry(pbpb25_568117->histos[kNpart], "default", "pl");
   legend->AddEntry(pbpb25_568117_Pb->histos[kNpart], "Pb", "lp");
-  legend->AddEntry(pbpb25_568117_PbHN->histos[kNpart], "PbHN", "pl");
-  legend->AddEntry(pbpb25_568117_Pbpn->histos[kNpart], "Pbpn", "lp");
   legend->AddEntry(pbpb25_568117_Pbstar->histos[kNpart], "Pb*", "pl");
+  legend->AddEntry(pbpb25_568117_Pbpn->histos[kNpart], "Pbpn", "lp");
+  legend->AddEntry(pbpb25_568117_PbHN->histos[kNpart], "PbHN", "pl");
   legend->AddEntry(pbpb25_568117_Pbrw->histos[kNpart], "Pbrw", "pl");
-  legend->AddEntry(pbpb25_568117_Pbpnrw->histos[kNpart], "Pbpnrw*", "pl");
+  legend->AddEntry(pbpb25_568117_Pbpnrw->histos[kNpart], "Pbpnrw", "pl");
 
   TCanvas* canvNpart = new TCanvas("canvNpart", "", 1200, 800);
   canvNpart->SetTopMargin(0.03);
@@ -215,11 +215,11 @@ void drawTGlauberMC()
   legend2->SetBorderSize(0);
   legend2->SetFillColorAlpha(0, 0);
   legend2->AddEntry(pbpb25_568117_Pb->histos[kNpart], "Pb", "lp");
-  legend2->AddEntry(pbpb25_568117_PbHN->histos[kNpart], "PbHN", "pl");
-  legend2->AddEntry(pbpb25_568117_Pbpn->histos[kNpart], "Pbpn", "lp");
   legend2->AddEntry(pbpb25_568117_Pbstar->histos[kNpart], "Pb*", "pl");
+  legend2->AddEntry(pbpb25_568117_Pbpn->histos[kNpart], "Pbpn", "lp");
+  legend2->AddEntry(pbpb25_568117_PbHN->histos[kNpart], "PbHN", "pl");
   legend2->AddEntry(pbpb25_568117_Pbrw->histos[kNpart], "Pbrw", "pl");
-  legend2->AddEntry(pbpb25_568117_Pbpnrw->histos[kNpart], "Pbpnrw*", "pl");
+  legend2->AddEntry(pbpb25_568117_Pbpnrw->histos[kNpart], "Pbpnrw", "pl");
 
   // Ratio histograms Npart
   TCanvas* canvNpartRatio = new TCanvas("canvNpartRatio", "", 1200, 800);

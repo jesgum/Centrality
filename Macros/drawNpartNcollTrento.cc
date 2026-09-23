@@ -1,5 +1,6 @@
 #include "TFile.h"
 #include "TCanvas.h"
+#include "TPad.h"
 #include "TStyle.h"
 #include "TH2.h"
 #include "TLegend.h"
@@ -7,166 +8,139 @@
 #include "TLine.h"
 #include "TString.h"
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
-#include <string>  
+#include <string>
 
 #include "Includes/colorManager.h"
 #include "Includes/centralityHelper.h"
 #include "Includes/systematicsHelper.h"
 
+// Draws one canvas (top: base vs. Trento variations, bottom: ratio to base)
+// for a single quantity (Npart or Ncoll). Only the variations are plotted
+// against the base -- the default (un-varied) Trento tune is not shown.
+void drawTrentoVariationsCompare(TH1F* base, std::vector<TH1F*>& variationHists, const std::vector<std::string>& variationNames,
+                                  ColorManager& colorMgr, const char* yTitle, const char* outFile)
+{
+  base->SetMarkerColor(kBlack);
+  base->SetLineColor(kBlack);
+  for (size_t i = 0; i < variationHists.size(); ++i) {
+    const int color = colorMgr.getColor(i);
+    variationHists[i]->SetMarkerColor(color);
+    variationHists[i]->SetLineColor(color);
+  }
+
+  TCanvas* canv = new TCanvas(Form("canv_%s", outFile), "", 1200, 800);
+  canv->SetTopMargin(0.0);
+  canv->SetBottomMargin(0.0);
+
+  TPad* padTop = new TPad(Form("padTop_%s", outFile), "", 0, 0.3, 1, 1);
+  padTop->SetTicks(1, 1);
+  padTop->SetTopMargin(0.04);
+  padTop->SetBottomMargin(0.02);
+  padTop->SetLeftMargin(0.12);
+  padTop->SetRightMargin(0.03);
+  padTop->Draw();
+  padTop->cd();
+  base->SetMinimum(0);
+  base->GetXaxis()->SetLabelSize(0);
+  base->GetYaxis()->SetTitle(yTitle);
+  base->GetYaxis()->SetTitleSize(0.05);
+  base->GetYaxis()->SetLabelSize(0.045);
+  base->GetYaxis()->SetTitleOffset(1.1);
+  base->Draw("pe");
+  for (auto* h : variationHists) {
+    h->Draw("pe same");
+  }
+
+  TLegend* leg = new TLegend(0.65, 0.5, 0.87, 0.94);
+  leg->SetBorderSize(0);
+  leg->SetFillColorAlpha(0, 0);
+  leg->AddEntry(base, "Base", "p");
+  for (size_t i = 0; i < variationHists.size(); ++i) {
+    leg->AddEntry(variationHists[i], Form("Trento %s", variationNames[i].c_str()), "p");
+  }
+  leg->Draw();
+
+  canv->cd();
+  TPad* padBot = new TPad(Form("padBot_%s", outFile), "", 0, 0, 1, 0.3);
+  padBot->SetTicks(1, 1);
+  padBot->SetTopMargin(0.02);
+  padBot->SetBottomMargin(0.35);
+  padBot->SetLeftMargin(0.12);
+  padBot->SetRightMargin(0.03);
+  padBot->Draw();
+  padBot->cd();
+
+  std::vector<TH1F*> ratios;
+  for (size_t i = 0; i < variationHists.size(); ++i) {
+    TH1F* hRatio = dynamic_cast<TH1F*>(variationHists[i]->Clone(Form("hRatio_%zu_%s", i, outFile)));
+    hRatio->Divide(base);
+    ratios.push_back(hRatio);
+  }
+
+  TH1F* hFrame = ratios[0];
+  hFrame->SetTitle("");
+  hFrame->GetYaxis()->SetTitle("Trento / Base");
+  hFrame->GetYaxis()->SetNdivisions(505);
+  hFrame->GetYaxis()->SetTitleSize(0.12);
+  hFrame->GetYaxis()->SetTitleOffset(0.45);
+  hFrame->GetYaxis()->SetLabelSize(0.10);
+  hFrame->GetXaxis()->SetTitle("Centrality (%)");
+  hFrame->GetXaxis()->SetTitleSize(0.13);
+  hFrame->GetXaxis()->SetLabelSize(0.11);
+
+  double ratioMin = 1, ratioMax = 1;
+  for (TH1F* hRatio : ratios) {
+    ratioMin = std::min(ratioMin, hRatio->GetMinimum());
+    ratioMax = std::max(ratioMax, hRatio->GetMaximum());
+  }
+  const double ratioMargin = 0.1 * (ratioMax - ratioMin);
+  hFrame->SetMinimum(ratioMin - ratioMargin);
+  hFrame->SetMaximum(ratioMax + ratioMargin);
+
+  hFrame->Draw("pe");
+  for (size_t i = 1; i < ratios.size(); ++i) {
+    ratios[i]->Draw("pe same");
+  }
+
+  TLine* line = new TLine(hFrame->GetXaxis()->GetXmin(), 1, hFrame->GetXaxis()->GetXmax(), 1);
+  line->SetLineStyle(2);
+  line->SetLineColor(kGray + 1);
+  line->Draw("same");
+
+  canv->SaveAs(outFile);
+}
+
 void drawNpartNcollTrento()
 {
   gStyle->SetOptStat(0);
   syst::GlauberParameters base("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.root");
-  syst::GlauberParameters<TH2D> trento("../Trento/trentofit_calib.root", true);
-  
-  TCanvas* canvNpart = new TCanvas("canvNpart", "", 1200, 800);
-  canvNpart->SetLogz();
-  canvNpart->SetTopMargin(0.03);
-  canvNpart->SetLeftMargin(0.1);
-  canvNpart->SetRightMargin(0.1);
-  canvNpart->SetBottomMargin(0.13);
-  trento.h2dNpart->Draw("colz");
-  trento.hNpart->Draw("same");
-  canvNpart->SaveAs("hNpart.pdf");
 
-  TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 800);
-  canvNcoll->SetLogz();
-  canvNcoll->SetTopMargin(0.03);
-  canvNcoll->SetLeftMargin(0.1);
-  canvNcoll->SetRightMargin(0.1);
-  canvNcoll->SetBottomMargin(0.13);
-  trento.h2dNcoll->Draw("colz");
-  trento.hNcoll->Draw("same");
-  canvNcoll->SaveAs("hNcoll.pdf");
+  const std::vector<std::string> variationNames = { "A_d0.0", "A_d0.4", "A_d0.8", "B_d0.0", "B_d0.4", "B_d0.8" };
+  // comsolpc has been split into two variants; produce the same comparison
+  // plots for both.
+  const std::vector<std::string> comsolFolders = { "comsolpc_80", "comsolpc_90" };
 
-  trento.hNpart->SetMarkerColor(kRed + 1);
-  trento.hNpart->SetLineColor(kRed + 1);
-  trento.hNcoll->SetMarkerColor(kRed + 1);
-  trento.hNcoll->SetLineColor(kRed + 1);
-  base.hNpart->SetMarkerColor(kBlue + 1);
-  base.hNpart->SetLineColor(kBlue + 1);
-  base.hNcoll->SetMarkerColor(kBlue + 1);
-  base.hNcoll->SetLineColor(kBlue + 1);
+  for (const auto& folder : comsolFolders) {
+    std::vector<syst::GlauberParameters<TH2D>> variations;
+    for (const auto& name : variationNames) {
+      variations.emplace_back(Form("../Trento/%s/trentofit_%s_calib.root", folder.c_str(), name.c_str()), true);
+    }
 
-  // === Canvas: Npart, Trento vs base with ratio ===
-  TCanvas* canvNpartCompare = new TCanvas("canvNpartCompare", "", 1200, 800);
-  canvNpartCompare->SetTopMargin(0.0);
-  canvNpartCompare->SetBottomMargin(0.0);
+    // === Colors: base stays black, the 6 variations get distinct colors
+    // from the ColorManager ===
+    ColorManager colorMgr(variations.size());
 
-  TPad* padNpartTop = new TPad("padNpartTop", "", 0, 0.3, 1, 1);
-  padNpartTop->SetTicks(1, 1);
-  padNpartTop->SetTopMargin(0.04);
-  padNpartTop->SetBottomMargin(0.02);
-  padNpartTop->SetLeftMargin(0.12);
-  padNpartTop->SetRightMargin(0.03);
-  padNpartTop->Draw();
-  padNpartTop->cd();
-  base.hNpart->SetMinimum(0);
-  base.hNpart->GetXaxis()->SetLabelSize(0);
-  base.hNpart->GetYaxis()->SetTitle("<N_{part}>");
-  base.hNpart->GetYaxis()->SetTitleSize(0.05);
-  base.hNpart->GetYaxis()->SetLabelSize(0.045);
-  base.hNpart->GetYaxis()->SetTitleOffset(1.1);
-  base.hNpart->Draw("pe");
-  trento.hNpart->Draw("pe same");
+    std::vector<TH1F*> npartHists, ncollHists;
+    for (auto& variation : variations) {
+      npartHists.push_back(variation.hNpart);
+      ncollHists.push_back(variation.hNcoll);
+    }
 
-  TLegend* legNpartCompare = new TLegend(0.65, 0.78, 0.87, 0.94);
-  legNpartCompare->SetBorderSize(0);
-  legNpartCompare->SetFillColorAlpha(0, 0);
-  legNpartCompare->AddEntry(base.hNpart, "Base", "p");
-  legNpartCompare->AddEntry(trento.hNpart, "Trento", "p");
-  legNpartCompare->Draw();
-
-  canvNpartCompare->cd();
-  TPad* padNpartBot = new TPad("padNpartBot", "", 0, 0, 1, 0.3);
-  padNpartBot->SetTicks(1, 1);
-  padNpartBot->SetTopMargin(0.02);
-  padNpartBot->SetBottomMargin(0.35);
-  padNpartBot->SetLeftMargin(0.12);
-  padNpartBot->SetRightMargin(0.03);
-  padNpartBot->Draw();
-  padNpartBot->cd();
-
-  TH1F* hRatioNpart = dynamic_cast<TH1F*>(trento.hNpart->Clone("hRatioNpart"));
-  hRatioNpart->Divide(base.hNpart);
-  hRatioNpart->SetTitle("");
-  hRatioNpart->GetYaxis()->SetTitle("Trento / Base");
-  hRatioNpart->GetYaxis()->SetNdivisions(505);
-  hRatioNpart->GetYaxis()->SetTitleSize(0.12);
-  hRatioNpart->GetYaxis()->SetTitleOffset(0.45);
-  hRatioNpart->GetYaxis()->SetLabelSize(0.10);
-  hRatioNpart->GetXaxis()->SetTitle("Centrality (%)");
-  hRatioNpart->GetXaxis()->SetTitleSize(0.13);
-  hRatioNpart->GetXaxis()->SetLabelSize(0.11);
-  hRatioNpart->Draw("pe");
-
-  TLine* lineNpartCompare = new TLine(hRatioNpart->GetXaxis()->GetXmin(), 1,
-                                       hRatioNpart->GetXaxis()->GetXmax(), 1);
-  lineNpartCompare->SetLineStyle(2);
-  lineNpartCompare->SetLineColor(kGray + 1);
-  lineNpartCompare->Draw("same");
-
-  canvNpartCompare->SaveAs("hNpartCompareTrentoBase.pdf");
-
-  // === Canvas: Ncoll, Trento vs base with ratio ===
-  TCanvas* canvNcollCompare = new TCanvas("canvNcollCompare", "", 1200, 800);
-  canvNcollCompare->SetTopMargin(0.0);
-  canvNcollCompare->SetBottomMargin(0.0);
-
-  TPad* padNcollTop = new TPad("padNcollTop", "", 0, 0.3, 1, 1);
-  padNcollTop->SetTicks(1, 1);
-  padNcollTop->SetTopMargin(0.04);
-  padNcollTop->SetBottomMargin(0.02);
-  padNcollTop->SetLeftMargin(0.12);
-  padNcollTop->SetRightMargin(0.03);
-  padNcollTop->Draw();
-  padNcollTop->cd();
-  base.hNcoll->SetMinimum(0);
-  base.hNcoll->GetXaxis()->SetLabelSize(0);
-  base.hNcoll->GetYaxis()->SetTitle("<N_{coll}>");
-  base.hNcoll->GetYaxis()->SetTitleSize(0.05);
-  base.hNcoll->GetYaxis()->SetLabelSize(0.045);
-  base.hNcoll->GetYaxis()->SetTitleOffset(1.1);
-  base.hNcoll->Draw("pe");
-  trento.hNcoll->Draw("pe same");
-
-  TLegend* legNcollCompare = new TLegend(0.65, 0.78, 0.87, 0.94);
-  legNcollCompare->SetBorderSize(0);
-  legNcollCompare->SetFillColorAlpha(0, 0);
-  legNcollCompare->AddEntry(base.hNcoll, "Base", "p");
-  legNcollCompare->AddEntry(trento.hNcoll, "Trento", "p");
-  legNcollCompare->Draw();
-
-  canvNcollCompare->cd();
-  TPad* padNcollBot = new TPad("padNcollBot", "", 0, 0, 1, 0.3);
-  padNcollBot->SetTicks(1, 1);
-  padNcollBot->SetTopMargin(0.02);
-  padNcollBot->SetBottomMargin(0.35);
-  padNcollBot->SetLeftMargin(0.12);
-  padNcollBot->SetRightMargin(0.03);
-  padNcollBot->Draw();
-  padNcollBot->cd();
-
-  TH1F* hRatioNcoll = dynamic_cast<TH1F*>(trento.hNcoll->Clone("hRatioNcoll"));
-  hRatioNcoll->Divide(base.hNcoll);
-  hRatioNcoll->SetTitle("");
-  hRatioNcoll->GetYaxis()->SetTitle("Trento / Base");
-  hRatioNcoll->GetYaxis()->SetNdivisions(505);
-  hRatioNcoll->GetYaxis()->SetTitleSize(0.12);
-  hRatioNcoll->GetYaxis()->SetTitleOffset(0.45);
-  hRatioNcoll->GetYaxis()->SetLabelSize(0.10);
-  hRatioNcoll->GetXaxis()->SetTitle("Centrality (%)");
-  hRatioNcoll->GetXaxis()->SetTitleSize(0.13);
-  hRatioNcoll->GetXaxis()->SetLabelSize(0.11);
-  hRatioNcoll->Draw("pe");
-
-  TLine* lineNcollCompare = new TLine(hRatioNcoll->GetXaxis()->GetXmin(), 1,
-                                       hRatioNcoll->GetXaxis()->GetXmax(), 1);
-  lineNcollCompare->SetLineStyle(2);
-  lineNcollCompare->SetLineColor(kGray + 1);
-  lineNcollCompare->Draw("same");
-
-  canvNcollCompare->SaveAs("hNcollCompareTrentoBase.pdf");
+    const TString suffix = folder.substr(folder.find('_') + 1).c_str();
+    drawTrentoVariationsCompare(base.hNpart, npartHists, variationNames, colorMgr, "<N_{part}>", Form("hNpartCompareTrentoBase_%s.pdf", suffix.Data()));
+    drawTrentoVariationsCompare(base.hNcoll, ncollHists, variationNames, colorMgr, "<N_{coll}>", Form("hNcollCompareTrentoBase_%s.pdf", suffix.Data()));
+  }
 }
