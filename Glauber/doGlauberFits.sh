@@ -50,12 +50,15 @@ OO_2025="${AR_PATH}LHC25ae_pass2/"
 # Bool_t lFreef = kFALSE
 # Float_t lfvalue = 0.800
 
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pb\"\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_PbHN\"\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpn\"\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbstar\"\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpnrw\"\)&
-root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbrw\"\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pb\"\,0\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pb\"\,1\)&
+# root.exe -q -b runGlauFit.cc\(\"${AR_PATH}LHC23_pass5/AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pb\"\)&
+root.exe -q -b runGlauFit.cc\(\"${AR_PATH}LHC23_pass5_small/AR_544122.root\"\,500,\"hFT0C_Collisions\"\,\"basehistos_Pb\"\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_PbHN\"\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpn\"\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbstar\"\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpnrw\"\)&
+# root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbrw\"\)&
 
 ###  OO: Fitting BC vs collisions
 # root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&

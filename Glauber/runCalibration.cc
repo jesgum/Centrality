@@ -20,7 +20,7 @@
 /// @param anchorPointPercentage anchor point percentage to use
 /// @param matchRange width of region in which data/glauber matching is to be done in rolling anchoring test
 /// @param doNpartNcoll wether or not to attempt calculating Npart, Ncoll in centrality bins
-void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root", Double_t anchorPointPercentage = 90.0, Double_t matchRange = 200.0, Bool_t doNpartNcoll = false, TString basename = "basehistos.root")
+void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root", Double_t anchorPointPercentage = 90.0, Double_t matchRange = 200.0, Bool_t doNpartNcoll = false, TString basename = "basehistos.root", Bool_t globalNormalisation = kFALSE)
 {
   TFile* file = new TFile(lInputFileName.Data(), "READ");
   file->ls();
@@ -58,7 +58,7 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
   for (int ii = 1; ii < hData->GetNbinsX() + 1; ii++) {
     // renormalize data curve
     int bin1 = ii + 1;
-    int bin2 = hData->FindBin(hData->GetBinLowEdge(ii + 1) + matchRange + 1e-3);
+    int bin2 = (globalNormalisation) ? hData->GetNbinsX() : hData->FindBin(hData->GetBinLowEdge(ii + 1) + matchRange + 1e-3);
     double matchRangeData = hData->Integral(bin1, bin2);
     double matchRangeFit = hFit->Integral(bin1, bin2);
 
@@ -121,7 +121,10 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
 
   TString calibFileName = lInputFileName.Data();
   calibFileName.ReplaceAll("glauberNBD", "calibration");
-  calibFileName.ReplaceAll(".root", Form("_Anchor%.1f.root", anchorPointPercentage));
+  const char* mode = globalNormalisation ? "_var1" : "";
+  cout << mode << endl;
+  calibFileName.ReplaceAll(".root", Form("%s_Anchor%.1f.root", mode, anchorPointPercentage));
+  cout << calibFileName << endl;
   TFile* fileCalib = new TFile(calibFileName.Data(), "RECREATE");
   // TFile* fileCalib = new TFile(outfile, "RECREATE");
 
