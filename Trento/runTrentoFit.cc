@@ -114,7 +114,7 @@ void runTrentoFit(Double_t lFitRange = 132.5, Double_t lPlotXrange = 54000)
 
   // Get Entropy, please
 
-  TFile* fileTrento = new TFile("outfileJesper.root", "READ");
+  TFile* fileTrento = new TFile("outfileNature.root", "READ");
   TH1D* hEntropy = (TH1D*)fileTrento->Get("hEntropy");
 
   gStyle->SetOptStat(0);

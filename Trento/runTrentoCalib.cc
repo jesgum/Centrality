@@ -38,10 +38,10 @@
 /// @param anchorPointPercentage anchor point percentage to use
 /// @param matchRange width of region in which data/glauber matching is to be done in rolling anchoring test
 /// @param doNpartNcoll wether or not to attempt calculating Npart, Ncoll in centrality bins
-void runTrentoCalib(TString lInputFileName = "trentofit.root")
+void runTrentoCalib(TString lInputFileName = "trentofit.root", TString lBasefile = "outfile.root")
 {
 
-  double anchorPointPercentage = 80.f;
+  double anchorPointPercentage = 90.f;
   Bool_t globalNormalisation = kFALSE;
   double matchRange = 200.0;
   bool doNpartNcoll = true;
@@ -178,7 +178,8 @@ void runTrentoCalib(TString lInputFileName = "trentofit.root")
     TF1* fitfunc = g->GetTrentoNBD();
 
     // Step 1: open the (Npart, Ncoll) pair information, provide
-    TFile* fbasefile = new TFile("outfileJesper.root", "READ");
+    TFile* fbasefile = new TFile(lBasefile.Data(), "READ");
+    // TFile* fbasefile = new TFile("outfileJesper.root", "READ");
     TH1F* hNSources = (TH1F*)fbasefile->Get("hEntropy");
     TH2D* hNsNp = (TH2D*)fbasefile->Get("hNsNp");
     TH2D* hNsNc = (TH2D*)fbasefile->Get("hNsNc");
