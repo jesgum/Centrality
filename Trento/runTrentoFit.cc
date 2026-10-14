@@ -63,7 +63,7 @@ Double_t FastIntegrate(TF1 *f1, Double_t a, Double_t b, Int_t n = 5){
   return lIntegral/(b-a);
 }
 
-void runTrentoFit(Double_t lFitRange = 132.5, Double_t lPlotXrange = 54000)
+void runTrentoFit(Double_t lFitRange = 500, Double_t lPlotXrange = 54000)
 {
   // This macro does an NBD + Trento fit to ALICE data
   gStyle->SetOptStat(0);

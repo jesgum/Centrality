@@ -41,7 +41,7 @@
 void runTrentoCalib(TString lInputFileName = "trentofit.root", TString lBasefile = "outfile.root")
 {
 
-  double anchorPointPercentage = 90.f;
+  double anchorPointPercentage = 80.f;
   Bool_t globalNormalisation = kFALSE;
   double matchRange = 200.0;
   bool doNpartNcoll = true;

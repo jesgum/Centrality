@@ -22,6 +22,7 @@
 /// @param doNpartNcoll wether or not to attempt calculating Npart, Ncoll in centrality bins
 void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ancestorMode2_hFT0C_BCs.root", Double_t anchorPointPercentage = 90.0, Double_t matchRange = 200.0, Bool_t doNpartNcoll = false, TString basename = "basehistos.root", Bool_t globalNormalisation = kFALSE)
 {
+  globalNormalisation = kFALSE;
   TFile* file = new TFile(lInputFileName.Data(), "READ");
   file->ls();
 
@@ -170,6 +171,7 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
     TH2F* h2dEcc = new TH2F("h2dEcc", "", 100, 0, 100, 100, 0.0f, 1.0f);
     TH2F* h2dB = new TH2F("h2dB", "", 100, 0, 100, 100, 0.0f, 20.0f);
     TH2F* h2dNancestors = new TH2F("h2dNancestors", "", 100, 0, 100, 900, -0.5f, 899.5f);
+    TH2F* h2dMult = new TH2F("h2dMult", "", 100, 0, 100, 70000, 0.0f, 70000.f);
 
     // Replay
     multGlauberNBDFitter* g = new multGlauberNBDFitter("lglau");
@@ -192,7 +194,7 @@ void runCalibration(TString lInputFileName = "results/AR_544122_glauberNBD_ances
     Double_t lMax = hData->GetBinLowEdge(hData->GetNbinsX() + 1);
 
     // uncomment if Np Nc needed -> Warning, slow!
-    g->CalculateAvNpNc( hProfileNpart, hProfileNcoll, h2dNpart, h2dNcoll, hCalib, 0, lMax , hNpNcEcc, h2dEcc, hNpNcB, h2dB, h2dNancestors, 1e-6 );
+    g->CalculateAvNpNc( hProfileNpart, hProfileNcoll, h2dNpart, h2dNcoll, hCalib, 0, lMax , hNpNcEcc, h2dEcc, hNpNcB, h2dB, h2dNancestors, h2dMult, 1e-6 );
 
     hProfileNpart->Write();
     hProfileNcoll->Write();

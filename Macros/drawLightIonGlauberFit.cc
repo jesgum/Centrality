@@ -36,12 +36,14 @@ struct GlauberInfo
 
     const int rebin = 20;
     hRatio->Rebin(rebin);
+    // hGlauber->Rebin(rebin);
     hDataClone->Rebin(rebin);
     hInsetGlauberClone->Rebin(rebin);
 
-    hData->Scale(rebin);
-    hDataClone->Scale(rebin);
-    hInsetData->Scale(rebin);
+    // hData->Scale(rebin);
+    // hGlauber->Scale(rebin);
+    // hDataClone->Scale(rebin);
+    // hInsetData->Scale(rebin);
     hRatio->Divide(hDataClone, hInsetGlauberClone, 1, 1, "B");
     hInsetRatio->Divide(hInsetData, hInsetGlauber, 1, 1, "B");
     delete hDataClone; delete hInsetGlauberClone;
@@ -81,7 +83,7 @@ struct GlauberInfo
 void doColVsBc()
 {
 
-  const float xmax = 34000;
+  const float xmax = 26000;
   const float ymax = 3e+9;
   const float insetXmax = 2000;
 
@@ -89,10 +91,10 @@ void doColVsBc()
   const float legY = 0.7;
   const float legWidth = 0.2;
   const float legHeight = 0.2;
-   GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_BCs_Anchor90.root", kBlue + 1);
-  GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor90.root", kRed + 1);
-  // GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2_systematics/AR_564374_calibration_hFT0M_BCs_LightIonDef.root");
-  // GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
+  //  GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_BCs_Anchor90.root", kBlue + 1);
+  // GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor90.root", kRed + 1);
+  GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_BCs_Anchor70.root", kBlue + 1);
+  GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor70.root", kRed + 1);
   // GlauberInfo bcs("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_0_LightIonDef.root", kBlue + 1);
   // GlauberInfo coll("../AnalysisResults/LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root", kRed + 1);
 
@@ -139,7 +141,7 @@ void doColVsBc()
   insetTop->Draw();
   insetTop->cd();
 
-  // coll.hInsetData->GetYaxis()->SetRangeUser(2e+5, 6e+7);
+  coll.hInsetData->GetYaxis()->SetRangeUser(2e+3, 6e+5);
   coll.hInsetData->GetXaxis()->SetRangeUser(0, insetXmax);
   coll.hInsetData->GetYaxis()->SetLabelSize(0.045);
   coll.hInsetData->GetXaxis()->SetLabelSize(0.05);
@@ -443,8 +445,7 @@ void drawLightIonGlauberFit()
 
 
   gStyle->SetOptStat(0);
-  // doColVsBc();
-  doGlauber();
-
+  doColVsBc();
+  // doGlauber();
   
 }

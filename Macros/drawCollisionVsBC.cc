@@ -10,7 +10,7 @@
 #include <array>
 #include <iostream>
 
-static std::array<int, 2> normRange = { 2000, 12000 };
+static std::array<int, 2> normRange = { 500, 50000 };
 
 void styleHistogram(TH1F* hist, int color)
 {
@@ -18,7 +18,7 @@ void styleHistogram(TH1F* hist, int color)
   hist->SetLineColor(color);
   hist->SetLineWidth(2);
   hist->Scale(1. / hist->Integral(normBins[0], normBins[1]));
-  hist->GetXaxis()->SetTitle("FT0M Amplitude");
+  hist->GetXaxis()->SetTitle("FT0C Amplitude");
   hist->GetYaxis()->SetTitle("Normalized count");
   hist->GetXaxis()->SetTitleSize(0.05);
   hist->GetYaxis()->SetTitleSize(0.05);
@@ -32,7 +32,7 @@ void styleRatioHistogram(TH1F* hist)
   hist->SetLineColor(kBlack);
   hist->SetLineWidth(2);
   hist->SetTitle("");
-  hist->GetXaxis()->SetTitle("FT0M Amplitude");
+  hist->GetXaxis()->SetTitle("FT0C Amplitude");
   hist->GetYaxis()->SetTitle("Coll. / BC");
   hist->GetYaxis()->SetNdivisions(505);
   hist->GetYaxis()->CenterTitle();
@@ -58,7 +58,8 @@ void styleCanvas(TCanvas* canv)
 // PbPb 2023    AR_545210.root
 // PbPb 2024    AR_560089.root
 // PbPb 2025    AR_567905.root
-void drawCollisionVsBC(const char* dataset = "LHC25ae_pass2", const char* ar = "AR_564374.root", const char* system = "OO")
+void drawCollisionVsBC(const char* dataset = "LHC25_pass1", const char* ar = "AR_567905.root", const char* system = "Pb#minusPb 2025")
+// void drawCollisionVsBC(const char* dataset = "LHC24_pass3", const char* ar = "AR_560089.root", const char* system = "Pb#minusPb 2024")
 {
   gStyle->SetOptStat(0);
   const char* filePath = Form("../AnalysisResults/%s/%s", dataset, ar);
@@ -70,18 +71,21 @@ void drawCollisionVsBC(const char* dataset = "LHC25ae_pass2", const char* ar = "
 
   // TH1F* hCoT0 = (TH1F*)file->Get("centrality-study_no_rejectpileup/hFT0M_Collisions");
   // TH1F* hBcT0 = (TH1F*)file->Get("centrality-study_no_rejectpileup/hFT0M_BCs");
-  TH1F* hCoT0 = (TH1F*)file->Get("centrality-study/hFT0M_Collisions");
-  TH1F* hBcT0 = (TH1F*)file->Get("centrality-study/hFT0M_BCs");
+  TH1F* hCoT0 = (TH1F*)file->Get("centrality-study/hFT0C_Collisions");
+  TH1F* hBcT0 = (TH1F*)file->Get("centrality-study/hFT0C_BCs");
   TH1F* hCoT0_Zoom = (TH1F*)hCoT0->Clone("hCoT0_Zoom");
   TH1F* hBcT0_Zoom = (TH1F*)hBcT0->Clone("hBcT0_Zoom");
   const float xmin = 0;
   const float xmax = 46000;
+
   const float ymax = 5e-2;
   const float ymin = 5e-10;
+
   const float xmin_zoom = 0;
-  const float xmax_zoom = 4000;
-  const float ymax_zoom = 5e-2;
-  const float ymin_zoom = 5e-7;
+  const float xmax_zoom = 800;
+
+  const float ymax_zoom = 5e+1;
+  const float ymin_zoom = 1e-5;
 
   if (!hCoT0 || !hBcT0) {
     std::cerr << "Error: Could not retrieve histograms from file " << filePath << std::endl;

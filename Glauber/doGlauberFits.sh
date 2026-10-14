@@ -53,18 +53,21 @@ OO_2025="${AR_PATH}LHC25ae_pass2/"
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pb\"\,0\)&
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pb\"\,1\)&
 # root.exe -q -b runGlauFit.cc\(\"${AR_PATH}LHC23_pass5/AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pb\"\)&
-root.exe -q -b runGlauFit.cc\(\"${AR_PATH}LHC23_pass5_small/AR_544122.root\"\,500,\"hFT0C_Collisions\"\,\"basehistos_Pb\"\)&
+# root.exe -q -b runGlauFit.cc\(\"${AR_PATH}LHC23_pass5_small/AR_544122_kIsGoodZvtxFT0vsPv.root\"\,500,\"hFT0C_Collisions\"\,\"basehistos_Pb\"\)&
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_PbHN\"\)&
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpn\"\)&
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbstar\"\)&
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbpnrw\"\)&
 # root.exe -q -b runGlauFit.cc\(\"${PBPB_2023}AR_544122.root\"\,500,\"hFT0C_BCs\"\,\"basehistos_Pbrw\"\)&
 
+root.exe -q -b runGlauFit.cc\(\"${AR_PATH}LHC26_pass1_outer/AR_572184.root\"\,500,\"hFT0AOuter_BCs\"\,\"basehistos_Pb\"\)&
+
 ###  OO: Fitting BC vs collisions
 # root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564356.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
 # root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564359.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
 # root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564373.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
 # root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
+# root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564374.root\"\,\"hFT0C_Collisions\"\,\"hFT0C_Collisions\"\)&
 # root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564387.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
 # root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564400.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&
 # root.exe -q -b runGlauFitOO.cc\(\"${OO_2025}AR_564414.root\"\,\"hFT0M_Collisions\"\,\"hFT0M_Collisions\"\)&

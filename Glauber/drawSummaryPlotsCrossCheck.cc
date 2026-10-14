@@ -128,7 +128,7 @@ void drawSummaryPlotsCrossCheck( TString lInputFileName = "AnalysisResultsLHC24a
   
   
   hV0M->GetXaxis()->SetRangeUser(0,lFitRangeMax);
-  hV0M->GetYaxis()->SetRangeUser(0.25,hV0M->GetMaximum()*3);
+  hV0M->GetYaxis()->SetRangeUser(0.25,hV0M->GetMaximum()*10);
   hV0M->SetLineColor(kBlack);
   hV0M->SetMarkerStyle(20);
   hV0M->SetMarkerColor(kBlack);

@@ -1,5 +1,6 @@
 #include "TFile.h"
 #include "TCanvas.h"
+#include "TPad.h"
 #include "TStyle.h"
 #include "TH2.h"
 #include "TLegend.h"
@@ -7,13 +8,14 @@
 #include "TLine.h"
 #include "TString.h"
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
 #include <string>  
 
 #include "Includes/colorManager.h"
 
-std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, TString basehistos, const char* name)
+std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, TString basehistos, const char* name, const std::vector<double>& centBins)
 {
   Bool_t fixedMu = true;
   Bool_t fixedK = true;
@@ -43,8 +45,8 @@ std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, TString basehistos,
     return {};
   }
 
-  h2dNpart->GetXaxis()->SetTitle("Centrality percentile (FT0C)");
-  h2dNcoll->GetXaxis()->SetTitle("Centrality percentile (FT0C)");
+  h2dNpart->GetXaxis()->SetTitle("Centrality (%)");
+  h2dNcoll->GetXaxis()->SetTitle("Centrality (%)");
   h2dNpart->GetXaxis()->SetTitleSize(0.045);
   h2dNcoll->GetXaxis()->SetTitleSize(0.045);
   h2dNpart->GetXaxis()->SetTitleOffset(1.05);
@@ -56,8 +58,9 @@ std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, TString basehistos,
   h2dNpart->GetYaxis()->SetTitleOffset(1);
   h2dNcoll->GetYaxis()->SetTitleOffset(1);
 
-  TH1F* hAvgNpart = new TH1F("hAvgNpart_local", "", 100, 0, 100);
-  TH1F* hAvgNcoll = new TH1F("hAvgNcoll_local", "", 100, 0, 100);
+  const int nCentBins = centBins.size() - 1;
+  TH1F* hAvgNpart = new TH1F("hAvgNpart_local", "", nCentBins, centBins.data());
+  TH1F* hAvgNcoll = new TH1F("hAvgNcoll_local", "", nCentBins, centBins.data());
 
   hAvgNpart->SetDirectory(0);
   hAvgNcoll->SetDirectory(0);
@@ -70,19 +73,24 @@ std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, TString basehistos,
     std::cout << " - - - cent - - - <Npart> - - - <Ncoll> - - - " << std::endl;
   }
 
-  for (Int_t icent{0}; icent < h2dNpart->GetNbinsX(); ++icent) {
-    TH1D* hProjectionNpart = dynamic_cast<TH1D*>(h2dNpart->ProjectionY(Form("hProjectionNpart_%d", icent), icent + 1, icent + 1));
-    TH1D* hProjectionNcoll = dynamic_cast<TH1D*>(h2dNcoll->ProjectionY(Form("hProjectionNcoll_%d", icent), icent + 1, icent + 1));
+  // Each output bin projects the 2D x-bins inside its centrality edges
+  for (Int_t icent{0}; icent < nCentBins; ++icent) {
+    const double lo = centBins[icent];
+    const double hi = centBins[icent + 1];
+    const int firstBin = h2dNpart->GetXaxis()->FindBin(lo + 1e-3);
+    const int lastBin = h2dNpart->GetXaxis()->FindBin(hi - 1e-3);
+    TH1D* hProjectionNpart = dynamic_cast<TH1D*>(h2dNpart->ProjectionY(Form("hProjectionNpart_%d", icent), firstBin, lastBin));
+    TH1D* hProjectionNcoll = dynamic_cast<TH1D*>(h2dNcoll->ProjectionY(Form("hProjectionNcoll_%d", icent), firstBin, lastBin));
     hAvgNpart->SetBinContent(icent + 1, hProjectionNpart->GetMean());
     hAvgNpart->SetBinError(icent + 1, hProjectionNpart->GetMeanError());
     hAvgNcoll->SetBinContent(icent + 1, hProjectionNcoll->GetMean());
     hAvgNcoll->SetBinError(icent + 1, hProjectionNcoll->GetMeanError());
 
     if (printNpartNcoll) {
-      std::cout << Form("%d-%d%% | ", icent, icent+1) 
-                << hProjectionNpart->GetMean() << " | " 
+      std::cout << Form("%g-%g%% | ", lo, hi)
+                << hProjectionNpart->GetMean() << " | "
                 << hProjectionNcoll->GetMean() << std::endl;
-    }    
+    }
     delete hProjectionNpart; delete hProjectionNcoll;
   }
 
@@ -114,10 +122,10 @@ std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, TString basehistos,
 }
 
 struct Histos {
-  Histos(std::vector<TH1F*> vec, const char* run)
+  Histos(std::vector<TH1F*> vec, const char* lbl)
   {
     histos = vec;
-    runNumber = run;
+    label = lbl;
   }
   void setColor(int color)
   {
@@ -127,9 +135,108 @@ struct Histos {
     }
   }
 
-  const char* runNumber;
+  const char* label;
   std::vector<TH1F*> histos;
 };
+
+// Draws <X> vs centrality in a top pad and the ratio to the reference in a bottom pad
+void drawWithRatio(int quantity, Histos* reference, const std::vector<Histos*>& variations, bool drawReference,
+                   const char* yTitle, const char* ratioTitle, double ratioMin, double ratioMax, const char* outName)
+{
+  TCanvas* canv = new TCanvas(Form("canv_%s", outName), "", 1000, 900);
+
+  const double padSplit = 0.35;
+  TPad* padTop = new TPad(Form("padTop_%s", outName), "", 0, padSplit, 1, 1);
+  padTop->SetTopMargin(0.04);
+  padTop->SetBottomMargin(0.);
+  padTop->SetLeftMargin(0.13);
+  padTop->SetRightMargin(0.03);
+  padTop->Draw();
+
+  canv->cd();
+  TPad* padBottom = new TPad(Form("padBottom_%s", outName), "", 0, 0, 1, padSplit);
+  padBottom->SetTopMargin(0.);
+  padBottom->SetBottomMargin(0.3);
+  padBottom->SetLeftMargin(0.13);
+  padBottom->SetRightMargin(0.03);
+  padBottom->SetGridy();
+  padBottom->Draw();
+
+  // Text sizes scaled so that top and bottom pad labels appear equally large
+  const double textSize = 0.045;
+  const double scaleTop = 1. / (1. - padSplit);
+  const double scaleBottom = 1. / padSplit;
+
+  // Top pad
+  padTop->cd();
+  TH1F* hFrameTop = (TH1F*)reference->histos[quantity]->Clone(Form("hFrameTop_%s", outName));
+  hFrameTop->Reset();
+  double yMax = 0.;
+  for (auto& hist : variations) {
+    yMax = std::max(yMax, hist->histos[quantity]->GetMaximum());
+  }
+  if (drawReference) {
+    yMax = std::max(yMax, reference->histos[quantity]->GetMaximum());
+  }
+  hFrameTop->GetYaxis()->SetRangeUser(1e-3, 1.1 * yMax);
+  hFrameTop->GetYaxis()->SetTitle(yTitle);
+  hFrameTop->GetYaxis()->SetTitleSize(textSize * scaleTop);
+  hFrameTop->GetYaxis()->SetLabelSize(textSize * scaleTop * 0.85);
+  hFrameTop->GetYaxis()->SetTitleOffset(1.4 / scaleTop);
+  hFrameTop->GetXaxis()->SetLabelSize(0.);
+  hFrameTop->Draw("axis");
+
+  TLegend* legend = new TLegend(0.78, 0.55, 1, 0.93);
+  legend->SetBorderSize(0);
+  legend->SetFillColorAlpha(0, 0);
+  legend->SetTextSize(textSize * scaleTop * 0.8);
+  if (drawReference) {
+    reference->histos[quantity]->Draw("pe same");
+    legend->AddEntry(reference->histos[quantity], reference->label, "pl");
+  }
+  for (auto& hist : variations) {
+    hist->histos[quantity]->Draw("pe same");
+    legend->AddEntry(hist->histos[quantity], hist->label, "pl");
+  }
+  legend->Draw();
+
+  TLatex* latex = new TLatex();
+  latex->SetNDC();
+  latex->SetTextFont(42);
+  latex->SetTextSize(textSize * scaleTop);
+  latex->DrawLatex(0.2, 0.85, "ALICE Pb#minusPb #sqrt{#it{s}_{NN}} = 5.36 TeV");
+
+  // Bottom pad
+  padBottom->cd();
+  TH1F* hFrameBottom = (TH1F*)reference->histos[quantity]->Clone(Form("hFrameBottom_%s", outName));
+  hFrameBottom->Reset();
+  hFrameBottom->GetYaxis()->SetRangeUser(ratioMin, ratioMax);
+  hFrameBottom->GetYaxis()->SetTitle(ratioTitle);
+  hFrameBottom->GetYaxis()->SetTitleSize(textSize * scaleBottom);
+  hFrameBottom->GetYaxis()->SetLabelSize(textSize * scaleBottom * 0.85);
+  hFrameBottom->GetYaxis()->SetTitleOffset(1.25 / scaleBottom);
+  hFrameBottom->GetYaxis()->SetNdivisions(505);
+  hFrameBottom->GetYaxis()->CenterTitle();
+  hFrameBottom->GetXaxis()->SetTitle("Centrality (%)");
+  hFrameBottom->GetXaxis()->SetTitleSize(textSize * scaleBottom);
+  hFrameBottom->GetXaxis()->SetLabelSize(textSize * scaleBottom * 0.85);
+  hFrameBottom->GetXaxis()->SetTitleOffset(1.);
+  hFrameBottom->GetXaxis()->SetTickLength(0.03 * scaleBottom);
+  hFrameBottom->Draw("axis");
+
+  TLine* line = new TLine(hFrameBottom->GetXaxis()->GetXmin(), 1, hFrameBottom->GetXaxis()->GetXmax(), 1);
+  line->SetLineStyle(kDashed);
+  line->SetLineColor(kGray + 1);
+  line->Draw();
+
+  for (auto& hist : variations) {
+    TH1F* hRatio = (TH1F*)hist->histos[quantity]->Clone(Form("hRatio_%s_%s", outName, hist->label));
+    hRatio->Divide(hist->histos[quantity], reference->histos[quantity], 1, 1, "");
+    hRatio->Draw("same");
+  }
+
+  canv->SaveAs(Form("%s.pdf", outName));
+}
 
 void drawTGlauberMC()
 {
@@ -142,130 +249,56 @@ void drawTGlauberMC()
     kB
   };
 
-  Histos* pbpb25_568117 = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "", "PbPb25"), "568117");
-  Histos* pbpb25_568117_Pb = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "_basehistos_Pb", "PbPb25"), "568117");
-  Histos* pbpb25_568117_PbHN = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "_basehistos_PbHN", "PbPb25"), "568117");
-  Histos* pbpb25_568117_Pbpn = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "_basehistos_Pbpn", "PbPb25"), "568117");
-  Histos* pbpb25_568117_Pbstar = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "_basehistos_Pbstar", "PbPb25"), "568117");
-  Histos* pbpb25_568117_Pbrw = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "_basehistos_Pbrw", "PbPb25"), "568117");
-  Histos* pbpb25_568117_Pbpnrw = new Histos(doNpartNcoll("LHC25_pass1", "AR_568117", "_basehistos_Pbpnrw", "PbPb25"), "568117");
+  // Centrality bin edges (%)
+  const std::vector<double> centBins = { 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+  // const std::vector<double> centBins = { 0, 1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+  // std::vector<double> centBins;
+  // for (int ii = 0; ii < 101; ++ii) {
+  //   centBins.push_back(ii);
+  // }
 
-  ColorManager cm(6);
-  pbpb25_568117->setColor(cm.getColor(-1));
-  pbpb25_568117_Pb->setColor(cm.getColor(0));
-  pbpb25_568117_Pbstar->setColor(cm.getColor(1));
-  pbpb25_568117_Pbpn->setColor(cm.getColor(2));
-  pbpb25_568117_PbHN->setColor(cm.getColor(3));
-  pbpb25_568117_Pbrw->setColor(cm.getColor(4));
-  pbpb25_568117_Pbpnrw->setColor(cm.getColor(5));
+  // Reference (denominator of the ratios)
+  const char* dataset = "LHC25_pass1";
+  const char* ar = "AR_568117";
+  Histos* reference = new Histos(doNpartNcoll(dataset, ar, "", "PbPb25", centBins), "Pb");
+  if (reference->histos.empty()) {
+    std::cerr << "Error: reference histograms not available!" << std::endl;
+    return;
+  }
+  reference->setColor(kBlack);
+  const bool drawReference = true; // draw the reference in the top pad
 
-  TLegend* legend = new TLegend(0.67, 0.7, 0.87, 0.95);
-  legend->SetBorderSize(0);
-  legend->SetFillColorAlpha(0, 0);
-  legend->AddEntry(pbpb25_568117->histos[kNpart], "default", "pl");
-  legend->AddEntry(pbpb25_568117_Pb->histos[kNpart], "Pb", "lp");
-  legend->AddEntry(pbpb25_568117_Pbstar->histos[kNpart], "Pb*", "pl");
-  legend->AddEntry(pbpb25_568117_Pbpn->histos[kNpart], "Pbpn", "lp");
-  legend->AddEntry(pbpb25_568117_PbHN->histos[kNpart], "PbHN", "pl");
-  legend->AddEntry(pbpb25_568117_Pbrw->histos[kNpart], "Pbrw", "pl");
-  legend->AddEntry(pbpb25_568117_Pbpnrw->histos[kNpart], "Pbpnrw", "pl");
+  // Variations: { basehistos suffix, legend label, enabled }
+  struct Variation {
+    const char* basehistos;
+    const char* label;
+    bool enabled;
+  };
+  const std::vector<Variation> variationConfig = {
+    { "_basehistos_Pbstar", "Pb*", true },
+    { "_basehistos_Pbpn", "Pbpn", true },
+    { "_basehistos_PbHN", "PbHN", true },
+    { "_basehistos_Pbrw", "Pbrw", true },
+    { "_basehistos_Pbpnrw", "Pbpnrw", true },
+  };
 
-  TCanvas* canvNpart = new TCanvas("canvNpart", "", 1200, 800);
-  canvNpart->SetTopMargin(0.03);
-  canvNpart->SetLeftMargin(0.1);
-  canvNpart->SetRightMargin(0.1);
-  canvNpart->SetBottomMargin(0.13);
-  // hAvgNpart->Draw();
-  // pbpb25_567905->histos[kNpart]->Draw("pe");
-  pbpb25_568117->histos[kNpart]->Draw("pe");
-  pbpb25_568117_Pb->histos[kNpart]->Draw("pe same");
-  pbpb25_568117_PbHN->histos[kNpart]->Draw("pe same");
-  pbpb25_568117_Pbpn->histos[kNpart]->Draw("pe same");
-  pbpb25_568117_Pbstar->histos[kNpart]->Draw("pe same");
-  pbpb25_568117_Pbrw->histos[kNpart]->Draw("pe same");
-  pbpb25_568117_Pbpnrw->histos[kNpart]->Draw("pe same");
-  legend->Draw();
-  canvNpart->SaveAs("hNpartTGlauberMC.pdf");
-
-  TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 800);
-  canvNcoll->SetTopMargin(0.03);
-  canvNcoll->SetLeftMargin(0.1);
-  canvNcoll->SetRightMargin(0.1);
-  canvNcoll->SetBottomMargin(0.13);
-  // hAvgNcoll->Draw();
-  // pbpb25_567905->histos[kNcoll]->Draw("pe");
-  pbpb25_568117->histos[kNcoll]->Draw("pe");
-  pbpb25_568117_Pb->histos[kNcoll]->Draw("pe same");
-  pbpb25_568117_PbHN->histos[kNcoll]->Draw("pe same");
-  pbpb25_568117_Pbpn->histos[kNcoll]->Draw("pe same");
-  pbpb25_568117_Pbstar->histos[kNcoll]->Draw("pe same");
-  pbpb25_568117_Pbrw->histos[kNcoll]->Draw("pe same");
-  pbpb25_568117_Pbpnrw->histos[kNcoll]->Draw("pe same");
-  legend->Draw();
-  canvNcoll->SaveAs("hNcollTGlauberMC.pdf");
-
-  std::vector<Histos*> registry = { pbpb25_568117_Pb,
-                                    pbpb25_568117_PbHN,
-                                    pbpb25_568117_Pbpn,
-                                    pbpb25_568117_Pbstar,
-                                    pbpb25_568117_Pbrw,
-                                    pbpb25_568117_Pbpnrw };
-  
-  TLegend* legend2 = new TLegend(0.17, 0.7, 0.37, 0.95);
-  legend2->SetBorderSize(0);
-  legend2->SetFillColorAlpha(0, 0);
-  legend2->AddEntry(pbpb25_568117_Pb->histos[kNpart], "Pb", "lp");
-  legend2->AddEntry(pbpb25_568117_Pbstar->histos[kNpart], "Pb*", "pl");
-  legend2->AddEntry(pbpb25_568117_Pbpn->histos[kNpart], "Pbpn", "lp");
-  legend2->AddEntry(pbpb25_568117_PbHN->histos[kNpart], "PbHN", "pl");
-  legend2->AddEntry(pbpb25_568117_Pbrw->histos[kNpart], "Pbrw", "pl");
-  legend2->AddEntry(pbpb25_568117_Pbpnrw->histos[kNpart], "Pbpnrw", "pl");
-
-  // Ratio histograms Npart
-  TCanvas* canvNpartRatio = new TCanvas("canvNpartRatio", "", 1200, 800);
-  canvNpartRatio->SetTopMargin(0.03);
-  canvNpartRatio->SetLeftMargin(0.13);
-  canvNpartRatio->SetRightMargin(0.03);
-  canvNpartRatio->SetBottomMargin(0.13);
-
-  TLine* line = new TLine(0, 1, 100, 1);
-  line->SetLineStyle(kDashed);
-  line->SetLineColor(kGray);
-
-  bool firstNpart = true;
-  for (auto& hist : registry) {
-    TH1F* hRatio = (TH1F*)hist->histos[kNpart]->Clone();
-    hRatio->Divide(hist->histos[kNpart], pbpb25_568117->histos[kNpart], 1, 1, "");
-    hRatio->GetYaxis()->SetRangeUser(0.985, 1.03);
-    hRatio->GetYaxis()->SetTitle("<N_{part}> ratio to basehistos");
-    hRatio->GetXaxis()->SetTitle("Centrality percentile (FT0C)");
-    hRatio->Draw(firstNpart ? "hist" : "hist same");
-    firstNpart = false;
+  // Colors are assigned by position in the full list, so they stay fixed when toggling entries
+  ColorManager cm(variationConfig.size());
+  std::vector<Histos*> variations;
+  for (size_t i = 0; i < variationConfig.size(); ++i) {
+    const auto& var = variationConfig[i];
+    if (!var.enabled) {
+      continue;
+    }
+    std::vector<TH1F*> vec = doNpartNcoll(dataset, ar, var.basehistos, "PbPb25", centBins);
+    if (vec.empty()) {
+      continue;
+    }
+    Histos* hist = new Histos(vec, var.label);
+    hist->setColor(cm.getColor(i));
+    variations.push_back(hist);
   }
 
-  legend2->Draw();
-  line->Draw();
-  canvNpartRatio->SaveAs("hNpartRatioTGlauberMC.pdf");
-
-  // Ratio histograms Ncoll
-  TCanvas* canvNcollRatio = new TCanvas("canvNcollRatio", "", 1200, 800);
-  canvNcollRatio->SetTopMargin(0.03);
-  canvNcollRatio->SetLeftMargin(0.13);
-  canvNcollRatio->SetRightMargin(0.03);
-  canvNcollRatio->SetBottomMargin(0.13);
-
-  bool firstNcoll = true;
-  for (auto& hist : registry) {
-    TH1F* hRatio = (TH1F*)hist->histos[kNcoll]->Clone();
-    hRatio->Divide(hist->histos[kNcoll], pbpb25_568117->histos[kNcoll], 1, 1, "B");
-
-    hRatio->GetYaxis()->SetRangeUser(0.985, 1.09);
-    hRatio->GetYaxis()->SetTitle("<N_{coll}> ratio to basehistos");
-    hRatio->GetXaxis()->SetTitle("Centrality percentile (FT0C)");
-    hRatio->Draw(firstNcoll ? "hist" : "hist same");
-    firstNcoll = false;
-  }
-  legend2->Draw();
-  line->Draw();
-  canvNcollRatio->SaveAs("hNcollRatioTGlauberMC.pdf");                
+  drawWithRatio(kNpart, reference, variations, drawReference, "#LT N_{part} #GT", "Ratio to Pb", 0.97, 1.045, "hNpartTGlauberMC");
+  drawWithRatio(kNcoll, reference, variations, drawReference, "#LT N_{coll} #GT", "Ratio to Pb", 0.97, 1.09, "hNcollTGlauberMC");
 }

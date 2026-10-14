@@ -74,11 +74,12 @@ void runCalibrationOO(TString lInputFileName = "results/AR_544122_glauberNBD_anc
     
     TProfile *hProfileNpart = new TProfile("hProfileNpart", "", 100, 0, 100);
     TProfile *hProfileNcoll = new TProfile("hProfileNcoll", "", 100, 0, 100);
-    TH2F *h2dNpart = new TH2F("h2dNpart", "", 100, 0, 100, 500, -0.5f, 499.5f);
-    TH2F *h2dNcoll = new TH2F("h2dNcoll", "", 100, 0, 100, 3000, -0.5f, 2999.5);
-    TH2F *h2dEcc = new TH2F("h2dEcc", "", 100, 0, 100, 100, 0.0f, 1.0f);
-    TH2F *h2dB = new TH2F("h2dB", "", 100, 0, 100, 100, 0.0f, 20.0f);
-    TH2F *h2dNancestors = new TH2F("h2dNancestors", "", 100, 0, 100, 900, -0.5f, 899.5f);
+    TH2D *h2dNpart = new TH2D("h2dNpart", "", 100, 0, 100, 500, -0.5f, 499.5f);
+    TH2D *h2dNcoll = new TH2D("h2dNcoll", "", 100, 0, 100, 3000, -0.5f, 2999.5);
+    TH2D *h2dEcc = new TH2D("h2dEcc", "", 100, 0, 100, 100, 0.0f, 1.0f);
+    TH2D *h2dB = new TH2D("h2dB", "", 100, 0, 100, 100, 0.0f, 20.0f);
+    TH2D *h2dNancestors = new TH2D("h2dNancestors", "", 100, 0, 100, 900, -0.5f, 899.5f);
+    TH2D* h2dMult = new TH2D("h2dMult", "", 100, 0, 100, 30000, 0.0f, 30000.f);
     
     
     // Replay
@@ -90,6 +91,7 @@ void runCalibrationOO(TString lInputFileName = "results/AR_544122_glauberNBD_anc
     TH2D *hNpNc = (TH2D*) fbasefile->Get("hNpNc");
     TH3D *hNpNcEcc = (TH3D*) fbasefile->Get("hNpNcEcc");
     TH3D *hNpNcB = (TH3D*) fbasefile->Get("hNpNcB");
+
     g->SetNpartNcollCorrelation(hNpNc);
     g->InitializeNpNc();
     
@@ -106,10 +108,9 @@ void runCalibrationOO(TString lInputFileName = "results/AR_544122_glauberNBD_anc
     //  hGlauberParameters -> SetBinContent( 5, fitfunc -> GetParameter(4));
     
     Double_t lMax = hData->GetBinLowEdge( hData->GetNbinsX() + 1);
-    g->CalculateAvNpNc( hProfileNpart, hProfileNcoll, h2dNpart, h2dNcoll, hCalib, 0, lMax , hNpNcEcc, h2dEcc, hNpNcB, h2dB, h2dNancestors );
+    g->CalculateAvNpNc( hProfileNpart, hProfileNcoll, (TH2F*)h2dNpart, (TH2F*)h2dNcoll, hCalib, 0, lMax , hNpNcEcc, (TH2F*)h2dEcc, hNpNcB, (TH2F*)h2dB, (TH2F*)h2dNancestors, (TH2F*)h2dMult );
     
     fileCalib->cd();
-    
     hProfileNpart->Write();
     hProfileNcoll->Write();
     h2dNpart->Write();

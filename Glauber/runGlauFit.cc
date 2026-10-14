@@ -137,7 +137,7 @@ Double_t GetBoundaryForPercentile( TH1 *histo, Double_t lPercentileRequested ) {
 }
 
 int runGlauFit(TString lInputFileName = "AnalysisResultsLHC24ar.root", Double_t lFitRange = /*350*/500., TString histogramName = "hFT0C_BCs", TString lBaseHistName = "basehistos", int ancestorMode = 2) {
-  Bool_t lFreek = kFALSE;
+  Bool_t lFreek = kTRUE;
   Bool_t use_dMu_dNanc = kFALSE;
   Bool_t lFreef = kFALSE;
   Float_t lfvalue = 0.800;

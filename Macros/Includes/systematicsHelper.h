@@ -29,11 +29,12 @@ static const std::vector<double> centBinsD(CentBins.begin(), CentBins.end());
 // GlauberParameters is filled from ROOT files that store these histograms
 // with different precisions depending on their origin (see below).
 template <typename Hist1D = TH1F>
-inline Hist1D* initGlauParHist(const std::vector<float>& vals, const char* title, const int color)
+inline Hist1D* initGlauParHist(const std::vector<float>& vals, const char* title, const int color, const std::vector<float>& bins = CentBins)
 {
+  const std::vector<double> binsD(bins.begin(), bins.end());
   const bool oldAddDirStatus = TH1::AddDirectoryStatus();
   TH1::AddDirectory(kFALSE);
-  Hist1D* hist = new Hist1D(title, "", static_cast<int>(centBinsD.size()) - 1, centBinsD.data());
+  Hist1D* hist = new Hist1D(title, "", static_cast<int>(binsD.size()) - 1, binsD.data());
   TH1::AddDirectory(oldAddDirStatus);
   hist->SetMarkerStyle(kFullCircle);
   hist->SetMarkerColor(color);
@@ -55,12 +56,18 @@ struct GlauberParameters {
   Hist2D* h2dNcoll = nullptr;
   Hist1D* hNpart = nullptr;
   Hist1D* hNcoll = nullptr;
-  std::vector<float> npart, ncoll;
-  GlauberParameters(const char* path, const bool useFullPath = false);
+  Hist2D* h2dNancestor = nullptr; // optional: not produced by every calibration
+  Hist1D* hNancestor = nullptr;   // only filled if h2dNancestor is available
+  Hist2D* h2dMult = nullptr;      // optional: not produced by every calibration
+  Hist1D* hMult = nullptr;        // only filled if h2dMult is available
+  std::vector<float> npart, ncoll, nancestor, mult;
+  std::vector<float> bins; // centrality bin edges used for the rebinned vectors and 1D histograms
+  GlauberParameters(const char* path, const bool useFullPath = false, const std::vector<float>& centBins = CentBins);
 };
 
 template <typename Hist2D, typename Hist1D>
-GlauberParameters<Hist2D, Hist1D>::GlauberParameters(const char* path, const bool useFullPath)
+GlauberParameters<Hist2D, Hist1D>::GlauberParameters(const char* path, const bool useFullPath, const std::vector<float>& centBins)
+  : bins(centBins)
 {
   const char* fullpath = useFullPath ? path : Form("../AnalysisResults/%s", path);
   TFile* infile = new TFile(fullpath, "read");
@@ -79,8 +86,18 @@ GlauberParameters<Hist2D, Hist1D>::GlauberParameters(const char* path, const boo
     std::cerr << "Error: h2dNcoll not found!" << std::endl;
   }
 
+  // optional, silently skipped if absent
+  h2dNancestor = dynamic_cast<Hist2D*>(infile->Get("h2dNancestors"));
+  h2dMult = dynamic_cast<Hist2D*>(infile->Get("h2dMult"));
+
   h2dNpart->SetDirectory(0);
   h2dNcoll->SetDirectory(0);
+  if (h2dNancestor) {
+    h2dNancestor->SetDirectory(0);
+  }
+  if (h2dMult) {
+    h2dMult->SetDirectory(0);
+  }
 
   infile->Close();
   delete infile;
@@ -92,9 +109,19 @@ GlauberParameters<Hist2D, Hist1D>::GlauberParameters(const char* path, const boo
     ncoll.push_back(hProjectionNcoll->GetMean());
     delete hProjectionNpart;
     delete hProjectionNcoll;
+    if (h2dNancestor) {
+      TH1D* hProjectionNancestor = (TH1D*)h2dNancestor->ProjectionY(Form("hProjectionNancestor_%d", icent + 1), icent + 1, icent + 1);
+      nancestor.push_back(hProjectionNancestor->GetMean());
+      delete hProjectionNancestor;
+    }
+    if (h2dMult) {
+      TH1D* hProjectionMult = (TH1D*)h2dMult->ProjectionY(Form("hProjectionMult_%d", icent + 1), icent + 1, icent + 1);
+      mult.push_back(hProjectionMult->GetMean());
+      delete hProjectionMult;
+    }
   }
 
-  // Rebin npart and ncoll according to CentBins (formerly the static rebin() method)
+  // Rebin npart and ncoll according to bins (formerly the static rebin() method)
   auto rebinInPlace = [](std::vector<float>& vals, const std::vector<float>& bins) {
     std::vector<float> weights(vals.size(), 1);
     std::vector<float> result;
@@ -115,15 +142,27 @@ GlauberParameters<Hist2D, Hist1D>::GlauberParameters(const char* path, const boo
     vals = result;
   };
 
-  rebinInPlace(npart, CentBins);
-  rebinInPlace(ncoll, CentBins);
+  rebinInPlace(npart, bins);
+  rebinInPlace(ncoll, bins);
+  if (h2dNancestor) {
+    rebinInPlace(nancestor, bins);
+  }
+  if (h2dMult) {
+    rebinInPlace(mult, bins);
+  }
 
   TString histName(path);
   histName.ReplaceAll(".root", "");
   histName.ReplaceAll("/", "_");
 
-  hNpart = initGlauParHist<Hist1D>(npart, Form("hNpart_%s", histName.Data()), kBlack);
-  hNcoll = initGlauParHist<Hist1D>(ncoll, Form("hNcoll_%s", histName.Data()), kBlack);
+  hNpart = initGlauParHist<Hist1D>(npart, Form("hNpart_%s", histName.Data()), kBlack, bins);
+  hNcoll = initGlauParHist<Hist1D>(ncoll, Form("hNcoll_%s", histName.Data()), kBlack, bins);
+  if (h2dNancestor) {
+    hNancestor = initGlauParHist<Hist1D>(nancestor, Form("hNancestor_%s", histName.Data()), kBlack, bins);
+  }
+  if (h2dMult) {
+    hMult = initGlauParHist<Hist1D>(mult, Form("hMult_%s", histName.Data()), kBlack, bins);
+  }
 }
 
 template <typename Hist2D, typename Hist1D>
@@ -250,6 +289,16 @@ struct SystSource {
   std::vector<std::vector<float>> relSyst; // indexed by cent::GlauberQuantity (kNpart, kNcoll)
   bool asMarkers = false; // draw as markers instead of a line (used for external references, e.g. Run 2)
   int marker = kFullCircle;
+  int lineWidth = 1;
+  int lineStyle = kSolid;
+
+  void setLineStyle(int col, int width, int style)
+  {
+    color = col;
+    lineWidth = width;
+    lineStyle = style;
+  }
+
   const std::vector<float>& values(int var, bool relative) const
   {
     return relative ? relSyst[var] : syst[var];
@@ -316,7 +365,7 @@ inline SystSource makeReferenceSource(const char* label, int color, const std::v
 }
 
 // Quadrature-sums the sources flagged `includeInTotal` into a new SystSource.
-inline SystSource combineSourcesInTotal(const char* label, int color, bool draw, const std::vector<SystSource>& sources)
+inline SystSource combineSourcesInTotal(const char* label, int color, bool draw, const std::vector<SystSource>& sources, int lineWidth = 1, int lineStyle = kSolid)
 {
   std::vector<std::vector<std::vector<float>>> allSyst, allRelSyst;
   for (const auto& source : sources) {
@@ -330,6 +379,8 @@ inline SystSource combineSourcesInTotal(const char* label, int color, bool draw,
   SystSource total;
   total.label = label;
   total.color = color;
+  total.lineWidth = lineWidth;
+  total.lineStyle = lineStyle;
   total.draw = draw;
   total.includeInTotal = false;
   total.syst = combineSystematicsInQuadrature(allSyst);
@@ -339,12 +390,18 @@ inline SystSource combineSourcesInTotal(const char* label, int color, bool draw,
 
 // Draws one canvas for a given quantity (cent::kNpart or cent::kNcoll) and
 // value kind (absolute or relative), overlaying every source with `draw ==
-// true`, plus the total if `total.draw == true`. The (always invisible)
-// total histogram is used only to fix the axis range/style, so the frame
-// stays stable regardless of which sources are toggled on.
-inline void drawSystematics(const std::vector<SystSource>& sources, const SystSource& total, int var, bool relative, const char* titleYaxis, const char* outFile, const float min = 2e-6, const float max = 2e-1)
+// true`, plus every total with `draw == true`. Passing several totals makes it
+// possible to compare different ways of combining the sources on one canvas.
+// The (always invisible) first total is used only to fix the axis range/style,
+// so the frame stays stable regardless of which sources are toggled on.
+inline void drawSystematics(const std::vector<SystSource>& sources, const std::vector<SystSource>& totals, int var, bool relative, const char* titleYaxis, const char* outFile, const float min = 2e-6, const float max = 2e-1)
 {
-  TH1F* hFrame = initGlauParHist(total.values(var, relative), Form("hFrame_%s", outFile), total.color);
+  if (totals.empty()) {
+    std::cerr << "Error in drawSystematics: no total given!" << std::endl;
+    return;
+  }
+
+  TH1F* hFrame = initGlauParHist(totals.front().values(var, relative), Form("hFrame_%s", outFile), totals.front().color);
   hFrame->SetMarkerColorAlpha(0, 0);
   hFrame->SetLineColorAlpha(0, 0);
 
@@ -354,16 +411,28 @@ inline void drawSystematics(const std::vector<SystSource>& sources, const SystSo
   hFrame->SetMinimum(min);
   hFrame->SetMaximum(max);
   hFrame->Draw();
-  canv->SetLogy();
+  // canv->SetLogy();
 
   TLegend* leg = new TLegend(0.18, 0.66, 0.63, 0.94);
   leg->SetBorderSize(0);
   leg->SetFillColorAlpha(0, 0);
 
-  TH1F* hTotal = nullptr;
-  if (total.draw) {
-    hTotal = initGlauParHist(total.values(var, relative), Form("hTotal_%s", outFile), total.color);
-    leg->AddEntry(hTotal, total.label.c_str(), "l");
+  auto applyLineStyle = [](TH1F* h, const SystSource& source) {
+    h->SetLineColor(source.color);
+    h->SetLineWidth(source.lineWidth);
+    h->SetLineStyle(source.lineStyle);
+  };
+
+  std::vector<TH1F*> hTotals;
+  int itot = 0;
+  for (const auto& total : totals) {
+    if (!total.draw) {
+      continue;
+    }
+    TH1F* h = initGlauParHist(total.values(var, relative), Form("hTotal%d_%s", itot++, outFile), total.color);
+    applyLineStyle(h, total);
+    leg->AddEntry(h, total.label.c_str(), "l");
+    hTotals.push_back(h);
   }
 
   int isrc = 0;
@@ -372,6 +441,7 @@ inline void drawSystematics(const std::vector<SystSource>& sources, const SystSo
       continue;
     }
     TH1F* h = initGlauParHist(source.values(var, relative), Form("hSource%d_%s", isrc++, outFile), source.color);
+    applyLineStyle(h, source);
     if (source.asMarkers) {
       h->SetMarkerSize(1.5);
       h->SetMarkerStyle(source.marker);
@@ -383,12 +453,17 @@ inline void drawSystematics(const std::vector<SystSource>& sources, const SystSo
     }
   }
 
-  if (hTotal) {
-    hTotal->Draw("hist same");
+  for (auto* h : hTotals) {
+    h->Draw("hist same");
   }
 
   leg->Draw();
   canv->SaveAs(outFile);
+}
+
+inline void drawSystematics(const std::vector<SystSource>& sources, const SystSource& total, int var, bool relative, const char* titleYaxis, const char* outFile, const float min = 2e-6, const float max = 2e-1)
+{
+  drawSystematics(sources, std::vector<SystSource>{ total }, var, relative, titleYaxis, outFile, min, max);
 }
 
 } // namespace syst
