@@ -28,23 +28,40 @@
 //  4.34     0.15         3.14     0.22
 //  3.26     0.15         2.13     0.18
 // //  2.45     0.14         1.41     0.14
-// static const std::vector<float> NpartVal = { 32.10, 29.39, 25.35, 19.84, 14.97, 11.06, 8.07, 5.88, 4.34, 3.26, 2.45 };
-// static const std::vector<float> NpartErr = { 0.70, 1.04, 1.07, 0.74, 0.51, 0.48, 0.43, 0.30, 0.15, 0.15, 0.14 };
-// static const std::vector<float> NpartRelErr = { 0.021807, 0.035387, 0.042209, 0.037298, 0.034068, 0.043399, 0.053284, 0.051020, 0.034562, 0.046012, 0.057143 };
-// static const std::vector<float> NcollVal = { 53.86, 45.18, 35.40, 24.36, 16.26, 10.73, 7.07, 4.68, 3.14, 2.13, 1.41 };
-// static const std::vector<float> NcollErr = { 4.82, 4.42, 3.49, 2.21, 1.48, 1.08, 0.73, 0.43, 0.22, 0.18, 0.14 };
-// static const std::vector<float> NcollRelErr = { 0.061688, 0.075377, 0.094876, 0.114188, 0.123326, 0.126535, 0.125960, 0.122473, 0.116667, 0.125604, 0.115942};
-static const std::vector<float> NpartVal = { 12.60 };
-static const std::vector<float> NpartErr = { 0.54 };
-static const std::vector<float> NpartRelErr = { NpartErr[0] / NpartVal[0] };
-static const std::vector<float> NcollVal = { 15.47 };
-static const std::vector<float> NcollErr = { 1.43 };
-static const std::vector<float> NcollRelErr = { NcollErr[0] / NcollVal[0] };
+// Published values per centrality class (CentClasses) and for 0-100% (MB)
+static const std::vector<float> CentClasses = { 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+static const std::vector<float> NpartValCent = { 32.10, 29.39, 25.35, 19.84, 14.97, 11.06, 8.07, 5.88, 4.34, 3.26, 2.45 };
+static const std::vector<float> NpartErrCent = { 0.70, 1.04, 1.07, 0.74, 0.51, 0.48, 0.43, 0.30, 0.15, 0.15, 0.14 };
+static const std::vector<float> NcollValCent = { 53.86, 45.18, 35.40, 24.36, 16.26, 10.73, 7.07, 4.68, 3.14, 2.13, 1.41 };
+static const std::vector<float> NcollErrCent = { 4.82, 4.42, 3.49, 2.21, 1.48, 1.08, 0.73, 0.43, 0.22, 0.18, 0.14 };
+static const std::vector<float> NpartValMB = { 12.60 };
+static const std::vector<float> NpartErrMB = { 0.54 };
+static const std::vector<float> NcollValMB = { 15.47 };
+static const std::vector<float> NcollErrMB = { 1.43 };
+
+// err / val, bin by bin
+static std::vector<float> relativeErrors(const std::vector<float>& errs, const std::vector<float>& vals)
+{
+  std::vector<float> rel;
+  for (size_t ii = 0; ii < vals.size(); ++ii) {
+    rel.push_back(errs[ii] / vals[ii]);
+  }
+  return rel;
+}
 
 
 void doSystematicsNeNe()
 {
   gStyle->SetOptStat(0);
+  // Centrality binning: false = centrality classes, true = a single 0-100% bin
+  const bool minBias = true;
+  syst::CentBins = minBias ? std::vector<float>{ 0, 100 } : CentClasses;
+  const std::vector<float>& NpartVal = minBias ? NpartValMB : NpartValCent;
+  const std::vector<float>& NpartErr = minBias ? NpartErrMB : NpartErrCent;
+  const std::vector<float>& NcollVal = minBias ? NcollValMB : NcollValCent;
+  const std::vector<float>& NcollErr = minBias ? NcollErrMB : NcollErrCent;
+  const std::vector<float> NpartRelErr = relativeErrors(NpartErr, NpartVal);
+  const std::vector<float> NcollRelErr = relativeErrors(NcollErr, NcollVal);
   enum GlauberQuantity {
     kNpart = 0,
     kNcoll,
@@ -231,16 +248,19 @@ void doSystematicsNeNe()
   for (int ii = 0; ii < syst::CentBins.size() - 1; ++ii) {
     const float errNpartFT0C = NpartVal[ii] * relSystTotal[kNpart][ii];
     const float errNcollFT0C = NcollVal[ii] * relSystTotal[kNcoll][ii];
+    // RMS: assume the relative RMS of our calibration (base) also holds for the published values
+    const float rmsNpartFT0C = NpartVal[ii] * base.npartRMS[ii] / base.npart[ii];
+    const float rmsNcollFT0C = NcollVal[ii] * base.ncollRMS[ii] / base.ncoll[ii];
     const float errNpartFT0M = systTotal[kNpart][ii];
     const float errNcollFT0M = systTotal[kNcoll][ii];
 
     errNpart.push_back(errNpartFT0C);
     errNcoll.push_back(errNcollFT0C);
     if (publishValues) {
-      std::cout << Form("%.f-%.f%% | Npart: %.2f +- %.2f | Ncoll: %.2f +- %.2f", syst::CentBins[ii], syst::CentBins[ii + 1], NpartVal[ii], errNpartFT0C, NcollVal[ii], errNcollFT0C) << std::endl;
+      std::cout << Form("%s | Npart: %.2f (RMS %.2f) +- %.2f | Ncoll: %.2f (RMS %.2f) +- %.2f", syst::binLabel(syst::CentBins, ii).Data(), NpartVal[ii], rmsNpartFT0C, errNpartFT0C, NcollVal[ii], rmsNcollFT0C, errNcollFT0C) << std::endl;
     }
     if (publishCrossCheck) {
-      std::cout << Form("%.f-%.f%% | Npart: %.4f +- %.4f | Ncoll: %.4f +- %.4f", syst::CentBins[ii], syst::CentBins[ii + 1], errNpartFT0M, systTotal[kNpart][ii], errNcollFT0M, systTotal[kNcoll][ii]) << std::endl;
+      std::cout << Form("%s | Npart: %.4f +- %.4f | Ncoll: %.4f +- %.4f", syst::binLabel(syst::CentBins, ii).Data(), errNpartFT0M, systTotal[kNpart][ii], errNcollFT0M, systTotal[kNcoll][ii]) << std::endl;
     }
   }
 

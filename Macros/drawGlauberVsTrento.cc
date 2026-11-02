@@ -35,7 +35,7 @@ void drawGlauberVsTrento()
   // ---- switch groups of histograms on/off ----
   Bool_t lDrawGlauber = kTRUE; // all entries with ModelType::Glauber
   Bool_t lDrawTrento = kTRUE;  // all entries with ModelType::Trento
-  Bool_t lDrawPythia = kTRUE;  // scaled PYTHIA 8 Angantyr N_ch
+  Bool_t lDrawPythia = kFALSE;  // scaled PYTHIA 8 Angantyr N_ch
   Bool_t lDrawNGlo = kFALSE;    // scaled N global tracks
   Bool_t lRebinToMult = kFALSE;
   Int_t lLineWidth = 1;
@@ -47,8 +47,10 @@ void drawGlauberVsTrento()
     { kTRUE, "../AnalysisResults/LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.0.root", "Glauber mode 2", ModelType::Glauber },
     { kFALSE, "../AnalysisResults/LHC23_pass5/AR_544122_calibration_ancestorMode1_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.0.root", "Glauber mode 1", ModelType::Glauber },
     { kFALSE, "../AnalysisResults/LHC23_pass5/AR_544122_calibration_ancestorMode0_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.0.root", "Glauber mode 0", ModelType::Glauber },
-    { kTRUE, "../Trento/trentofit_Jesper2_calib.root", "T_{R}ENTo v1 params", ModelType::Trento },
-    { kTRUE, "../Trento/trentofit_New_calib.root", "T_{R}ENTo v2 params", ModelType::Trento },
+    { kFALSE, "../Trento/trentofit_Jesper2_calib.root", "T_{R}ENTo v1 params", ModelType::Trento },
+    { kFALSE, "../Trento/trentofit_New_calib.root", "T_{R}ENTo v2 params", ModelType::Trento },
+    // { kTRUE, "../Trento/madhatter/norm_166.667_p_-0.1_k_2.2_d_0.126316/trentofit_calib.root", "T_{R}ENTo madhatter", ModelType::Trento },
+    { kTRUE, "../Trento/madhatter/norm_166.667_p_-0.1_k_2.03158_d_0.294737/trentofit_calib.root", "T_{R}ENTo madhatter", ModelType::Trento },
   };
   TString lRunNumber = "544122";
   TString lOutputName = "GlauberVsTrento.pdf";

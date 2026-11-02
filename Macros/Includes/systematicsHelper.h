@@ -16,14 +16,27 @@
 #include <vector>
 #include <string>
 #include <initializer_list>
+#include <algorithm>
 
 #include "centralityHelper.h"
 
 namespace syst {
 
-static const std::vector<float> CentBins = { 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-// static const std::vector<float> CentBins = { 0, 100 };
-static const std::vector<double> centBinsD(CentBins.begin(), CentBins.end());
+// Default centrality binning (integer edges, in %) of everything below. It is
+// read whenever a GlauberParameters/histogram is created, so a macro can switch
+// it (e.g. to { 0, 100 }) by reassigning it before building anything.
+inline std::vector<float> CentBins = { 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+
+// Binning used by SystSource::print(), independent of the (plotting) CentBins.
+// Integer edges in %. A macro switches it in one place, e.g.
+//   syst::PrintBins = { 0, 10, 30, 50, 70, 100 };
+inline std::vector<float> PrintBins = CentBins;
+
+// Printable label of centrality interval ii of bins, e.g. "0-5%"
+inline TString binLabel(const std::vector<float>& bins, const size_t ii)
+{
+  return Form("%g-%g%%", bins[ii], bins[ii + 1]);
+}
 
 // Hist1D is a template parameter (rather than a fixed TH1F/TH1D) because
 // GlauberParameters is filled from ROOT files that store these histograms
@@ -46,6 +59,56 @@ inline Hist1D* initGlauParHist(const std::vector<float>& vals, const char* title
   return hist;
 }
 
+// Averages per-1% values (index = centrality %) into the given integer bin edges
+inline std::vector<float> rebinValues(const std::vector<float>& vals, const std::vector<float>& bins)
+{
+  std::vector<float> result;
+  for (int ii = 0; ii < static_cast<int>(bins.size()) - 1; ++ii) {
+    const int thisBin = bins[ii];
+    const int nextBin = bins[ii + 1];
+
+    std::vector<float> theseValues, theseWeights;
+    for (int jj = thisBin; jj < nextBin; ++jj) {
+      theseValues.push_back(vals[jj]);
+      theseWeights.push_back(1);
+    }
+
+    result.push_back(cent::weightedAverage(theseValues, theseWeights));
+  }
+  return result;
+}
+
+// RMS of the equal-weight mixture of the per-1% distributions in each bin
+// (same weighting as rebinValues): var = <rms_i^2 + mean_i^2> - <mean_i>^2
+inline std::vector<float> rebinRMS(const std::vector<float>& means, const std::vector<float>& rms, const std::vector<float>& bins)
+{
+  std::vector<float> secondMoments;
+  for (size_t ii = 0; ii < means.size(); ++ii) {
+    secondMoments.push_back(rms[ii] * rms[ii] + means[ii] * means[ii]);
+  }
+  const std::vector<float> rebinnedMeans = rebinValues(means, bins);
+  const std::vector<float> rebinnedSecondMoments = rebinValues(secondMoments, bins);
+  std::vector<float> result;
+  for (size_t ii = 0; ii < rebinnedMeans.size(); ++ii) {
+    result.push_back(std::sqrt(std::max(0.f, rebinnedSecondMoments[ii] - rebinnedMeans[ii] * rebinnedMeans[ii])));
+  }
+  return result;
+}
+
+// Plain <Npart>/<Ncoll> values (and the RMS of their distributions), shaped
+// like GlauberParameters so that computeSystematics() works on both
+struct GlauberValues {
+  std::vector<float> npart, ncoll;
+  std::vector<float> npartRMS, ncollRMS;
+};
+
+// Per-1% GlauberValues averaged into the given bins
+inline GlauberValues rebinGlauberValues(const GlauberValues& fine, const std::vector<float>& bins)
+{
+  return { rebinValues(fine.npart, bins), rebinValues(fine.ncoll, bins),
+           rebinRMS(fine.npart, fine.npartRMS, bins), rebinRMS(fine.ncoll, fine.ncollRMS, bins) };
+}
+
 // Hist2D/Hist1D let callers pick TH2F/TH1F or TH2D/TH1D to match the actual
 // type of h2dNpart/h2dNcoll in the source file: the Glauber calibration files
 // (Glauber/runCalibration*.cc) write TH2F, while the Trento calibration file
@@ -61,6 +124,8 @@ struct GlauberParameters {
   Hist2D* h2dMult = nullptr;      // optional: not produced by every calibration
   Hist1D* hMult = nullptr;        // only filled if h2dMult is available
   std::vector<float> npart, ncoll, nancestor, mult;
+  std::vector<float> npartRMS, ncollRMS; // RMS of the Npart/Ncoll distribution in each bin
+  GlauberValues fine; // per-1% npart/ncoll before rebinning, to re-evaluate at other binnings
   std::vector<float> bins; // centrality bin edges used for the rebinned vectors and 1D histograms
   GlauberParameters(const char* path, const bool useFullPath = false, const std::vector<float>& centBins = CentBins);
 };
@@ -69,7 +134,7 @@ template <typename Hist2D, typename Hist1D>
 GlauberParameters<Hist2D, Hist1D>::GlauberParameters(const char* path, const bool useFullPath, const std::vector<float>& centBins)
   : bins(centBins)
 {
-  const char* fullpath = useFullPath ? path : Form("../AnalysisResults/%s", path);
+  const TString fullpath = useFullPath ? TString(path) : TString::Format("../AnalysisResults/%s", path);
   TFile* infile = new TFile(fullpath, "read");
   if (!infile || infile->IsZombie()) {
     std::cerr << "Error: file not found!" << std::endl;
@@ -78,12 +143,21 @@ GlauberParameters<Hist2D, Hist1D>::GlauberParameters(const char* path, const boo
   h2dNpart = dynamic_cast<Hist2D*>(infile->Get("h2dNpart"));
   h2dNcoll = dynamic_cast<Hist2D*>(infile->Get("h2dNcoll"));
 
+  // dynamic_cast also fails if the histogram exists with the other precision
+  // (TH2F vs TH2D), so name the stored type to make that case obvious
+  auto reportMissing = [&](const char* name) {
+    TObject* obj = infile->Get(name);
+    if (obj) {
+      std::cerr << "Error: " << name << " in " << fullpath << " is a " << obj->ClassName() << ", use GlauberParameters<" << obj->ClassName() << "> for it!" << std::endl;
+    } else {
+      std::cerr << "Error: " << name << " not found in " << fullpath << "!" << std::endl;
+    }
+  };
   if (!h2dNpart) {
-    std::cerr << "Error: h2dNpart not found!" << std::endl;
+    reportMissing("h2dNpart");
   }
-
   if (!h2dNcoll) {
-    std::cerr << "Error: h2dNcoll not found!" << std::endl;
+    reportMissing("h2dNcoll");
   }
 
   // optional, silently skipped if absent
@@ -107,6 +181,8 @@ GlauberParameters<Hist2D, Hist1D>::GlauberParameters(const char* path, const boo
     TH1D* hProjectionNcoll = (TH1D*)h2dNcoll->ProjectionY(Form("hProjectionNcoll_%d", icent + 1), icent + 1, icent + 1);
     npart.push_back(hProjectionNpart->GetMean());
     ncoll.push_back(hProjectionNcoll->GetMean());
+    npartRMS.push_back(hProjectionNpart->GetRMS());
+    ncollRMS.push_back(hProjectionNcoll->GetRMS());
     delete hProjectionNpart;
     delete hProjectionNcoll;
     if (h2dNancestor) {
@@ -121,34 +197,18 @@ GlauberParameters<Hist2D, Hist1D>::GlauberParameters(const char* path, const boo
     }
   }
 
-  // Rebin npart and ncoll according to bins (formerly the static rebin() method)
-  auto rebinInPlace = [](std::vector<float>& vals, const std::vector<float>& bins) {
-    std::vector<float> weights(vals.size(), 1);
-    std::vector<float> result;
+  fine = { npart, ncoll, npartRMS, ncollRMS };
 
-    for (int ii = 0; ii < static_cast<int>(bins.size()) - 1; ++ii) {
-      const int thisBin = bins[ii];
-      const int nextBin = bins[ii + 1];
-
-      std::vector<float> theseValues, theseWeights;
-      for (int jj = thisBin; jj < nextBin; ++jj) {
-        theseValues.push_back(vals[jj]);
-        theseWeights.push_back(weights[jj]);
-      }
-
-      result.push_back(cent::weightedAverage(theseValues, theseWeights));
-    }
-
-    vals = result;
-  };
-
-  rebinInPlace(npart, bins);
-  rebinInPlace(ncoll, bins);
+  const GlauberValues rebinned = rebinGlauberValues(fine, bins);
+  npart = rebinned.npart;
+  ncoll = rebinned.ncoll;
+  npartRMS = rebinned.npartRMS;
+  ncollRMS = rebinned.ncollRMS;
   if (h2dNancestor) {
-    rebinInPlace(nancestor, bins);
+    nancestor = rebinValues(nancestor, bins);
   }
   if (h2dMult) {
-    rebinInPlace(mult, bins);
+    mult = rebinValues(mult, bins);
   }
 
   TString histName(path);
@@ -176,8 +236,19 @@ inline void doGlauParQA(Hist2D* h2d, Hist1D* h1d, const char* name)
   delete canv;
 }
 
+// How the |variation - base| differences of one source are combined, per bin
+enum class Combination {
+  kAverage, // mean of the differences (e.g. a +-shift pair)
+  kRMS      // sqrt(sum d^2 / N), for a set of alternative models (e.g. nuclear shapes)
+};
+
+inline std::vector<float> combineVariations(const std::vector<std::vector<float>>& differences, Combination combination)
+{
+  return combination == Combination::kRMS ? cent::rmsOverVariations(differences) : cent::averageOverVariations(differences);
+}
+
 template <typename GPBase, typename GPVar>
-inline std::vector<std::vector<float>> computeSystematics(GPBase base, const std::vector<GPVar>& variations)
+inline std::vector<std::vector<float>> computeSystematics(GPBase base, const std::vector<GPVar>& variations, Combination combination = Combination::kAverage)
 {
   std::vector<std::vector<float>> variationsNpart;
   std::vector<std::vector<float>> variationsNcoll;
@@ -186,17 +257,17 @@ inline std::vector<std::vector<float>> computeSystematics(GPBase base, const std
     variationsNcoll.push_back(cent::calculateDifference(variation.ncoll, base.ncoll));
   }
 
-  return { cent::averageOverVariations(variationsNpart), cent::averageOverVariations(variationsNcoll) };
+  return { combineVariations(variationsNpart, combination), combineVariations(variationsNcoll, combination) };
 }
 
 template <typename GPBase, typename GPVar>
-inline std::vector<std::vector<float>> computeSystematics(GPBase base, std::initializer_list<GPVar> variations)
+inline std::vector<std::vector<float>> computeSystematics(GPBase base, std::initializer_list<GPVar> variations, Combination combination = Combination::kAverage)
 {
-  return computeSystematics(base, std::vector<GPVar>(variations));
+  return computeSystematics(base, std::vector<GPVar>(variations), combination);
 }
 
 template <typename GPBase, typename GPVar>
-inline std::vector<std::vector<float>> computeRelativeSystematics(GPBase base, const std::vector<GPVar>& variations)
+inline std::vector<std::vector<float>> computeRelativeSystematics(GPBase base, const std::vector<GPVar>& variations, Combination combination = Combination::kAverage)
 {
   std::vector<std::vector<float>> variationsNpart;
   std::vector<std::vector<float>> variationsNcoll;
@@ -205,13 +276,13 @@ inline std::vector<std::vector<float>> computeRelativeSystematics(GPBase base, c
     variationsNcoll.push_back(cent::calculateRelativeDifference(variation.ncoll, base.ncoll));
   }
 
-  return { cent::averageOverVariations(variationsNpart), cent::averageOverVariations(variationsNcoll) };
+  return { combineVariations(variationsNpart, combination), combineVariations(variationsNcoll, combination) };
 }
 
 template <typename GPBase, typename GPVar>
-inline std::vector<std::vector<float>> computeRelativeSystematics(GPBase base, std::initializer_list<GPVar> variations)
+inline std::vector<std::vector<float>> computeRelativeSystematics(GPBase base, std::initializer_list<GPVar> variations, Combination combination = Combination::kAverage)
 {
-  return computeRelativeSystematics(base, std::vector<GPVar>(variations));
+  return computeRelativeSystematics(base, std::vector<GPVar>(variations), combination);
 }
 
 inline std::vector<std::vector<float>> combineSystematicsInQuadrature(const std::vector<std::vector<std::vector<float>>>& allSystematics)
@@ -287,6 +358,14 @@ struct SystSource {
   bool includeInTotal = true; // fold this source into the quadrature-summed "Total"
   std::vector<std::vector<float>> syst;    // indexed by cent::GlauberQuantity (kNpart, kNcoll)
   std::vector<std::vector<float>> relSyst; // indexed by cent::GlauberQuantity (kNpart, kNcoll)
+  std::vector<std::vector<float>> central; // base <Npart>/<Ncoll> the systematics refer to, same indexing
+  std::vector<std::vector<float>> rms;     // RMS of the base Npart/Ncoll distributions, same indexing (empty if unknown)
+  std::vector<float> bins = CentBins;      // centrality bin edges of all the vectors above
+  // What is needed to re-evaluate the source at another binning (see rebinned()):
+  GlauberValues baseFine;                    // per-1% base values
+  std::vector<GlauberValues> variationsFine; // per-1% values of each variation
+  Combination combination = Combination::kAverage; // how the variations are combined
+  std::vector<SystSource> components;        // totals only: the sources folded in
   bool asMarkers = false; // draw as markers instead of a line (used for external references, e.g. Run 2)
   int marker = kFullCircle;
   int lineWidth = 1;
@@ -304,25 +383,105 @@ struct SystSource {
     return relative ? relSyst[var] : syst[var];
   }
 
-  void print(int var, bool relative = true)
+  static const char* quantityName(int var)
   {
-    const std::vector<float>& sys = relative ? relSyst[var] : syst[var];
-    for (size_t ii = 0; ii < sys.size(); ++ii) {
-      std::cout << CentBins[ii] << "-" << CentBins[ii + 1] << "% | " << sys[ii] << std::endl;
+    return var == cent::kNpart ? "Npart" : var == cent::kNcoll ? "Ncoll" : "?";
+  }
+
+  // "<value> (RMS <rms>) +- <abs. syst> (<rel. syst>%)" for one quantity and bin
+  TString formatBin(int var, size_t ii) const
+  {
+    TString out = central.empty() ? "" : Form("%8.2f ", central[var][ii]);
+    if (!rms.empty() && !rms[var].empty()) {
+      out += Form("(RMS %7.2f) ", rms[var][ii]);
+    }
+    return out + Form("+- %7.3f (%5.2f%%)", syst[var][ii], 100. * relSyst[var][ii]);
+  }
+
+  // This source re-evaluated at newBins: the base and variations (or, for a
+  // total, its components) are rebinned from 1% first, then compared, so the
+  // result is the same as building everything with newBins from the start.
+  SystSource rebinned(const std::vector<float>& newBins) const
+  {
+    if (newBins == bins) {
+      return *this;
+    }
+    SystSource out = *this;
+    out.bins = newBins;
+    if (!components.empty()) {
+      std::vector<std::vector<std::vector<float>>> allSyst, allRelSyst;
+      for (auto& component : out.components) {
+        component = component.rebinned(newBins);
+        allSyst.push_back(component.syst);
+        allRelSyst.push_back(component.relSyst);
+      }
+      out.syst = combineSystematicsInQuadrature(allSyst);
+      out.relSyst = combineSystematicsInQuadrature(allRelSyst);
+      out.central = out.components.front().central;
+      out.rms = out.components.front().rms;
+    } else if (!variationsFine.empty()) {
+      const GlauberValues base = rebinGlauberValues(baseFine, newBins);
+      std::vector<GlauberValues> variations;
+      for (const auto& variation : variationsFine) {
+        variations.push_back(rebinGlauberValues(variation, newBins));
+      }
+      out.syst = computeSystematics(base, variations, combination);
+      out.relSyst = computeRelativeSystematics(base, variations, combination);
+      out.central = { base.npart, base.ncoll };
+      out.rms = { base.npartRMS, base.ncollRMS };
+    } else {
+      std::cerr << "Warning: " << label << " cannot be rebinned (no per-1% values, e.g. a reference), keeping its own binning" << std::endl;
+      return *this;
+    }
+    return out;
+  }
+
+  // One quantity (cent::kNpart or cent::kNcoll), one line per bin of printBins
+  void print(int var, const std::vector<float>& printBins = PrintBins) const
+  {
+    const SystSource source = rebinned(printBins);
+    std::cout << label << " | <" << quantityName(var) << ">" << std::endl;
+    for (size_t ii = 0; ii < source.syst[var].size(); ++ii) {
+      std::cout << Form("%-8s | %s", binLabel(source.bins, ii).Data(), source.formatBin(var, ii).Data()) << std::endl;
+    }
+  }
+
+  // Npart and Ncoll side by side, one line per bin of printBins
+  void print(const std::vector<float>& printBins = PrintBins) const
+  {
+    const SystSource source = rebinned(printBins);
+    std::cout << label << std::endl;
+    for (size_t ii = 0; ii < source.syst[cent::kNpart].size(); ++ii) {
+      std::cout << Form("%-8s | Npart: %s | Ncoll: %s", binLabel(source.bins, ii).Data(), source.formatBin(cent::kNpart, ii).Data(), source.formatBin(cent::kNcoll, ii).Data()) << std::endl;
     }
   }
 };
 
 template <typename GPBase, typename GPVar>
-inline SystSource makeSystSource(const char* label, int color, bool draw, bool includeInTotal, GPBase base, const std::vector<GPVar>& variations)
+inline SystSource makeSystSource(const char* label, int color, bool draw, bool includeInTotal, GPBase base, const std::vector<GPVar>& variations, Combination combination = Combination::kAverage)
 {
-  return { label, color, draw, includeInTotal, computeSystematics(base, variations), computeRelativeSystematics(base, variations) };
+  SystSource source;
+  source.label = label;
+  source.color = color;
+  source.draw = draw;
+  source.includeInTotal = includeInTotal;
+  source.combination = combination;
+  source.syst = computeSystematics(base, variations, combination);
+  source.relSyst = computeRelativeSystematics(base, variations, combination);
+  source.central = { base.npart, base.ncoll };
+  source.rms = { base.npartRMS, base.ncollRMS };
+  source.bins = base.bins;
+  source.baseFine = base.fine;
+  for (const auto& variation : variations) {
+    source.variationsFine.push_back(variation.fine);
+  }
+  return source;
 }
 
 template <typename GPBase, typename GPVar>
-inline SystSource makeSystSource(const char* label, int color, bool draw, bool includeInTotal, GPBase base, std::initializer_list<GPVar> variations)
+inline SystSource makeSystSource(const char* label, int color, bool draw, bool includeInTotal, GPBase base, std::initializer_list<GPVar> variations, Combination combination = Combination::kAverage)
 {
-  return makeSystSource(label, color, draw, includeInTotal, base, std::vector<GPVar>(variations));
+  return makeSystSource(label, color, draw, includeInTotal, base, std::vector<GPVar>(variations), combination);
 }
 
 // Builds a reference source from externally quoted values and uncertainties
@@ -361,22 +520,30 @@ inline SystSource makeReferenceSource(const char* label, int color, const std::v
   ref.asMarkers = true;
   ref.syst = { absolute(npartVals, npartErrs), absolute(ncollVals, ncollErrs) };
   ref.relSyst = { relative(npartVals, npartErrs), relative(ncollVals, ncollErrs) };
+  ref.central = { npartVals, ncollVals };
   return ref;
 }
 
 // Quadrature-sums the sources flagged `includeInTotal` into a new SystSource.
 inline SystSource combineSourcesInTotal(const char* label, int color, bool draw, const std::vector<SystSource>& sources, int lineWidth = 1, int lineStyle = kSolid)
 {
+  SystSource total;
   std::vector<std::vector<std::vector<float>>> allSyst, allRelSyst;
+  const SystSource* first = nullptr; // central values and binning are taken from the first included source
   for (const auto& source : sources) {
     if (!source.includeInTotal) {
       continue;
     }
+    if (!first) {
+      first = &source;
+    } else if (source.bins != first->bins) {
+      std::cerr << "Error in combineSourcesInTotal(" << label << "): " << source.label << " has different binning than " << first->label << "!" << std::endl;
+    }
     allSyst.push_back(source.syst);
     allRelSyst.push_back(source.relSyst);
+    total.components.push_back(source);
   }
 
-  SystSource total;
   total.label = label;
   total.color = color;
   total.lineWidth = lineWidth;
@@ -385,6 +552,11 @@ inline SystSource combineSourcesInTotal(const char* label, int color, bool draw,
   total.includeInTotal = false;
   total.syst = combineSystematicsInQuadrature(allSyst);
   total.relSyst = combineSystematicsInQuadrature(allRelSyst);
+  if (first) {
+    total.central = first->central;
+    total.rms = first->rms;
+    total.bins = first->bins;
+  }
   return total;
 }
 
@@ -401,7 +573,7 @@ inline void drawSystematics(const std::vector<SystSource>& sources, const std::v
     return;
   }
 
-  TH1F* hFrame = initGlauParHist(totals.front().values(var, relative), Form("hFrame_%s", outFile), totals.front().color);
+  TH1F* hFrame = initGlauParHist(totals.front().values(var, relative), Form("hFrame_%s", outFile), totals.front().color, totals.front().bins);
   hFrame->SetMarkerColorAlpha(0, 0);
   hFrame->SetLineColorAlpha(0, 0);
 
@@ -429,7 +601,7 @@ inline void drawSystematics(const std::vector<SystSource>& sources, const std::v
     if (!total.draw) {
       continue;
     }
-    TH1F* h = initGlauParHist(total.values(var, relative), Form("hTotal%d_%s", itot++, outFile), total.color);
+    TH1F* h = initGlauParHist(total.values(var, relative), Form("hTotal%d_%s", itot++, outFile), total.color, total.bins);
     applyLineStyle(h, total);
     leg->AddEntry(h, total.label.c_str(), "l");
     hTotals.push_back(h);
@@ -440,7 +612,7 @@ inline void drawSystematics(const std::vector<SystSource>& sources, const std::v
     if (!source.draw) {
       continue;
     }
-    TH1F* h = initGlauParHist(source.values(var, relative), Form("hSource%d_%s", isrc++, outFile), source.color);
+    TH1F* h = initGlauParHist(source.values(var, relative), Form("hSource%d_%s", isrc++, outFile), source.color, source.bins);
     applyLineStyle(h, source);
     if (source.asMarkers) {
       h->SetMarkerSize(1.5);

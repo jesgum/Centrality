@@ -48,7 +48,7 @@ OO_2025="${AR_PATH}LHC25ae_pass2/"
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pbrw.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pbrw\"\)&
 
 # root.exe -q -b runCalibration.cc\(\"${AR_PATH}LHC23_pass5_small/AR_544122_kIsGoodZvtxFT0vsPv_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_Collisions_basehistos_Pb.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pb\"\)&
-root.exe -q -b runCalibration.cc\(\"${AR_PATH}LHC23_pass5_small/AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_Collisions_basehistos_Pb.root\"\,80.0,200.0,kTRUE\,\"basehistos_Pb\"\)&
+# root.exe -q -b runCalibration.cc\(\"${AR_PATH}LHC23_pass5_small/AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_Collisions_basehistos_Pb.root\"\,80.0,200.0,kTRUE\,\"basehistos_Pb\"\)&
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode0_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pb\"\)&
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode1_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pb\"\)&
 # root.exe -q -b runCalibration.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb.root\"\,90.0,200.0,kTRUE\,\"basehistos_Pb\"\)&
@@ -67,6 +67,7 @@ wait
 # root.exe -q -b drawSummaryPlotsCrossCheck.cc\(\"${AR_PATH}LHC26_pass1_outer/AR_572184_glauberNBD_ancestorMode2_freeK_fixedMu_hFT0AOuter_BCs_basehistos_Pb.root\"\,\"${AR_PATH}LHC26_pass1_outer/AR_572184_calibration_ancestorMode2_freeK_fixedMu_hFT0AOuter_BCs_basehistos_Pb_Anchor80.0.root\"\)&
 
 # root.exe -q -b drawSummaryPlotsCrossCheck.cc\(\"${AR_PATH}LHC23_pass5_small/AR_544122_glauberNBD_ancestorMode0_fixedK_fixedMu_hFT0C_Collisions_basehistos_Pb.root\"\,\"${AR_PATH}LHC23_pass5_small/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_Collisions_basehistos_Pb_Anchor90.0.root\"\)&
+root.exe -q -b drawSummaryPlotsCrossCheck.cc\(\"${AR_PATH}LHC23_pass5_small/AR_544122_glauberNBD_ancestorMode0_fixedK_fixedMu_hFT0C_Collisions_basehistos_Pb.root\"\,\"${AR_PATH}LHC23_pass5_small/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_Collisions_basehistos_Pb_Anchor80.0.root\"\)&
 # root.exe -q -b drawSummaryPlotsCrossCheck.cc\(\"${AR_PATH}LHC23_pass5_small/AR_544122_kIsGoodZvtxFT0vsPv_glauberNBD_ancestorMode2_fixedK_fixedMu_hFT0C_Collisions_basehistos_Pb.root\"\,\"${AR_PATH}LHC23_pass5_small/AR_544122_kIsGoodZvtxFT0vsPv_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_Collisions_basehistos_Pb_Anchor90.0.root\"\)&
 # root.exe -q -b drawSummaryPlotsCrossCheck.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode0_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb.root\"\,\"${PBPB_2023}AR_544122_calibration_ancestorMode0_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.0.root\"\)&
 # root.exe -q -b drawSummaryPlotsCrossCheck.cc\(\"${PBPB_2023}AR_544122_glauberNBD_ancestorMode1_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb.root\"\,\"${PBPB_2023}AR_544122_calibration_ancestorMode1_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.0.root\"\)&

@@ -7,8 +7,10 @@
 #include "TLatex.h"
 #include "TLine.h"
 #include "TString.h"
+#include "TSystem.h"
 
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -113,34 +115,62 @@ void drawTrentoVariationsCompare(TH1F* base, std::vector<TH1F*>& variationHists,
   canv->SaveAs(outFile);
 }
 
-void drawNpartNcollTrento()
+// Scan point directories and legend labels from the scan<tag>_best.txt written by Trento/scan/drawScan.cc
+bool readBestPoints(const char* fileName, std::vector<std::string>& dirs, std::vector<std::string>& labels)
+{
+  std::ifstream file(fileName);
+  if (!file) {
+    std::cerr << "Error: cannot open " << fileName << std::endl;
+    return false;
+  }
+  std::string line;
+  while (std::getline(file, line)) {
+    if (line.empty() || line[0] == '#') {
+      continue;
+    }
+    const size_t tab1 = line.find('\t');
+    const size_t tab2 = line.find('\t', tab1 + 1);
+    dirs.push_back(line.substr(0, tab1));
+    labels.push_back(tab2 == std::string::npos ? dirs.back() : line.substr(tab2 + 1));
+  }
+  return !dirs.empty();
+}
+
+/// @param bestFile scan<tag>_best.txt from Trento/scan/drawScan.cc; empty = the Trento point in Trento/madhatter
+void drawNpartNcollTrento(const char* bestFile = "")
 {
   gStyle->SetOptStat(0);
   syst::GlauberParameters base("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.root");
 
-  const std::vector<std::string> variationNames = { "A_d0.0", "A_d0.4", "A_d0.8", "B_d0.0", "B_d0.4", "B_d0.8" };
-  // comsolpc has been split into two variants; produce the same comparison
-  // plots for both.
-  const std::vector<std::string> comsolFolders = { "comsolpc_80", "comsolpc_90" };
-
-  for (const auto& folder : comsolFolders) {
-    std::vector<syst::GlauberParameters<TH2D>> variations;
-    for (const auto& name : variationNames) {
-      variations.emplace_back(Form("../Trento/%s/trentofit_%s_calib.root", folder.c_str(), name.c_str()), true);
+  // Trento points, one directory per point (output of Trento/scan/runScan.sh)
+  std::vector<std::string> pointDirs = { "../Trento/madhatter/norm_166.667_p_-0.1_k_2.2_d_0.126316" };
+  std::vector<std::string> variationNames = { "madhatter" }; // legend entries, same order as pointDirs
+  TString outTag = "madhatter";
+  if (bestFile[0] != '\0') {
+    pointDirs.clear();
+    variationNames.clear();
+    if (!readBestPoints(bestFile, pointDirs, variationNames)) {
+      return;
     }
-
-    // === Colors: base stays black, the 6 variations get distinct colors
-    // from the ColorManager ===
-    ColorManager colorMgr(variations.size());
-
-    std::vector<TH1F*> npartHists, ncollHists;
-    for (auto& variation : variations) {
-      npartHists.push_back(variation.hNpart);
-      ncollHists.push_back(variation.hNcoll);
-    }
-
-    const TString suffix = folder.substr(folder.find('_') + 1).c_str();
-    drawTrentoVariationsCompare(base.hNpart, npartHists, variationNames, colorMgr, "<N_{part}>", Form("hNpartCompareTrentoBase_%s.pdf", suffix.Data()));
-    drawTrentoVariationsCompare(base.hNcoll, ncollHists, variationNames, colorMgr, "<N_{coll}>", Form("hNcollCompareTrentoBase_%s.pdf", suffix.Data()));
+    outTag = gSystem->BaseName(bestFile);
+    outTag.ReplaceAll(".txt", "");
   }
+
+  std::vector<syst::GlauberParameters<TH2D>> variations;
+  for (const auto& dir : pointDirs) {
+    variations.emplace_back(Form("%s/trentofit_calib.root", dir.c_str()), true);
+  }
+
+  // === Colors: base stays black, the variations get distinct colors
+  // from the ColorManager ===
+  ColorManager colorMgr(variations.size());
+
+  std::vector<TH1F*> npartHists, ncollHists;
+  for (auto& variation : variations) {
+    npartHists.push_back(variation.hNpart);
+    ncollHists.push_back(variation.hNcoll);
+  }
+
+  drawTrentoVariationsCompare(base.hNpart, npartHists, variationNames, colorMgr, "<N_{part}>", Form("hNpartCompareTrentoBase_%s.pdf", outTag.Data()));
+  drawTrentoVariationsCompare(base.hNcoll, ncollHists, variationNames, colorMgr, "<N_{coll}>", Form("hNcollCompareTrentoBase_%s.pdf", outTag.Data()));
 }

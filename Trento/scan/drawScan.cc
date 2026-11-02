@@ -17,6 +17,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -39,6 +40,7 @@ const size_t NClosestToPrint = 5;
 
 struct ScanPoint {
   std::string name;
+  TString dir;             // directory with the output of runScan.sh
   TString label;           // legend entry
   TH1* hData = nullptr;    // data, rebinned
   TH1* hFit = nullptr;     // Trento + NBD fit, rebinned and normalized to the data in the fit range
@@ -97,27 +99,47 @@ TString makeLabel(const std::string& name)
   return label;
 }
 
-TH1* getHist(TFile* file, const char* histName)
+std::unique_ptr<TFile> openFile(const TString& path)
 {
-  TH1* hist = dynamic_cast<TH1*>(file->Get(histName));
+  std::unique_ptr<TFile> file(TFile::Open(path, "READ"));
+  if (!file || file->IsZombie()) {
+    std::cerr << "Error: cannot open " << path << std::endl;
+    return nullptr;
+  }
+  return file;
+}
+
+// With TH1::AddDirectory(kFALSE) the histograms read from a file are not owned by it, so the caller owns them
+template <typename T = TH1>
+std::unique_ptr<T> getHist(TFile* file, const char* histName)
+{
+  TObject* obj = file->Get(histName);
+  std::unique_ptr<T> hist(dynamic_cast<T*>(obj));
   if (!hist) {
+    delete obj;
     std::cerr << "Error: " << histName << " not found in " << file->GetName() << std::endl;
   }
   return hist;
 }
 
 // Mean of y per 1% centrality bin, averaged (equal weights) into CentBins
-TH1D* meanVsCentrality(TH2* h2d, const char* name)
+TH1D* meanVsCentrality(const TH2* h2d, const char* name)
 {
   TH1D* hist = new TH1D(name, "", static_cast<int>(CentBins.size()) - 1, CentBins.data());
+  const TAxis* yAxis = h2d->GetYaxis();
   for (int ibin = 0; ibin < hist->GetNbinsX(); ++ibin) {
     const int first = h2d->GetXaxis()->FindBin(CentBins[ibin] + 1e-3);
     const int last = h2d->GetXaxis()->FindBin(CentBins[ibin + 1] - 1e-3);
     double sum = 0;
     for (int icent = first; icent <= last; ++icent) {
-      TH1D* hProjection = h2d->ProjectionY("hProjection", icent, icent);
-      sum += hProjection->GetMean();
-      delete hProjection;
+      // same as ProjectionY(icent, icent)->GetMean(), without creating a histogram per bin
+      double sumW = 0, sumWY = 0;
+      for (int iy = 1; iy <= yAxis->GetNbins(); ++iy) {
+        const double w = h2d->GetBinContent(icent, iy);
+        sumW += w;
+        sumWY += w * yAxis->GetBinCenter(iy);
+      }
+      sum += sumW != 0 ? sumWY / sumW : 0;
     }
     hist->SetBinContent(ibin + 1, sum / (last - first + 1));
     hist->SetBinError(ibin + 1, 1e-4);
@@ -128,40 +150,66 @@ TH1D* meanVsCentrality(TH2* h2d, const char* name)
 // Reference from a calibration file (Trento or Glauber), only h2dNpart and h2dNcoll are needed
 bool loadReference(const TString& path, ScanPoint& point)
 {
-  TFile* file = TFile::Open(path, "READ");
-  if (!file || file->IsZombie()) {
-    std::cerr << "Error: cannot open reference file " << path << std::endl;
+  point.dir = path;
+  auto file = openFile(path);
+  if (!file) {
     return false;
   }
-  TH2* h2dNpart = dynamic_cast<TH2*>(getHist(file, "h2dNpart"));
-  TH2* h2dNcoll = dynamic_cast<TH2*>(getHist(file, "h2dNcoll"));
+  auto h2dNpart = getHist<TH2>(file.get(), "h2dNpart");
+  auto h2dNcoll = getHist<TH2>(file.get(), "h2dNcoll");
   if (!h2dNpart || !h2dNcoll) {
     return false;
   }
-  point.hNpart = meanVsCentrality(h2dNpart, "hNpart_reference");
-  point.hNcoll = meanVsCentrality(h2dNcoll, "hNcoll_reference");
-  file->Close();
+  point.hNpart = meanVsCentrality(h2dNpart.get(), "hNpart_reference");
+  point.hNcoll = meanVsCentrality(h2dNcoll.get(), "hNcoll_reference");
   return true;
 }
 
+// What is needed for the summary table and the ranking: fit parameters and <Npart>/<Ncoll>
 bool loadPoint(const TString& dir, ScanPoint& point)
 {
-  TFile* fileOut = TFile::Open(dir + "/outfile.root", "READ");
-  TFile* fileFit = TFile::Open(dir + "/trentofit.root", "READ");
-  TFile* fileCalib = TFile::Open(dir + "/trentofit_calib.root", "READ");
-  if (!fileOut || !fileFit || !fileCalib) {
+  point.dir = dir;
+  auto fileFit = openFile(dir + "/trentofit.root");
+  auto fileCalib = openFile(dir + "/trentofit_calib.root");
+  if (!fileFit || !fileCalib) {
     return false;
   }
 
-  TH1* hDataFine = getHist(fileFit, "hV0MUltraFine");
-  TH1* hFitFine = getHist(fileFit, "hGlauber");
-  TH1* hPars = getHist(fileFit, "hGlauberParameters");
-  TH1* hFitRange = getHist(fileFit, "hGlauberFitRange");
-  TH1* hAnchor = getHist(fileCalib, "hAnchorPoint");
-  TH1* hEntropy = getHist(fileOut, "hEntropy");
-  TH2* h2dNpart = dynamic_cast<TH2*>(getHist(fileCalib, "h2dNpart"));
-  TH2* h2dNcoll = dynamic_cast<TH2*>(getHist(fileCalib, "h2dNcoll"));
-  if (!hDataFine || !hFitFine || !hPars || !hFitRange || !hAnchor || !hEntropy || !h2dNpart || !h2dNcoll) {
+  auto hPars = getHist(fileFit.get(), "hGlauberParameters");
+  auto hFitRange = getHist(fileFit.get(), "hGlauberFitRange");
+  auto hAnchor = getHist(fileCalib.get(), "hAnchorPoint");
+  auto h2dNpart = getHist<TH2>(fileCalib.get(), "h2dNpart");
+  auto h2dNcoll = getHist<TH2>(fileCalib.get(), "h2dNcoll");
+  if (!hPars || !hFitRange || !hAnchor || !h2dNpart || !h2dNcoll) {
+    return false;
+  }
+
+  const char* name = point.name.c_str();
+  point.hNpart = meanVsCentrality(h2dNpart.get(), Form("hNpart_%s", name));
+  point.hNcoll = meanVsCentrality(h2dNcoll.get(), Form("hNcoll_%s", name));
+  point.mu = hPars->GetBinContent(1);
+  point.k = hPars->GetBinContent(2);
+  point.chi2 = hPars->GetBinContent(6);
+  point.ndf = hPars->GetBinContent(7);
+  point.fitMin = hFitRange->GetBinContent(1);
+  point.fitMax = hFitRange->GetBinContent(2);
+  point.anchorPoint = hAnchor->GetBinContent(1);
+  return true;
+}
+
+// The rest, only needed for the scan points that are drawn
+bool loadPlots(const TString& dir, ScanPoint& point)
+{
+  auto fileOut = openFile(dir + "/outfile.root");
+  auto fileFit = openFile(dir + "/trentofit.root");
+  if (!fileOut || !fileFit) {
+    return false;
+  }
+
+  auto hDataFine = getHist(fileFit.get(), "hV0MUltraFine");
+  auto hFitFine = getHist(fileFit.get(), "hGlauber");
+  auto hEntropy = getHist(fileOut.get(), "hEntropy");
+  if (!hDataFine || !hFitFine || !hEntropy) {
     return false;
   }
 
@@ -170,32 +218,24 @@ bool loadPoint(const TString& dir, ScanPoint& point)
   point.hFit = hFitFine->Rebin(RebinData, Form("hFit_%s", name));
   point.hEntropy = hEntropy->Rebin(RebinEntropy, Form("hEntropy_%s", name));
   point.hEntropy->Scale(1. / point.hEntropy->Integral(), "width");
-  point.hNpart = meanVsCentrality(h2dNpart, Form("hNpart_%s", name));
-  point.hNcoll = meanVsCentrality(h2dNcoll, Form("hNcoll_%s", name));
-  point.mu = hPars->GetBinContent(1);
-  point.k = hPars->GetBinContent(2);
-  point.chi2 = hPars->GetBinContent(6);
-  point.ndf = hPars->GetBinContent(7);
-  point.fitMin = hFitRange->GetBinContent(1);
-  point.fitMax = hFitRange->GetBinContent(2);
 
   // hGlauber is evaluated on the fine binning but normalized to the rebinned data used in the fit:
   // normalize it to the data inside the fit range instead
   const int binMin = point.hData->FindBin(point.fitMin);
   const int binMax = point.hData->FindBin(point.fitMax);
   point.hFit->Scale(point.hData->Integral(binMin, binMax) / point.hFit->Integral(binMin, binMax));
-  point.anchorPoint = hAnchor->GetBinContent(1);
-
-  std::ifstream config((dir + "/trento.conf").Data());
-  std::string line;
-  while (std::getline(config, line)) {
-    point.trentoConfig += "    " + line + "\n";
-  }
-
-  fileOut->Close();
-  fileFit->Close();
-  fileCalib->Close();
   return true;
+}
+
+// Contents of trento.conf, indented
+std::string readConfig(const TString& dir)
+{
+  std::string contents, line;
+  std::ifstream config((dir + "/trento.conf").Data());
+  while (std::getline(config, line)) {
+    contents += "    " + line + "\n";
+  }
+  return contents;
 }
 
 void setStyle(TH1* hist, int color, int marker = kFullCircle)
@@ -208,14 +248,28 @@ void setStyle(TH1* hist, int color, int marker = kFullCircle)
   hist->SetLineWidth(2);
 }
 
-TLegend* makeLegend(size_t nEntries, double x1, double y1, double x2, double y2)
+// Legend hanging down from y2, its height set by the number of rows (all coordinates NDC)
+TLegend* makeLegend(size_t nEntries, double x1, double x2, double y2)
 {
-  TLegend* leg = new TLegend(x1, y1, x2, y2);
+  const int nColumns = std::max<int>(1, std::ceil(nEntries / 12.));
+  const int nRows = std::ceil(static_cast<double>(nEntries) / nColumns);
+  TLegend* leg = new TLegend(x1, y2 - 0.055 * nRows, x2, y2);
   leg->SetBorderSize(0);
   leg->SetFillColorAlpha(0, 0);
   leg->SetTextSize(0.035);
-  leg->SetNColumns(std::max<int>(1, std::ceil(nEntries / 12.)));
+  leg->SetNColumns(nColumns);
   return leg;
+}
+
+// Upper y limit of the frame in pad such that values up to dataMax stay below the legend
+double yMaxBelowLegend(const TPad* pad, const TLegend* leg, double yMin, double dataMax, bool logy)
+{
+  // fraction of the frame height below the legend, with a small gap
+  const double frac = 0.95 * (leg->GetY1() - pad->GetBottomMargin()) / (1 - pad->GetTopMargin() - pad->GetBottomMargin());
+  if (logy) {
+    return yMin * std::pow(dataMax / yMin, 1 / frac);
+  }
+  return yMin + (dataMax - yMin) / frac;
 }
 
 // Canvas split in a top pad (values) and a bottom pad (ratios), as in Macros/drawNpartNcollTrento.cc
@@ -285,14 +339,19 @@ void drawFits(const std::vector<ScanPoint>& points, const TString& outFile)
   setStyle(hData, kBlack);
   hData->SetMarkerSize(0.5);
   hData->GetXaxis()->SetRangeUser(0, xMax);
+  double dataMax = hData->GetMaximum();
+  for (const auto& point : points) {
+    point.hFit->GetXaxis()->SetRangeUser(0, xMax);
+    dataMax = std::max(dataMax, point.hFit->GetMaximum());
+  }
+  TLegend* leg = makeLegend(points.size() + 1, 0.14, 0.95, 0.94);
   hData->SetMinimum(0.2);
-  hData->SetMaximum(hData->GetMaximum() * 100); // room for the legend
+  hData->SetMaximum(yMaxBelowLegend(padTop, leg, 0.2, dataMax, true));
   styleTopFrame(hData, "Count");
   hData->Draw("pe");
 
   // data is drawn in black, so every fit gets a color
   ColorManager colorMgr(points.size());
-  TLegend* leg = makeLegend(points.size() + 1, 0.4, 0.45, 0.95, 0.94);
   leg->AddEntry(hData, "Data", "p");
   for (size_t i = 0; i < points.size(); ++i) {
     setStyle(points[i].hFit, colorMgr.getColor(i));
@@ -339,11 +398,11 @@ void drawEntropy(const std::vector<ScanPoint>& points, const std::vector<int>& c
   }
 
   // common frame, the entropy range differs between the scan points
-  TH1F* frame = canv->DrawFrame(0, yMax * 1e-6, xMax * 1.02, yMax * 5);
+  TLegend* leg = makeLegend(points.size(), 0.14, 0.95, 0.94);
+  TH1F* frame = canv->DrawFrame(0, yMax * 1e-6, xMax * 1.02, yMaxBelowLegend(canv, leg, yMax * 1e-6, yMax, true));
   frame->GetXaxis()->SetTitle("Entropy");
   frame->GetYaxis()->SetTitle("Probability density");
 
-  TLegend* leg = makeLegend(points.size(), 0.6, 0.55, 0.95, 0.94);
   for (size_t i = 0; i < points.size(); ++i) {
     TH1* hist = points[i].hEntropy;
     setStyle(hist, colors[i]);
@@ -367,13 +426,13 @@ void drawVsCentrality(const std::vector<ScanPoint>& points, const std::vector<in
   for (const auto& point : points) {
     yMax = std::max(yMax, (point.*member)->GetMaximum());
   }
-  TLegend* leg = makeLegend(points.size(), 0.6, 0.45, 0.95, 0.94);
+  TLegend* leg = makeLegend(points.size(), 0.6, 0.95, 0.94);
   for (size_t i = 0; i < points.size(); ++i) {
     TH1* hist = points[i].*member;
     setStyle(hist, colors[i]);
     if (i == 0) {
       hist->SetMinimum(0);
-      hist->SetMaximum(yMax * 1.1);
+      hist->SetMaximum(yMaxBelowLegend(padTop, leg, 0, yMax, false));
       styleTopFrame(hist, yTitle);
       hist->Draw("p");
     } else {
@@ -508,6 +567,55 @@ void drawParametersVsRank(const std::vector<std::pair<std::string, double>>& ran
   }
   canv->SaveAs(outFile);
 }
+
+std::string absolutePath(const TString& path)
+{
+  return (gSystem->IsAbsoluteFileName(path) ? path : TString(gSystem->WorkingDirectory()) + "/" + path).Data();
+}
+
+void printSummary(const std::vector<ScanPoint>& centPoints, bool referenceFromFile)
+{
+  printf("\n%-40s %10s %10s %12s %10s %10s %10s %10s %10s\n", "Scan point", "mu", "k", "chi2/ndf", "fit min", "fit max", "anchor", "Npart 0-5", "Ncoll 0-5");
+  for (size_t i = referenceFromFile ? 1 : 0; i < centPoints.size(); ++i) {
+    const ScanPoint& point = centPoints[i];
+    printf("%-40s %10.4f %10.4f %12.2f %10.1f %10.1f %10.1f %10.2f %10.2f\n", point.name.c_str(), point.mu, point.k,
+           point.ndf > 0 ? point.chi2 / point.ndf : -1., point.fitMin, point.fitMax, point.anchorPoint,
+           point.hNpart->GetBinContent(1), point.hNcoll->GetBinContent(1));
+  }
+  if (referenceFromFile) {
+    printf("%-40s %10s %10s %12s %10s %10s %10s %10.2f %10.2f\n", centPoints[0].label.Data(), "", "", "", "", "", "",
+           centPoints[0].hNpart->GetBinContent(1), centPoints[0].hNcoll->GetBinContent(1));
+  }
+  printf("(chi2/ndf = -1: not stored, rerun runTrentoFit.cc)\n");
+  printf("\n");
+}
+
+// Fits, entropy, Npart and Ncoll plots of the reference (first entry) and the scan points, named <prefix>_<plot>.pdf
+bool drawPlots(std::vector<ScanPoint>& centPoints, bool referenceFromFile, const TString& prefix)
+{
+  for (size_t i = referenceFromFile ? 1 : 0; i < centPoints.size(); ++i) { // a reference file has no fits or entropy
+    if (!loadPlots(centPoints[i].dir, centPoints[i])) {
+      std::cerr << "Error: could not read the plots of " << centPoints[i].name << std::endl;
+      return false;
+    }
+  }
+  const std::vector<ScanPoint> points(centPoints.begin() + (referenceFromFile ? 1 : 0), centPoints.end()); // scan points only
+
+  // Reference in black, the others from the ColorManager
+  const size_t iRef = 0;
+  ColorManager colorMgr(std::max<size_t>(centPoints.size() - 1, 1));
+  std::vector<int> centColors;
+  for (size_t i = 0, iColor = 0; i < centPoints.size(); ++i) {
+    centColors.push_back(i == iRef ? static_cast<int>(kBlack) : colorMgr.getColor(iColor++));
+  }
+  const std::vector<int> colors(centColors.begin() + (referenceFromFile ? 1 : 0), centColors.end()); // scan points only
+
+  drawFits(points, prefix + "_Fits.pdf");
+  drawEntropy(points, colors, prefix + "_Entropy.pdf");
+  drawVsCentrality(centPoints, centColors, iRef, &ScanPoint::hNpart, "<N_{part}>", prefix + "_Npart.pdf");
+  drawVsCentrality(centPoints, centColors, iRef, &ScanPoint::hNcoll, "<N_{coll}>", prefix + "_Ncoll.pdf");
+  return true;
+}
 } // namespace
 
 /// @param outDir output directory of runScan.sh
@@ -516,7 +624,10 @@ void drawParametersVsRank(const std::vector<std::pair<std::string, double>>& ran
 ///        file (*.root, e.g. a Glauber or Trento calibration) containing h2dNpart and h2dNcoll; empty = first point
 /// @param referenceLabel legend entry of a reference file
 /// @param nDraw number of scan points closest to the reference (combined Npart/Ncoll metric) to draw; <= 0 = all
-void drawScan(TString outDir = "output", TString filter = "", TString reference = "", TString referenceLabel = "Reference", int nDraw = 5)
+/// @param maxDeviationRank only scan points with a combined deviation up to this value (in %) are drawn in the
+///        parameters vs. rank plot, e.g. 20.f; <= 0 = all
+void drawScan(TString outDir = "output/fake", TString filter = "", TString reference = "", TString referenceLabel = "Reference", int nDraw = 5,
+              float maxDeviationRank = -1)
 {
   gStyle->SetOptStat(0);
   TH1::AddDirectory(kFALSE);
@@ -586,19 +697,15 @@ void drawScan(TString outDir = "output", TString filter = "", TString reference 
   }
   centPoints.insert(centPoints.end(), points.begin(), points.end());
 
-  // Summary table
-  printf("\n%-40s %10s %10s %12s %10s %10s %10s %10s %10s\n", "Scan point", "mu", "k", "chi2/ndf", "fit min", "fit max", "anchor", "Npart 0-5", "Ncoll 0-5");
-  for (const auto& point : points) {
-    printf("%-40s %10.4f %10.4f %12.2f %10.1f %10.1f %10.1f %10.2f %10.2f\n", point.name.c_str(), point.mu, point.k,
-           point.ndf > 0 ? point.chi2 / point.ndf : -1., point.fitMin, point.fitMax, point.anchorPoint,
-           point.hNpart->GetBinContent(1), point.hNcoll->GetBinContent(1));
-  }
-  if (referenceFromFile) {
-    printf("%-40s %10s %10s %12s %10s %10s %10s %10.2f %10.2f\n", referenceLabel.Data(), "", "", "", "", "", "",
-           centPoints[0].hNpart->GetBinContent(1), centPoints[0].hNcoll->GetBinContent(1));
-  }
-  printf("(chi2/ndf = -1: not stored, rerun runTrentoFit.cc)\n");
-  printf("\n");
+  printSummary(centPoints, referenceFromFile);
+
+  const TString absOutDir = absolutePath(outDir).c_str();
+
+  // file name tag from the filter, keeping only file name friendly characters
+  TString tag = filter;
+  TPRegexp("[^A-Za-z0-9.-]+").Substitute(tag, "_", "g");
+  tag = tag.Strip(TString::kBoth, '_');
+  tag = tag.IsNull() ? "" : "_" + tag;
 
   // Scan points closest to the reference in <Npart> and <Ncoll>
   struct Match {
@@ -629,7 +736,12 @@ void drawScan(TString outDir = "output", TString filter = "", TString reference 
     auto bestNpart = std::min_element(matches.begin(), matches.end(), [](const Match& a, const Match& b) { return a.npart < b.npart; });
     auto bestNcoll = std::min_element(matches.begin(), matches.end(), [](const Match& a, const Match& b) { return a.ncoll < b.ncoll; });
     printf("  Best in Npart only: %s, best in Ncoll only: %s\n", centPoints[bestNpart->index].name.c_str(), centPoints[bestNcoll->index].name.c_str());
-    const ScanPoint& best = centPoints[matches[0].index];
+    printf("  Folders:\n");
+    for (size_t i = 0; i < std::min(matches.size(), NClosestToPrint); ++i) {
+      printf("    %s/%s\n", absOutDir.Data(), centPoints[matches[i].index].name.c_str());
+    }
+    ScanPoint& best = centPoints[matches[0].index];
+    best.trentoConfig = readConfig(best.dir);
     printf("\nClosest scan point: %s (mu = %.4f, k = %.4f)\n  trento.conf:\n%s\n", best.name.c_str(), best.mu, best.k,
            best.trentoConfig.empty() ? "    (not found)\n" : best.trentoConfig.c_str());
   }
@@ -643,26 +755,29 @@ void drawScan(TString outDir = "output", TString filter = "", TString reference 
   for (size_t i : selected) {
     drawCentPoints.push_back(centPoints[i]);
   }
-  centPoints = drawCentPoints;
-  iRef = 0;
-  points.assign(centPoints.begin() + (referenceFromFile ? 1 : 0), centPoints.end()); // scan points only
 
-  // Reference in black, the others from the ColorManager
-  ColorManager colorMgr(std::max<size_t>(centPoints.size() - 1, 1));
-  std::vector<int> centColors;
-  for (size_t i = 0, iColor = 0; i < centPoints.size(); ++i) {
-    centColors.push_back(i == iRef ? static_cast<int>(kBlack) : colorMgr.getColor(iColor++));
+  // The drawn scan points, for drawBest.cc and macros that only need these (see readBestPoints in
+  // Macros/drawNpartNcollTrento.cc). One line per point, most accurate first:
+  //   <directory> <tab> <combined deviation in %> <tab> <legend label>
+  // preceded by "# reference <tab> <calibration file or scan point directory> <tab> <legend label>"
+  const TString bestFile = "scan" + tag + "_best.txt";
+  std::ofstream best(bestFile.Data());
+  best << "# reference\t" << absolutePath(drawCentPoints[0].dir) << "\t" << drawCentPoints[0].label << "\n";
+  best << "# closest to " << drawCentPoints[0].label << ": directory, combined Npart/Ncoll deviation (%), label\n";
+  for (size_t i = 1; i < drawCentPoints.size(); ++i) { // drawCentPoints[0] is the reference
+    const ScanPoint& point = drawCentPoints[i];
+    best << absolutePath(point.dir) << "\t" << 100 * matches[i - 1].combined << "\t" << point.label << "\n";
   }
-  const std::vector<int> colors(centColors.begin() + (referenceFromFile ? 1 : 0), centColors.end()); // scan points only
+  best.close();
+  printf("Wrote the %zu closest scan points to %s\n", drawCentPoints.size() - 1, bestFile.Data());
 
-  // file name tag from the filter, keeping only file name friendly characters
-  TString tag = filter;
-  TPRegexp("[^A-Za-z0-9.-]+").Substitute(tag, "_", "g");
-  tag = tag.Strip(TString::kBoth, '_');
-  tag = tag.IsNull() ? "" : "_" + tag;
-  drawFits(points, outDir + "/scan" + tag + "_Fits.pdf");
-  drawEntropy(points, colors, outDir + "/scan" + tag + "_Entropy.pdf");
-  drawVsCentrality(centPoints, centColors, iRef, &ScanPoint::hNpart, "<N_{part}>", outDir + "/scan" + tag + "_Npart.pdf");
-  drawVsCentrality(centPoints, centColors, iRef, &ScanPoint::hNcoll, "<N_{coll}>", outDir + "/scan" + tag + "_Ncoll.pdf");
+  if (!drawPlots(drawCentPoints, referenceFromFile, "scan" + tag)) {
+    return;
+  }
+  if (maxDeviationRank > 0) {
+    // ranking is sorted, so drop everything after the first point above the limit
+    auto it = std::find_if(ranking.begin(), ranking.end(), [&](const auto& entry) { return 100 * entry.second > maxDeviationRank; });
+    ranking.erase(it, ranking.end());
+  }
   drawParametersVsRank(ranking, nDraw, "scan" + tag + "_Parameters.pdf");
 }

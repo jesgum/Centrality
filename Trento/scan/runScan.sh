@@ -6,7 +6,8 @@
 #   4) runTrentoCalib.cc          -> trentofit_calib.root  (centrality calibration, Npart/Ncoll)
 # Every scan point gets its own directory, e.g. $OUTDIR/p_0.5 (one-at-a-time) or
 # $OUTDIR/norm_18.5_p_0.5_... (grid). `./runScan.sh --list` only prints the scan points,
-# `./runScan.sh -y` skips the confirmation prompt.
+# `./runScan.sh -y` skips the confirmation prompt. Scan points whose directory already contains
+# trentofit_calib.root are considered finished and skipped, so an interrupted scan can simply be restarted.
 #
 # Needs trento and ROOT with the O2Physics multiplicity tools (multGlauberNBDFitter, multCalibrator)
 # in the environment, e.g. run inside `alienv enter O2Physics/latest`.
@@ -30,12 +31,12 @@ GRID_STEP=0.2
 
 # Scan range per parameter as "min max nsteps" (nsteps points, min and max included),
 # leave empty to keep the default above. All empty -> single run with the defaults.
-SCAN_norm="100 200 20"
+SCAN_norm="100 200 10"
 SCAN_p="-0.1 0.1 10"
-SCAN_k="1.8 2.2 40"
+SCAN_k="1.8 2.2 20"
 SCAN_w=""
 SCAN_x=""
-SCAN_d="0 0.8 40"
+SCAN_d="0 0.8 20"
 # oneAtATime: vary one parameter at a time, the others at their default
 # grid:       every combination of the values above (number of points multiplies quickly!)
 SCAN_MODE="grid"
@@ -49,7 +50,7 @@ DO_TRENTO=1
 DO_SAVE=1
 DO_FIT=1
 DO_CALIB=1
-KEEP_DAT=1 # keep the (~100 MB per 1M events) trento text output
+KEEP_DAT=0 # keep the (~100 MB per 1M events) trento text output after a scan point finished
 #####################################################################
 
 SCAN_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -131,11 +132,13 @@ if [[ $LIST_ONLY -eq 1 ]]; then
   exit 0
 fi
 
-if [[ $ASSUME_YES -eq 0 ]]; then
+# Ask a yes/no question (skipped with -y), exit if the answer is no
+confirm() {
+  [[ $ASSUME_YES -eq 0 ]] || return 0
   while true; do
-    read -r -p "This scan will spawn ${#points[@]} total jobs with $NJOBS running at a time. Are you sure you want to proceed? [yes/no] " answer || answer="no"
+    read -r -p "$1 [yes/no] " answer || answer="no"
     case ${answer,,} in
-      y | yes) break ;;
+      y | yes) return 0 ;;
       n | no)
         echo "Aborted"
         exit 0
@@ -143,6 +146,22 @@ if [[ $ASSUME_YES -eq 0 ]]; then
       *) echo "Please answer yes/y or no/n" ;;
     esac
   done
+}
+
+confirm "This scan will spawn ${#points[@]} total jobs with $NJOBS running at a time. Are you sure you want to proceed?"
+
+# Finished points (e.g. from an earlier run with KEEP_DAT=1) are skipped below, so remove their trento output here
+if [[ $KEEP_DAT -eq 0 ]]; then
+  staleDats=()
+  for pt in "${points[@]}"; do
+    dir="$OUTDIR/$(pointName "$pt")"
+    [[ -s "$dir/trentofit_calib.root" && -e "$dir/PbPb.dat" ]] && staleDats+=("$dir/PbPb.dat")
+  done
+  if ((${#staleDats[@]} > 0)); then
+    confirm "KEEP_DAT=0: found ${#staleDats[@]} PbPb.dat file(s) in already finished scan points. Delete them?"
+    rm -f "${staleDats[@]}"
+    echo "Deleted ${#staleDats[@]} PbPb.dat file(s) of finished scan points"
+  fi
 fi
 
 if [[ $DO_TRENTO -eq 1 ]] && ! command -v trento >/dev/null; then
@@ -190,7 +209,6 @@ runPoint() {
     echo "[$name] saveTrento"
     root.exe -q -b -l "$SCAN_DIR/saveTrento.cc(\"PbPb.dat\", \"outfile.root\")" &>saveTrento.log
     requireFile outfile.root saveTrento
-    [[ $KEEP_DAT -eq 1 ]] || rm -f PbPb.dat
   fi
   if [[ $DO_FIT -eq 1 ]]; then
     echo "[$name] runTrentoFit"
@@ -202,12 +220,18 @@ runPoint() {
     root.exe -q -b -l "$SCAN_DIR/runTrentoCalib.cc(\"trentofit.root\", \"outfile.root\")" &>runTrentoCalib.log
     requireFile trentofit_calib.root runTrentoCalib
   fi
+  [[ $KEEP_DAT -eq 1 ]] || rm -f PbPb.dat
   echo "[$name] done -> $dir"
 }
 
 echo "Running ${#points[@]} scan point(s) with $NJOBS parallel job(s)"
 nFailed=0
+nSkipped=0
 for pt in "${points[@]}"; do
+  if [[ -s "$OUTDIR/$(pointName "$pt")/trentofit_calib.root" ]]; then
+    nSkipped=$((nSkipped + 1))
+    continue
+  fi
   while (($(jobs -rp | wc -l) >= NJOBS)); do
     wait -n || nFailed=$((nFailed + 1))
   done
@@ -229,6 +253,7 @@ while true; do
   nFailed=$((nFailed + 1))
 done
 echo "Scan finished, output in $OUTDIR"
+((nSkipped == 0)) || echo "Skipped $nSkipped already finished scan point(s)"
 if ((nFailed > 0)); then
   echo "WARNING: $nFailed scan point(s) failed" >&2
   exit 1

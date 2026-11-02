@@ -140,6 +140,34 @@ inline std::vector<T> averageOverVariations(const std::vector<std::vector<T>>& v
   return result;
 }
 
+// sqrt(sum_i d_i^2 / N): unlike the quadrature sum, it does not grow with the number of variations
+template <typename T>
+inline std::vector<T> rmsOverVariations(const std::vector<std::vector<T>>& variations)
+{
+  if (variations.empty()) {
+    return {};
+  }
+
+  const size_t nBins = variations[0].size();
+  std::vector<T> result(nBins, T{});
+
+  for (const auto& variation : variations) {
+    if (variation.size() != nBins) {
+      std::cerr << "Error in rmsOverVariations: inconsistent vector sizes!" << std::endl;
+      return {};
+    }
+    for (size_t ibin = 0; ibin < nBins; ++ibin) {
+      result[ibin] += variation[ibin] * variation[ibin];
+    }
+  }
+
+  for (auto& val : result) {
+    val = std::sqrt(val / static_cast<T>(variations.size()));
+  }
+
+  return result;
+}
+
 template <typename T>
 inline std::vector<T> sumInQuadratureOverVariations(const std::vector<std::vector<T>>& variations)
 {

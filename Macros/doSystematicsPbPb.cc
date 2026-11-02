@@ -35,7 +35,14 @@ static const std::vector<float> NcollErrRun2 = { 19.4, 15.7, 11.3, 8.21, 5.76, 3
 
 void doSystematicsPbPb()
 {
+  const bool drawSources = false;
   gStyle->SetOptStat(0);
+  // Centrality binning of the printouts (the plots always use syst::CentBins)
+  syst::PrintBins = { 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 80, 100 };
+  // syst::PrintBins = { 0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+  // syst::PrintBins = { 0, 100 };
+  // syst::PrintBins = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
+                      // 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 };
   syst::GlauberParameters base("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor90.root");
 
   syst::GlauberParameters pbHN("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_PbHN_Anchor90.root");
@@ -46,6 +53,9 @@ void doSystematicsPbPb()
 
   syst::GlauberParameters<TH2D> trentoRun1("../Trento/trentofit_Jesper2_calib.root", true);
   syst::GlauberParameters<TH2D> trentoRun2("../Trento/trentofit_New_calib.root", true);
+  syst::GlauberParameters<TH2D> trentoScan("../Trento/madhatter/norm_166.667_p_-0.1_k_2.2_d_0.126316/trentofit_calib.root", true);
+  // syst::GlauberParameters<TH2D> trentoScan("../Trento/madhatter/norm_166.667_p_-0.1_k_2.03158_d_0.294737/trentofit_calib.root", true);
+  // syst::GlauberParameters<TH2D> trentoScan("../Trento/madhatter/norm_144.444_p_-0.1_k_2.17895_d_0.168421/trentofit_calib.root", true);
 
   syst::GlauberParameters anchor89("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor89.root");
   syst::GlauberParameters anchor89p5("LHC23_pass5/AR_544122_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs_basehistos_Pb_Anchor89.5.root");
@@ -61,50 +71,52 @@ void doSystematicsPbPb()
   syst::GlauberParameters runDeviation("LHC25_pass1/AR_567905_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root");
 
   ColorManager cm(9);
+  ColorManager cm5(5);
   std::vector<syst::SystSource> sources = {
-    syst::makeSystSource("Nuclei shape", cm.getColor(0),    /*draw*/ false,    /*includeInTotal*/ true,       base, { pbHN, pbpn, pbpnrw, pbrw, pbstar }),
-    syst::makeSystSource("Trento", cm.getColor(1),          /*draw*/ false,    /*includeInTotal*/ false,      base, { trentoRun1 }),
-    syst::makeSystSource("0.5% shift", cm.getColor(2),      /*draw*/ false,    /*includeInTotal*/ false,      base, { anchor89p5, anchor90p5 }),
+    syst::makeSystSource("Nuclei shape", cm5.getColor(0),    /*draw*/ drawSources,    /*includeInTotal*/ true,       base, { pbHN, pbpn, pbpnrw, pbrw, pbstar }, syst::Combination::kRMS),
+    syst::makeSystSource("Trento", cm5.getColor(1),          /*draw*/ drawSources,    /*includeInTotal*/ true,       base, { trentoScan }),
+    syst::makeSystSource("1.0% AP shift", cm5.getColor(2),   /*draw*/ drawSources,    /*includeInTotal*/ true,       base, { anchor89, anchor91 }),
+    syst::makeSystSource("Collisions", cm5.getColor(3),      /*draw*/ drawSources,    /*includeInTotal*/ true,       base, { collisionAnchor80 }),
+    syst::makeSystSource("Run deviation", cm5.getColor(4),   /*draw*/ drawSources,    /*includeInTotal*/ true,       base, { runDeviation }),
+  };
+
+  std::vector<syst::SystSource> sourcesWoTrento = {
+    syst::makeSystSource("Nuclei shape", cm.getColor(0),    /*draw*/ false,    /*includeInTotal*/ true,       base, { pbHN, pbpn, pbpnrw, pbrw, pbstar }, syst::Combination::kRMS),
     syst::makeSystSource("1.0% AP shift", cm.getColor(3),   /*draw*/ false,    /*includeInTotal*/ true,       base, { anchor89, anchor91 }),
-    syst::makeSystSource("Variant1", cm.getColor(4),        /*draw*/ false,    /*includeInTotal*/ false,      base, { globalNorm }),
-    syst::makeSystSource("Variant2", cm.getColor(5),        /*draw*/ false,    /*includeInTotal*/ false,      base, { nancestor0 }),
     syst::makeSystSource("Nanc Rounded", cm.getColor(5),    /*draw*/ false,    /*includeInTotal*/ false,      base, { nancestor1 }),
     syst::makeSystSource("Collisions", cm.getColor(7),      /*draw*/ false,    /*includeInTotal*/ true,       base, { collisionAnchor80 }),
     syst::makeSystSource("Run deviation", cm.getColor(8),   /*draw*/ false,    /*includeInTotal*/ true,       base, { runDeviation }),
   };
-  std::vector<syst::SystSource> sourceColAncor80 = {
-    syst::makeSystSource("Nuclei shape", cm.getColor(0),    /*draw*/ false,    /*includeInTotal*/ true,       base, { pbHN, pbpn, pbpnrw, pbrw, pbstar }),
-    syst::makeSystSource("Trento", cm.getColor(1),          /*draw*/ false,    /*includeInTotal*/ false,      base, { trentoRun1 }),
-    syst::makeSystSource("0.5% shift", cm.getColor(2),      /*draw*/ false,    /*includeInTotal*/ false,      base, { anchor89p5, anchor90p5 }),
-    syst::makeSystSource("1.0% AP shift", cm.getColor(3),   /*draw*/ false,    /*includeInTotal*/ true,       base, { anchor89, anchor91 }),
-    syst::makeSystSource("Variant1", cm.getColor(4),        /*draw*/ false,    /*includeInTotal*/ false,      base, { globalNorm }),
-    syst::makeSystSource("Variant2", cm.getColor(5),        /*draw*/ false,    /*includeInTotal*/ false,      base, { nancestor0 }),
-    syst::makeSystSource("Nanc Rounded", cm.getColor(5),    /*draw*/ false,    /*includeInTotal*/ false,      base, { nancestor1 }),
-    syst::makeSystSource("Collisions", cm.getColor(7),      /*draw*/ false,    /*includeInTotal*/ true,       base, { collisionAnchor80 }),
-    syst::makeSystSource("Run deviation", cm.getColor(8),   /*draw*/ false,    /*includeInTotal*/ true,       base, { runDeviation }),
-  };
+
   std::vector<syst::SystSource> sourcesTrentoRun1 = {
-    syst::makeSystSource("Nuclei shape", cm.getColor(0),    /*draw*/ false,    /*includeInTotal*/ true,       base, { pbHN, pbpn, pbpnrw, pbrw, pbstar }),
+    syst::makeSystSource("Nuclei shape", cm.getColor(0),    /*draw*/ false,    /*includeInTotal*/ true,       base, { pbHN, pbpn, pbpnrw, pbrw, pbstar }, syst::Combination::kRMS),
     syst::makeSystSource("Trento", cm.getColor(1),          /*draw*/ false,    /*includeInTotal*/ true,       base, { trentoRun1 }),
-    syst::makeSystSource("0.5% shift", cm.getColor(2),      /*draw*/ false,    /*includeInTotal*/ false,      base, { anchor89p5, anchor90p5 }),
     syst::makeSystSource("1.0% AP shift", cm.getColor(3),   /*draw*/ false,    /*includeInTotal*/ true,       base, { anchor89, anchor91 }),
-    syst::makeSystSource("Variant1", cm.getColor(4),        /*draw*/ false,    /*includeInTotal*/ false,      base, { globalNorm }),
-    syst::makeSystSource("Variant2", cm.getColor(5),        /*draw*/ false,    /*includeInTotal*/ false,      base, { nancestor0 }),
     syst::makeSystSource("Nanc Rounded", cm.getColor(5),    /*draw*/ false,    /*includeInTotal*/ false,      base, { nancestor1 }),
     syst::makeSystSource("Collisions", cm.getColor(7),      /*draw*/ false,    /*includeInTotal*/ true,       base, { collisionAnchor80 }),
     syst::makeSystSource("Run deviation", cm.getColor(8),   /*draw*/ false,    /*includeInTotal*/ true,       base, { runDeviation }),
   };
+
   std::vector<syst::SystSource> sourcesTrentoRun2 = {
-    syst::makeSystSource("Nuclei shape", cm.getColor(0),    /*draw*/ false,    /*includeInTotal*/ true,       base, { pbHN, pbpn, pbpnrw, pbrw, pbstar }),
+    syst::makeSystSource("Nuclei shape", cm.getColor(0),    /*draw*/ false,    /*includeInTotal*/ true,       base, { pbHN, pbpn, pbpnrw, pbrw, pbstar }, syst::Combination::kRMS),
     syst::makeSystSource("Trento", cm.getColor(1),          /*draw*/ false,    /*includeInTotal*/ true,       base, { trentoRun2 }),
-    syst::makeSystSource("0.5% shift", cm.getColor(2),      /*draw*/ false,    /*includeInTotal*/ false,      base, { anchor89p5, anchor90p5 }),
     syst::makeSystSource("1.0% AP shift", cm.getColor(3),   /*draw*/ false,    /*includeInTotal*/ true,       base, { anchor89, anchor91 }),
-    syst::makeSystSource("Variant1", cm.getColor(4),        /*draw*/ false,    /*includeInTotal*/ false,      base, { globalNorm }),
-    syst::makeSystSource("Variant2", cm.getColor(5),        /*draw*/ false,    /*includeInTotal*/ false,      base, { nancestor0 }),
     syst::makeSystSource("Nanc Rounded", cm.getColor(5),    /*draw*/ false,    /*includeInTotal*/ false,      base, { nancestor1 }),
     syst::makeSystSource("Collisions", cm.getColor(7),      /*draw*/ false,    /*includeInTotal*/ true,       base, { collisionAnchor80 }),
     syst::makeSystSource("Run deviation", cm.getColor(8),   /*draw*/ false,    /*includeInTotal*/ true,       base, { runDeviation }),
   };
+
+  std::vector<syst::SystSource> collisionSources = {
+    syst::makeSystSource("Coll anchor 90%", kRed+1,      /*draw*/ true,    /*includeInTotal*/ true,       base, { collisions }),
+    syst::makeSystSource("Coll anchor 80%", kBlue+1,      /*draw*/ true,    /*includeInTotal*/ true,       base, { collisionAnchor80 }),
+  };
+
+  // same line width as the totals for every source
+  for (auto* list : { &sources, &sourcesWoTrento, &sourcesTrentoRun1, &sourcesTrentoRun2, &collisionSources }) {
+    for (auto& source : *list) {
+      source.lineWidth = 2;
+    }
+  }
 
   syst::SystSource run1 = syst::makeReferenceSource("Run 1", kBlue, NpartValRun1, NpartErrRun1, NcollValRun1, NcollErrRun1);
   run1.marker = kFullCircle;
@@ -112,25 +124,26 @@ void doSystematicsPbPb()
   syst::SystSource run2 = syst::makeReferenceSource("Run 2", kRed, NpartValRun2, NpartErrRun2, NcollValRun2, NcollErrRun2);
   run2.marker = kFullSquare;
 
-  sources.push_back(run1);
-  sources.push_back(run2);
+  syst::SystSource total = syst::combineSourcesInTotal("Total syst. uncertainty", kBlack, true, sources, 2, kSolid);
+  syst::SystSource totalDashed = syst::combineSourcesInTotal("Total syst. uncertainty", kBlack, true, sources, 2, kDashed);
+  syst::SystSource totalWoTrento = syst::combineSourcesInTotal("Total w/o T_{R}ENTo", kBlack, true, sourcesWoTrento, 2, kSolid);
 
-  syst::SystSource total = syst::combineSourcesInTotal("Total w/o T_{R}ENTo", kBlack, true, sources, 2, kSolid);
-  syst::SystSource totalColAncor80 = syst::combineSourcesInTotal("Total with Col anchor at 80%", kBlack, true, sourceColAncor80, 2, kDashed);
-  syst::SystSource totalTrentoRun1 = syst::combineSourcesInTotal("Total With T_{R}ENTo Run 1 params", kBlack, true, sourcesTrentoRun1, 2, kDashed);
-  syst::SystSource totalTrentoRun2 = syst::combineSourcesInTotal("Total With T_{R}ENTo Run 2 params", kGray, true, sourcesTrentoRun2, 2, kDashed);
+  syst::SystSource totalTrentoRun1 = syst::combineSourcesInTotal("Total With T_{R}ENTo Run 1 params", kBlue, true, sourcesTrentoRun1, 2, kDashed);
+  syst::SystSource totalTrentoRun2 = syst::combineSourcesInTotal("Total With T_{R}ENTo Run 2 params", kRed, true, sourcesTrentoRun2, 2, kDashed);
+  syst::SystSource totalCollisions = syst::combineSourcesInTotal("Total With T_{R}ENTo Run 2 params", kRed, false, sourcesTrentoRun2, 2, kDashed);
 
-  syst::drawSystematics(sources, {total, totalTrentoRun1, totalTrentoRun2}, cent::kNpart, true, "<N_{part}> relative systematic uncertainty", "hNpartRelSystematics_trento_PbPb.pdf", 0, 0.39);
-  syst::drawSystematics(sources, {total, totalTrentoRun1, totalTrentoRun2}, cent::kNcoll, true, "<N_{coll}> relative systematic uncertainty", "hNcollRelSystematics_trento_PbPb.pdf", 0, 0.65);
+  syst::drawSystematics(sources, {totalDashed, totalTrentoRun1, totalTrentoRun2, totalWoTrento}, cent::kNpart, true, "<N_{part}> relative systematic uncertainty", "hNpartRelSystematics_trento_PbPb.pdf", 0, 0.295);
+  syst::drawSystematics(sources, {totalDashed, totalTrentoRun1, totalTrentoRun2, totalWoTrento}, cent::kNcoll, true, "<N_{coll}> relative systematic uncertainty", "hNcollRelSystematics_trento_PbPb.pdf", 0, 0.245);
 
-  syst::drawSystematics(sources, {total, totalColAncor80}, cent::kNpart, true, "<N_{part}> relative systematic uncertainty", "hNpartRelSystematics_col80_PbPb.pdf", 0, 0.11);
-  syst::drawSystematics(sources, {total, totalColAncor80}, cent::kNcoll, true, "<N_{coll}> relative systematic uncertainty", "hNcollRelSystematics_col80_PbPb.pdf", 0, 0.16);
+  if (!drawSources) {
+    sources.push_back(run1);
+    sources.push_back(run2);
+  }
 
-  // syst::drawSystematics(sources, total, cent::kNpart, /*relative*/ false, "<N_{part}> systematic uncertainty", "hNpartSystematics_PbPb.pdf", 2e-6, 8e-1);
-  // syst::drawSystematics(sources, total, cent::kNcoll, /*relative*/ false, "<N_{coll}> systematic uncertainty", "hNcollSystematics_PbPb.pdf", 2e-6, 8e-1);
-  syst::drawSystematics(sources, total, cent::kNpart, /*relative*/ true, "<N_{part}> relative systematic uncertainty", "hNpartRelSystematics_PbPb.pdf", 0, 0.095);
+  syst::drawSystematics(sources, total, cent::kNpart, /*relative*/ true, "<N_{part}> relative systematic uncertainty", "hNpartRelSystematics_PbPb.pdf", 0, 0.065);
   syst::drawSystematics(sources, total, cent::kNcoll, /*relative*/ true, "<N_{coll}> relative systematic uncertainty", "hNcollRelSystematics_PbPb.pdf", 0, 0.095);
+  syst::drawSystematics(collisionSources, totalCollisions, cent::kNcoll, /*relative*/ true, "<N_{coll}> relative systematic uncertainty", "hNpartRelSystCollAnch.pdf", 0, 0.095);
+  syst::drawSystematics(collisionSources, totalCollisions, cent::kNpart, /*relative*/ true, "<N_{coll}> relative systematic uncertainty", "hNcollRelSystCollAnch.pdf", 0, 0.095);
 
-  // total.print(cent::kNpart);
-  // total.print(cent::kNcoll);
+  total.print();
 }
