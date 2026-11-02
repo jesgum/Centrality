@@ -16,6 +16,7 @@
 #include "Includes/colorManager.h"
 #include "Includes/centralityHelper.h"
 #include "Includes/systematicsHelper.h"
+#include "Includes/saveHelper.h"
 
 // <Npart>/<Ncoll> vs centrality for the PbPb anchor-point variations, with the
 // ratio to the reference (90%) anchor point in the bottom pad
@@ -104,6 +105,7 @@ void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* 
   lUnity->Draw();
 
   canv->SaveAs(outfile);
+  save::canvasToRoot(canv, outfile);
   for (auto* hRatio : hRatios) delete hRatio;
   delete lUnity;
   delete canv;
@@ -368,6 +370,7 @@ void drawGlauberFits(const std::vector<GlauberFit>& fits, const char* outfile, c
   drawAnchorLines(fits, lLoRangeRatio, 1.55);
 
   c1->SaveAs(outfile);
+  save::canvasToRoot(c1, outfile);
 }
 
 void drawPbPbNpartNcollVsAnchorPoint()

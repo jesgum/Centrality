@@ -15,6 +15,7 @@
 #include <string>  
 
 #include "colorManager.h"
+#include "Includes/saveHelper.h"
 
 void styleTH1(TH1F* hist, int color)
 {
@@ -144,6 +145,7 @@ void drawLightIonCalibration()
     leg->AddEntry(hCalibAncBCs,  "BC data 90% anchor",      "l");
     leg->Draw();
     canvCalib->SaveAs("hLightIonCalibration.pdf");
+    save::canvasToRoot(canvCalib, "hLightIonCalibration.pdf");
 
 TCanvas* canvSwap = new TCanvas("canvSwap", "", 1200, 1000);
 
@@ -246,4 +248,5 @@ lineUnity->Draw();
 
 canvSwap->cd();
 canvSwap->SaveAs("hLightIonCalibration_swapped.pdf");
+save::canvasToRoot(canvSwap, "hLightIonCalibration_swapped.pdf");
 }

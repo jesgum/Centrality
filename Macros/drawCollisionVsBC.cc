@@ -9,6 +9,7 @@
 
 #include <array>
 #include <iostream>
+#include "Includes/saveHelper.h"
 
 static std::array<int, 2> normRange = { 500, 50000 };
 
@@ -163,6 +164,7 @@ void drawCollisionVsBC(const char* dataset = "LHC25_pass1", const char* ar = "AR
   line1->SetLineColor(kGray + 1);
   line1->Draw();
   canvCollVsBC->SaveAs(Form("hCollVsBC_%s.pdf", system));
+  save::canvasToRoot(canvCollVsBC, Form("hCollVsBC_%s.pdf", system));
 
   // <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
   TCanvas* canvCollVsBC_Zoom = new TCanvas("canvCollVsBC_Zoom", "Collision vs BC (Zoomed)", 800, 800);
@@ -211,4 +213,5 @@ void drawCollisionVsBC(const char* dataset = "LHC25_pass1", const char* ar = "AR
   line2->SetLineColor(kGray + 1);
   line2->Draw();
   canvCollVsBC_Zoom->SaveAs(Form("hCollVsBC_Zoom_%s.pdf", system));
+  save::canvasToRoot(canvCollVsBC_Zoom, Form("hCollVsBC_Zoom_%s.pdf", system));
 }

@@ -14,6 +14,7 @@
 #include <string>
 
 #include "colorManager.h"
+#include "Includes/saveHelper.h"
 
 static std::array<int, 2> normRange = { 3000, 10000 };
 
@@ -140,6 +141,7 @@ void drawRejectNoFoundBC()
   base.hCol->Draw("hist same");
   leg->Draw();
   canv_base->SaveAs("h_bcrej_base.pdf");
+  save::canvasToRoot(canv_base, "h_bcrej_base.pdf");
 
   TCanvas* canv_vtxZ = new TCanvas("canv_vtxZ", "", 1600, 1000);
   styleCanvas(canv_vtxZ);
@@ -147,6 +149,7 @@ void drawRejectNoFoundBC()
   vtxZ.hCol->Draw("hist same");
   leg->Draw();
   canv_vtxZ->SaveAs("h_bcrej_vtxZ.pdf");
+  save::canvasToRoot(canv_vtxZ, "h_bcrej_vtxZ.pdf");
 
   TCanvas* canv_pile = new TCanvas("canv_pile", "", 1600, 1000);
   styleCanvas(canv_pile);
@@ -154,6 +157,7 @@ void drawRejectNoFoundBC()
   pile.hCol->Draw("hist same");
   leg->Draw();
   canv_pile->SaveAs("h_bcrej_pile.pdf");
+  save::canvasToRoot(canv_pile, "h_bcrej_pile.pdf");
 
   TCanvas* canv_ratio = new TCanvas("canv_ratio", "", 1600, 1000);
   styleCanvas(canv_ratio, false);
@@ -164,6 +168,7 @@ void drawRejectNoFoundBC()
   pile.hRatio->Draw("hist same");
   leg->Draw();
   canv_ratio->SaveAs("h_bcrej_ratio.pdf");
+  save::canvasToRoot(canv_ratio, "h_bcrej_ratio.pdf");
 
   TCanvas* canv_ratio_zoom = new TCanvas("canv_ratio_zoom", "", 1600, 1000);
   styleCanvas(canv_ratio_zoom, false);
@@ -175,4 +180,5 @@ void drawRejectNoFoundBC()
   pile.hRatio_Zoom->Draw("hist same");
   leg->Draw();
   canv_ratio_zoom->SaveAs("h_bcrej_ratio_zoom.pdf");
+  save::canvasToRoot(canv_ratio_zoom, "h_bcrej_ratio_zoom.pdf");
 }

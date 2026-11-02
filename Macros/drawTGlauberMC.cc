@@ -14,6 +14,7 @@
 #include <string>  
 
 #include "Includes/colorManager.h"
+#include "Includes/saveHelper.h"
 
 std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, TString basehistos, const char* name, const std::vector<double>& centBins)
 {
@@ -236,6 +237,7 @@ void drawWithRatio(int quantity, Histos* reference, const std::vector<Histos*>& 
   }
 
   canv->SaveAs(Form("%s.pdf", outName));
+  save::canvasToRoot(canv, Form("%s.pdf", outName));
 }
 
 void drawTGlauberMC()

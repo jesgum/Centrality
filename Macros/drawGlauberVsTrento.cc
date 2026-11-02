@@ -12,6 +12,7 @@
 #include "TColor.h"
 #include <vector>
 #include "Includes/colorManager.h"
+#include "Includes/saveHelper.h"
 
 using namespace std;
 
@@ -460,6 +461,7 @@ void drawGlauberVsTrento()
   inset2->Draw();
 
   c1->SaveAs(lOutputName.Data());
+  save::canvasToRoot(c1, lOutputName.Data());
 
   // standalone version of the top-pad inset (peripheral region)
   TCanvas* c2 = new TCanvas("c2", "", 900, 700);
@@ -512,4 +514,5 @@ void drawGlauberVsTrento()
   TString lOutputNameInset = lOutputName;
   lOutputNameInset.ReplaceAll(".pdf", "_inset.pdf");
   c2->SaveAs(lOutputNameInset.Data());
+  save::canvasToRoot(c2, lOutputNameInset.Data());
 }

@@ -15,6 +15,7 @@
 #include "Includes/colorManager.h"
 #include "Includes/centralityHelper.h"
 #include "Includes/systematicsHelper.h"
+#include "Includes/saveHelper.h"
 
 //  NeNe Npart            NeNe Ncoll
 //  32.10    0.70         53.86    4.82
@@ -179,6 +180,7 @@ void doSystematicsNeNe()
   if (drawTotal) hSysTotalNpart->Draw("hist same");
   leg->Draw();
   canvNpartSystematics->SaveAs("hNpartSystematics_NeNe.pdf");
+  save::canvasToRoot(canvNpartSystematics, "hNpartSystematics_NeNe.pdf");
 
   TCanvas* canvNcollSystematics = new TCanvas("canvNcollSystematics", "", canvWidth, canvHeight);
   syst::styleCanvas(canvNcollSystematics);
@@ -191,6 +193,7 @@ void doSystematicsNeNe()
   if (drawTotal) hSysTotalNcoll->Draw("hist same");
   leg->Draw();
   canvNcollSystematics->SaveAs("hNcollSystematics_NeNe.pdf");
+  save::canvasToRoot(canvNcollSystematics, "hNcollSystematics_NeNe.pdf");
 
   TCanvas* canvRelNpartSystematics = new TCanvas("canvRelNpartSystematics", "", canvWidth, canvHeight);
   syst::styleCanvas(canvRelNpartSystematics);
@@ -203,6 +206,7 @@ void doSystematicsNeNe()
   if (drawTotal) hRelSysTotalNpart->Draw("hist same");
   leg->Draw();
   canvRelNpartSystematics->SaveAs("FiguresSystematics/hNpartRelSystematics_NeNe.pdf");
+  save::canvasToRoot(canvRelNpartSystematics, "FiguresSystematics/hNpartRelSystematics_NeNe.pdf");
 
   TCanvas* canvRelNcollSystematics = new TCanvas("canvRelNcollSystematics", "", canvWidth, canvHeight);
   syst::styleCanvas(canvRelNcollSystematics);
@@ -215,6 +219,7 @@ void doSystematicsNeNe()
   if (drawTotal) hRelSysTotalNcoll->Draw("hist same");
   leg->Draw();
   canvRelNcollSystematics->SaveAs("FiguresSystematics/hNcollRelSystematics_NeNe.pdf");
+  save::canvasToRoot(canvRelNcollSystematics, "FiguresSystematics/hNcollRelSystematics_NeNe.pdf");
 
 
   /* Extra QA */
@@ -278,6 +283,7 @@ void doSystematicsNeNe()
   hOldNpartErr->Draw("hist");
   hNewNpartErr->Draw("hist same");
   canvNpart->SaveAs("qaNpart_NeNe.pdf");
+  save::canvasToRoot(canvNpart, "qaNpart_NeNe.pdf");
   
   TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 1000);
   syst::styleCanvas(canvNcoll);
@@ -288,4 +294,5 @@ void doSystematicsNeNe()
   hOldNcollErr->Draw("hist");
   hNewNcollErr->Draw("hist same");
   canvNcoll->SaveAs("qaNcoll_NeNe.pdf");
+  save::canvasToRoot(canvNcoll, "qaNcoll_NeNe.pdf");
 }

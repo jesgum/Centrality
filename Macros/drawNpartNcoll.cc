@@ -12,6 +12,7 @@
 #include <string>  
 
 #include "colorManager.h"
+#include "Includes/saveHelper.h"
 
 std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, const char* name)
 {
@@ -95,6 +96,7 @@ std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, const char* name)
   h2dNpart->Draw("colz");
   hAvgNpart->Draw("pe same");
   canvNpart->SaveAs(Form("h2dNpart_%s.pdf", name));
+  save::canvasToRoot(canvNpart, Form("h2dNpart_%s.pdf", name));
 
   TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 800);
   canvNcoll->SetLogz();
@@ -105,6 +107,7 @@ std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, const char* name)
   h2dNcoll->Draw("colz");
   hAvgNcoll->Draw("pe same");
   canvNcoll->SaveAs(Form("h2dNcoll_%s.pdf", name));
+  save::canvasToRoot(canvNcoll, Form("h2dNcoll_%s.pdf", name));
 
   delete canvNpart; delete canvNcoll;
   delete h2dNpart; delete h2dNcoll;
@@ -214,6 +217,7 @@ void drawNpartNcoll()
   pbpb25_568409->histos[kNpart]->Draw("pe same");
   pbpb25_568117->histos[kNpart]->Draw("pe same");
   canvNpart->SaveAs("hNpart.pdf");
+  save::canvasToRoot(canvNpart, "hNpart.pdf");
 
   TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 800);
   canvNcoll->SetTopMargin(0.03);
@@ -228,6 +232,7 @@ void drawNpartNcoll()
   pbpb25_568409->histos[kNcoll]->Draw("pe same");
   pbpb25_568117->histos[kNcoll]->Draw("pe same");
   canvNcoll->SaveAs("hNcoll.pdf");
+  save::canvasToRoot(canvNcoll, "hNcoll.pdf");
 
   // Ratio histograms Npart
   TCanvas* canvNpartRatio = new TCanvas("canvNpartRatio", "", 1200, 800);
@@ -250,6 +255,7 @@ void drawNpartNcoll()
 
   legend->Draw();
   canvNpartRatio->SaveAs("hNpartRatio.pdf");
+  save::canvasToRoot(canvNpartRatio, "hNpartRatio.pdf");
 
   // Ratio histograms Ncoll
   TCanvas* canvNcollRatio = new TCanvas("canvNcollRatio", "", 1200, 800);
@@ -272,4 +278,5 @@ void drawNpartNcoll()
   }
   legend->Draw();
   canvNcollRatio->SaveAs("hNcollRatio.pdf");
+  save::canvasToRoot(canvNcollRatio, "hNcollRatio.pdf");
 }

@@ -15,6 +15,7 @@
 #include "Includes/colorManager.h"
 #include "Includes/centralityHelper.h"
 #include "Includes/systematicsHelper.h"
+#include "Includes/saveHelper.h"
 
 // OO Npart              OO Ncoll      
 // 26.34     0.59        42.31     2.61
@@ -219,6 +220,7 @@ void doSystematicsOO()
   if (drawTotal) hSysTotalNpart->Draw("hist same");
   leg->Draw();
   canvNpartSystematics->SaveAs("hNpartSystematics_OO.pdf");
+  save::canvasToRoot(canvNpartSystematics, "hNpartSystematics_OO.pdf");
 
   TCanvas* canvNcollSystematics = new TCanvas("canvNcollSystematics", "", canvWidth, canvHeight);
   syst::styleCanvas(canvNcollSystematics);
@@ -234,6 +236,7 @@ void doSystematicsOO()
   if (drawTotal) hSysTotalNcoll->Draw("hist same");
   leg->Draw();
   canvNcollSystematics->SaveAs("hNcollSystematics_OO.pdf");
+  save::canvasToRoot(canvNcollSystematics, "hNcollSystematics_OO.pdf");
 
   TCanvas* canvRelNpartSystematics = new TCanvas("canvRelNpartSystematics", "", canvWidth, canvHeight);
   syst::styleCanvas(canvRelNpartSystematics);
@@ -249,6 +252,7 @@ void doSystematicsOO()
   if (drawTotal) hRelSysTotalNpart->Draw("hist same");
   leg->Draw();
   canvRelNpartSystematics->SaveAs("FiguresSystematics/hNpartRelSystematics_OO.pdf");
+  save::canvasToRoot(canvRelNpartSystematics, "FiguresSystematics/hNpartRelSystematics_OO.pdf");
 
   TCanvas* canvRelNcollSystematics = new TCanvas("canvRelNcollSystematics", "", canvWidth, canvHeight);
   syst::styleCanvas(canvRelNcollSystematics);
@@ -264,6 +268,7 @@ void doSystematicsOO()
   if (drawTotal) hRelSysTotalNcoll->Draw("hist same");
   leg->Draw();
   canvRelNcollSystematics->SaveAs("FiguresSystematics/hNcollRelSystematics_OO.pdf");
+  save::canvasToRoot(canvRelNcollSystematics, "FiguresSystematics/hNcollRelSystematics_OO.pdf");
 
 
   /* Extra QA */
@@ -334,6 +339,7 @@ void doSystematicsOO()
   hNewNpartErr->Draw("hist same");
   legSystematics->Draw();
   canvNpart->SaveAs("qaNpart_OO.pdf");
+  save::canvasToRoot(canvNpart, "qaNpart_OO.pdf");
   
   TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 1000);
   syst::styleCanvas(canvNcoll);
@@ -345,4 +351,5 @@ void doSystematicsOO()
   hNewNcollErr->Draw("hist same");
   legSystematics->Draw();
   canvNcoll->SaveAs("qaNcoll_OO.pdf");
+  save::canvasToRoot(canvNcoll, "qaNcoll_OO.pdf");
 }

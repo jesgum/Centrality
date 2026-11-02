@@ -16,6 +16,7 @@
 #include "Includes/colorManager.h"
 #include "Includes/centralityHelper.h"
 #include "Includes/systematicsHelper.h"
+#include "Includes/saveHelper.h"
 
 void drawMarkerForPercentile(TCanvas* canv, TH2D* h2d)
 {
@@ -64,6 +65,7 @@ void drawNpartNcollTH2()
   h2dNpart->Draw("colz");
   drawMarkerForPercentile(canvNpart, h2dNpart);
   canvNpart->SaveAs("h2dNpartOO.pdf");
+  save::canvasToRoot(canvNpart, "h2dNpartOO.pdf");
 
   TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 800, 800);
   canvNcoll->SetLeftMargin(0.13);
@@ -74,4 +76,5 @@ void drawNpartNcollTH2()
   h2dNcoll->Draw("colz");
   drawMarkerForPercentile(canvNcoll, h2dNcoll);
   canvNcoll->SaveAs("h2dNcollOO.pdf");
+  save::canvasToRoot(canvNcoll, "h2dNcollOO.pdf");
 }

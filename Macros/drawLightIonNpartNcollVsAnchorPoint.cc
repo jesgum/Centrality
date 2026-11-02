@@ -15,6 +15,7 @@
 #include "Includes/colorManager.h"
 #include "Includes/centralityHelper.h"
 #include "Includes/systematicsHelper.h"
+#include "Includes/saveHelper.h"
 
 void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* leg, const char* outfile, const char* titleYaxis = "<N_{part}>")
 {
@@ -97,6 +98,7 @@ void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* 
   for (int i = 1; i < runPairs.size(); ++i) hRatios[i]->Draw("pe same");
 
   canv->SaveAs(outfile);
+  save::canvasToRoot(canv, outfile);
   for (auto* hRatio : hRatios) delete hRatio;
   hRatios.clear();
   delete canv;

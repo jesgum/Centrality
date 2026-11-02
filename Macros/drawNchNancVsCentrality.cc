@@ -17,6 +17,7 @@
 #include "Includes/colorManager.h"
 #include "Includes/centralityHelper.h"
 #include "Includes/systematicsHelper.h"
+#include "Includes/saveHelper.h"
 
 void drawNchNancVsCentrality()
 {
@@ -160,4 +161,5 @@ hist->GetYaxis()->SetTitle("1/#it{#mu}_{AA} <#it{N}_{ch}> / <#it{N}_{anc}>");
   lat->DrawTextNDC(0.18, 0.87, "ALICE");
 
   canvNchNanc->SaveAs("hNchNancVsCentrality.pdf");
+  save::canvasToRoot(canvNchNanc, "hNchNancVsCentrality.pdf");
 }

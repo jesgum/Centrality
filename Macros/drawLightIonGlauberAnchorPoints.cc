@@ -13,6 +13,7 @@
 #include <string>
 
 #include "Includes/colorManager.h"
+#include "Includes/saveHelper.h"
 
 static bool doNeNe = false;
 
@@ -360,8 +361,8 @@ void drawLightIonGlauberAnchorPoints(bool isNeNe = false)
   latCol->SetTextSize(0.04);
   latCol->SetTextAlign(32);
   latCol->DrawLatexNDC(0.97, 0.975, "Collisions");
-  if (doNeNe) canvCol->SaveAs("FiguresSystematics/hGlauberCol_NeNe.pdf");
-  if (!doNeNe) canvCol->SaveAs("FiguresSystematics/hGlauberCol_OO.pdf");
+  if (doNeNe) { canvCol->SaveAs("FiguresSystematics/hGlauberCol_NeNe.pdf"); save::canvasToRoot(canvCol, "FiguresSystematics/hGlauberCol_NeNe.pdf"); }
+  if (!doNeNe) { canvCol->SaveAs("FiguresSystematics/hGlauberCol_OO.pdf"); save::canvasToRoot(canvCol, "FiguresSystematics/hGlauberCol_OO.pdf"); }
 
   TCanvas* canvBcs = makeCanvas("canvBcs");
   drawGlauberSet(canvBcs, bcs, "hFT0M_BCs", anchorpointPercentage);
@@ -371,6 +372,6 @@ void drawLightIonGlauberAnchorPoints(bool isNeNe = false)
   latBc->SetTextSize(0.04);
   latBc->SetTextAlign(32);
   latBc->DrawLatexNDC(0.97, 0.975, "Bunch crossings");
-  if (doNeNe) canvBcs->SaveAs("FiguresSystematics/hGlauberBcs_NeNe.pdf");
-  if (!doNeNe) canvBcs->SaveAs("FiguresSystematics/hGlauberBcs_OO.pdf");
+  if (doNeNe) { canvBcs->SaveAs("FiguresSystematics/hGlauberBcs_NeNe.pdf"); save::canvasToRoot(canvBcs, "FiguresSystematics/hGlauberBcs_NeNe.pdf"); }
+  if (!doNeNe) { canvBcs->SaveAs("FiguresSystematics/hGlauberBcs_OO.pdf"); save::canvasToRoot(canvBcs, "FiguresSystematics/hGlauberBcs_OO.pdf"); }
 }

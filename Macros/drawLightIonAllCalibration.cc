@@ -15,6 +15,7 @@
 #include <string>
 
 #include "colorManager.h"
+#include "Includes/saveHelper.h"
 
 void styleTH1(TH1F* hist, int color)
 {
@@ -110,6 +111,7 @@ void drawLightIonAllCalibration()
   hCollCalib564359->Draw("hist same");
   hCollCalib564356->Draw("hist same");
   canvColl->SaveAs("hCalibCrossCheckColl.pdf");
+  save::canvasToRoot(canvColl, "hCalibCrossCheckColl.pdf");
 
   TCanvas* canvBc = new TCanvas("canvBc", "", 1200, 1000);
   hBcCalib564445->GetXaxis()->SetRangeUser(0, 10000);
@@ -123,5 +125,6 @@ void drawLightIonAllCalibration()
   hBcCalib564359->Draw("hist same");
   hBcCalib564356->Draw("hist same");
   canvBc->SaveAs("hCalibCrossCheckBc.pdf");
+  save::canvasToRoot(canvBc, "hCalibCrossCheckBc.pdf");
 
 }

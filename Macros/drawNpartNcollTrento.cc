@@ -18,6 +18,7 @@
 #include "Includes/colorManager.h"
 #include "Includes/centralityHelper.h"
 #include "Includes/systematicsHelper.h"
+#include "Includes/saveHelper.h"
 
 // Draws one canvas (top: base vs. Trento variations, bottom: ratio to base)
 // for a single quantity (Npart or Ncoll). Only the variations are plotted
@@ -113,6 +114,7 @@ void drawTrentoVariationsCompare(TH1F* base, std::vector<TH1F*>& variationHists,
   line->Draw("same");
 
   canv->SaveAs(outFile);
+  save::canvasToRoot(canv, outFile);
 }
 
 // Scan point directories and legend labels from the scan<tag>_best.txt written by Trento/scan/drawScan.cc

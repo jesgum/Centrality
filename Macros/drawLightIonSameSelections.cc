@@ -14,6 +14,7 @@
 #include <string>
 
 #include "Includes/colorManager.h"
+#include "Includes/saveHelper.h"
 
 static std::array<int, 2> normRange = { 2000, 12000 };
 
@@ -165,6 +166,7 @@ void drawLightIonSameSelections()
   base.hCol->Draw("hist same");
   leg->Draw();
   canv_base->SaveAs("h_data_base.pdf");
+  save::canvasToRoot(canv_base, "h_data_base.pdf");
 
   TCanvas* canv_nobc = new TCanvas("canv_nobc", "", 1600, 1000);
   styleCanvas(canv_nobc);
@@ -179,6 +181,7 @@ void drawLightIonSameSelections()
   pileup.hCol->Draw("hist same");
   leg->Draw();
   canv_pileup->SaveAs("h_data_pileup.pdf");
+  save::canvasToRoot(canv_pileup, "h_data_pileup.pdf");
 
   TCanvas* canv_nobcpileup = new TCanvas("canv_nobcpileup", "", 1600, 1000);
   styleCanvas(canv_nobcpileup);
@@ -193,6 +196,7 @@ void drawLightIonSameSelections()
   vtxZ.hCol->Draw("hist same");
   leg->Draw();
   canv_vtxZ->SaveAs("h_data_vtxZ.pdf");
+  save::canvasToRoot(canv_vtxZ, "h_data_vtxZ.pdf");
 
   TCanvas* canv_nobcvtxZ = new TCanvas("canv_nobcvtxZ", "", 1600, 1000);
   styleCanvas(canv_nobcvtxZ);
@@ -213,6 +217,7 @@ void drawLightIonSameSelections()
   // nobcvtxZ.hRatio->Draw("hist same");
   leg->Draw();
   canv_ratio->SaveAs("h_data_ratio.pdf");
+  save::canvasToRoot(canv_ratio, "h_data_ratio.pdf");
 
   // Zoomed-in version of the ratio plot: same curves, tighter y-axis window
   // around 1 so the differences between base/nobc/pileup/nobcpileup are
@@ -230,4 +235,5 @@ void drawLightIonSameSelections()
   // nobcvtxZ.hRatio_Zoom->Draw("hist same");
   leg->Draw();
   canv_ratio_zoom->SaveAs("h_data_ratio_zoom.pdf");
+  save::canvasToRoot(canv_ratio_zoom, "h_data_ratio_zoom.pdf");
 }

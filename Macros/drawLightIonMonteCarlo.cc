@@ -14,6 +14,7 @@
 #include <string>
 
 #include "colorManager.h"
+#include "Includes/saveHelper.h"
 
 static std::array<int, 2> normRange = { 3000, 10000 };
 
@@ -146,6 +147,7 @@ void drawLightIonMonteCarlo()
   base.hCol->Draw("hist same");
   leg->Draw();
   canv_base->SaveAs("h_mc_base.pdf");
+  save::canvasToRoot(canv_base, "h_mc_base.pdf");
 
   TCanvas* canv_nobc = new TCanvas("canv_nobc", "", 1600, 1000);
   styleCanvas(canv_nobc);
@@ -153,6 +155,7 @@ void drawLightIonMonteCarlo()
   nobc.hCol->Draw("hist same");
   leg->Draw();
   canv_nobc->SaveAs("h_mc_nobc.pdf");
+  save::canvasToRoot(canv_nobc, "h_mc_nobc.pdf");
 
   TCanvas* canv_pileup = new TCanvas("canv_pileup", "", 1600, 1000);
   styleCanvas(canv_pileup);
@@ -160,6 +163,7 @@ void drawLightIonMonteCarlo()
   pileup.hCol->Draw("hist same");
   leg->Draw();
   canv_pileup->SaveAs("h_mc_pileup.pdf");
+  save::canvasToRoot(canv_pileup, "h_mc_pileup.pdf");
 
   TCanvas* canv_nobcpileup = new TCanvas("canv_nobcpileup", "", 1600, 1000);
   styleCanvas(canv_nobcpileup);
@@ -167,6 +171,7 @@ void drawLightIonMonteCarlo()
   nobcpileup.hCol->Draw("hist same");
   leg->Draw();
   canv_nobcpileup->SaveAs("h_mc_nobcpileup.pdf");
+  save::canvasToRoot(canv_nobcpileup, "h_mc_nobcpileup.pdf");
 
   TCanvas* canv_vtxZ = new TCanvas("canv_vtxZ", "", 1600, 1000);
   styleCanvas(canv_vtxZ);
@@ -174,6 +179,7 @@ void drawLightIonMonteCarlo()
   vtxZ.hCol->Draw("hist same");
   leg->Draw();
   canv_vtxZ->SaveAs("h_mc_vtxZ.pdf");
+  save::canvasToRoot(canv_vtxZ, "h_mc_vtxZ.pdf");
 
   TCanvas* canv_nobcvtxZ = new TCanvas("canv_nobcvtxZ", "", 1600, 1000);
   styleCanvas(canv_nobcvtxZ);
@@ -181,6 +187,7 @@ void drawLightIonMonteCarlo()
   nobcvtxZ.hCol->Draw("hist same");
   leg->Draw();
   canv_nobcvtxZ->SaveAs("h_mc_nobcvtxZ.pdf");
+  save::canvasToRoot(canv_nobcvtxZ, "h_mc_nobcvtxZ.pdf");
 
   TCanvas* canv_ratio = new TCanvas("canv_ratio", "", 1600, 1000);
   styleCanvas(canv_ratio, false);
@@ -194,6 +201,7 @@ void drawLightIonMonteCarlo()
   nobcvtxZ.hRatio->Draw("hist same");
   leg->Draw();
   canv_ratio->SaveAs("h_mc_ratio.pdf");
+  save::canvasToRoot(canv_ratio, "h_mc_ratio.pdf");
 
   // Zoomed-in version of the ratio plot: same curves, tighter y-axis window
   // around 1 so the differences between base/nobc/pileup/nobcpileup are
@@ -211,4 +219,5 @@ void drawLightIonMonteCarlo()
   nobcvtxZ.hRatio_Zoom->Draw("hist same");
   leg->Draw();
   canv_ratio_zoom->SaveAs("h_mc_ratio_zoom.pdf");
+  save::canvasToRoot(canv_ratio_zoom, "h_mc_ratio_zoom.pdf");
 }

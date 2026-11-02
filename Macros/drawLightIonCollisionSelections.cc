@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "centralityHelper.h"
+#include "Includes/saveHelper.h"
 
 void drawLightIonCollisionSelections()
 {
@@ -57,10 +58,12 @@ void drawLightIonCollisionSelections()
   lCalib->Draw();
   lSyst->Draw();
   canvCompare->SaveAs("hSelectionComparison.pdf");
+  save::canvasToRoot(canvCompare, "hSelectionComparison.pdf");
 
   TCanvas* canvRatio = new TCanvas("canvRatio", "", 1200, 1000);
   hPercentiles->GetYaxis()->SetRangeUser(0.995, 1.18);
   hPercentiles->Draw("");
   canvRatio->SaveAs("hPercentileRatios.pdf");
+  save::canvasToRoot(canvRatio, "hPercentileRatios.pdf");
   
 }

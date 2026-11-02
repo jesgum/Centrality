@@ -12,6 +12,7 @@
 #include <string>  
 
 #include "Includes/colorManager.h"
+#include "Includes/saveHelper.h"
 
 std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, const char* name)
 {
@@ -94,6 +95,7 @@ std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, const char* name)
   h2dNpart->Draw("colz");
   hAvgNpart->Draw("pe same");
   canvNpart->SaveAs(Form("h2dNpart_%sOO.pdf", name));
+  save::canvasToRoot(canvNpart, Form("h2dNpart_%sOO.pdf", name));
 
   TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 800);
   canvNcoll->SetLogz();
@@ -105,6 +107,7 @@ std::vector<TH1F*> doNpartNcoll(TString dataset, TString ar, const char* name)
   h2dNcoll->Draw("colz");
   hAvgNcoll->Draw("pe same");
   canvNcoll->SaveAs(Form("h2dNcoll_%sOO.pdf", name));
+  save::canvasToRoot(canvNcoll, Form("h2dNcoll_%sOO.pdf", name));
 
   delete canvNpart; delete canvNcoll;
   delete h2dNpart; delete h2dNcoll;
@@ -305,6 +308,7 @@ void drawNpartNcollLightIon()
   lineNpart->SetLineColor(kGray + 1);
   lineNpart->Draw("same");
   canvNpart->SaveAs("hNpartOO.pdf");
+  save::canvasToRoot(canvNpart, "hNpartOO.pdf");
 
   // === Canvas: Ncoll with ratio ===
   TCanvas* canvNcoll = new TCanvas("canvNcoll", "", 1200, 800);
@@ -370,4 +374,5 @@ void drawNpartNcollLightIon()
   lineNcoll->SetLineColor(kGray + 1);
   lineNcoll->Draw("same");
   canvNcoll->SaveAs("hNcollOO.pdf");
+  save::canvasToRoot(canvNcoll, "hNcollOO.pdf");
 }

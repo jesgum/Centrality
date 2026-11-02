@@ -14,6 +14,7 @@
 #include <string>
 
 #include "colorManager.h"
+#include "Includes/saveHelper.h"
 
 struct Histos {
   static constexpr int NParams = 6;
@@ -167,6 +168,7 @@ struct Histos {
     hColScaledMc->Draw("hist same");
     legend->Draw();
     canv_coll->SaveAs(Form("h_coll%s.pdf", key));
+    save::canvasToRoot(canv_coll, Form("h_coll%s.pdf", key));
 
     if (drawBc) {
       TCanvas* canv_bc = new TCanvas(Form("canv_bc%s", key), "", 1200, 1000);
@@ -179,6 +181,7 @@ struct Histos {
       hBcScaledMc->Draw("hist same");
       legend->Draw();
       canv_bc->SaveAs(Form("h_bc%s.pdf", key));
+      save::canvasToRoot(canv_bc, Form("h_bc%s.pdf", key));
     }
     
     // --- Ratio canvases: before (red) vs after (blue) scaling, overlaid on hline at 1 ---
@@ -200,6 +203,7 @@ struct Histos {
       leg->AddEntry(hAfter, "MC / Data (scaled)", "l");
       leg->Draw();
       c->SaveAs(Form("%s.pdf", fname));
+      save::canvasToRoot(c, Form("%s.pdf", fname));
     };
     
     hColRatioMc->GetYaxis()->SetRangeUser(0, 1.3);
@@ -232,6 +236,7 @@ struct Histos {
       leg->AddEntry(hBc, "MC (scaled)", "l");
       leg->Draw();
       c->SaveAs(Form("%s.pdf", fname));
+      save::canvasToRoot(c, Form("%s.pdf", fname));
     };
 
     hCollBcRatioData->GetYaxis()->SetRangeUser(0, 2.3);
@@ -262,6 +267,7 @@ struct Histos {
     hBcScaledMc->Draw("hist same");
     legend_master->Draw();
     canv_master->SaveAs(Form("h_all%s.pdf", key));
+    save::canvasToRoot(canv_master, Form("h_all%s.pdf", key));
   } // Histos
 
   TFormula* f1scale = nullptr;

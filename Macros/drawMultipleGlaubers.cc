@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#include "Includes/saveHelper.h"
 
 // Draws the Glauber + NBD fits of several calibration files (output of Glauber/runCalibration.cc) on the same
 // pad together with the data, bottom pad: data / fit, both with an inset zooming on the peripheral region (layout
@@ -276,6 +277,7 @@ void drawMultipleFits(const std::vector<GlauberInput>& inputs, const TString& ou
   }
 
   canv->SaveAs(outFile);
+  save::canvasToRoot(canv, outFile);
 }
 
 void drawMultipleGlaubers()

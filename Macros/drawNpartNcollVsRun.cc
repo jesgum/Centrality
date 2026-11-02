@@ -14,6 +14,7 @@
 #include <set>
 
 #include "colorManager.h"
+#include "Includes/saveHelper.h"
 
 static std::map <int, const char*> calibs = {
   {567905, "AR_567905_calibration_ancestorMode2_fixedK_fixedMu_hFT0C_BCs.root"},
@@ -301,6 +302,7 @@ void drawNpartNcollVsRun()
     }
     latex->DrawTextNDC(0.97, 0.995, Form("%d-%d %%", binCent, binCent + 1));
     canvNpart->SaveAs(Form("FiguresPerCentralityPercentile/hNpart_%d.pdf", binCent));
+    save::canvasToRoot(canvNpart, Form("FiguresPerCentralityPercentile/hNpart_%d.pdf", binCent));
     canvNpart->SaveAs(Form("FiguresPerCentralityPercentile/hNpart_%d.png", binCent));
 
     TCanvas* canvNcoll = new TCanvas(Form("canvNcoll_%d", binCent), "", 1600, 1000);
@@ -323,6 +325,7 @@ void drawNpartNcollVsRun()
     }
     latex->DrawTextNDC(0.97, 0.995, Form("%d-%d %%", binCent, binCent + 1));
     canvNcoll->SaveAs(Form("FiguresPerCentralityPercentile/hNcoll_%d.pdf", binCent));    
+    save::canvasToRoot(canvNcoll, Form("FiguresPerCentralityPercentile/hNcoll_%d.pdf", binCent));
     canvNcoll->SaveAs(Form("FiguresPerCentralityPercentile/hNcoll_%d.png", binCent));    
     delete canvNpart; delete canvNcoll;
   }

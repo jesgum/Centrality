@@ -5,6 +5,7 @@
 #include "TStyle.h"
 
 #include <iostream>
+#include "Includes/saveHelper.h"
 
 double getBoundaryForPercentile(TH1* histo, double lPercentileRequested ) {
   //This function returns the boundary for a specific percentile.
@@ -107,4 +108,5 @@ void calculateNGloToFT0C()
 
   canv->cd();
   canv->SaveAs("hNGloToFT0C.pdf");
+  save::canvasToRoot(canv, "hNGloToFT0C.pdf");
 }

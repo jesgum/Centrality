@@ -1,3 +1,5 @@
+#include "Includes/saveHelper.h"
+
 TH1D *GetCentralityHisto(TH1F *hMult, TH1 *hCalib, Double_t lCent1, Double_t lCent2, TString lName = "h"){
   TH1D *h = (TH1D*) hMult->Clone(lName.Data());
   
@@ -353,4 +355,5 @@ void drawSummaryPlots(){
   exportName.ReplaceAll(".root", ".pdf"); 
 
   c1->SaveAs(exportName.Data());
+  save::canvasToRoot(c1, exportName.Data());
 }

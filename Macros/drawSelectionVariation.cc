@@ -16,6 +16,7 @@
 #include "Includes/colorManager.h"
 #include "Includes/centralityHelper.h"
 #include "Includes/systematicsHelper.h"
+#include "Includes/saveHelper.h"
 
 void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* leg, const char* outfile, const char* titleYaxis = "<N_{part}>")
 {
@@ -98,6 +99,7 @@ void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* 
   for (int i = 1; i < runPairs.size(); ++i) hRatios[i]->Draw("pe same");
 
   canv->SaveAs(outfile);
+  save::canvasToRoot(canv, outfile);
   for (auto* hRatio : hRatios) delete hRatio;
   hRatios.clear();
   delete canv;
@@ -229,6 +231,7 @@ void drawSelectionVariation()
   noPileup.hData->Draw("hist same");
   noEvSel.hData->Draw("hist same");
   canvData->SaveAs("hSelectionComparisonData.pdf");
+  save::canvasToRoot(canvData, "hSelectionComparisonData.pdf");
 
   TCanvas* canvGlau = new TCanvas("canvGlau", "", 1200, 1000);
   canvGlau->SetLogy();
@@ -240,6 +243,7 @@ void drawSelectionVariation()
   noPileup.hGlau->Draw("hist same");
   noEvSel.hGlau->Draw("hist same");
   canvGlau->SaveAs("hSelectionComparisonGlau.pdf");
+  save::canvasToRoot(canvGlau, "hSelectionComparisonGlau.pdf");
 
   const float ratioYmin = 0.5;
   const float ratioYmax = 1.5;
@@ -284,6 +288,7 @@ void drawSelectionVariation()
   legData->Draw("same");
 
   canvDataRatio->SaveAs("hSelectionComparisonDataRatio.pdf");
+  save::canvasToRoot(canvDataRatio, "hSelectionComparisonDataRatio.pdf");
 
   TCanvas* canvGlauRatio = new TCanvas("canvGlauRatio", "", 1200, 1000);
   hRatioVtxZGlau->GetXaxis()->SetRangeUser(xmin, xmax);
@@ -309,6 +314,7 @@ void drawSelectionVariation()
   legGlau->Draw("same");
 
   canvGlauRatio->SaveAs("hSelectionComparisonGlauRatio.pdf");
+  save::canvasToRoot(canvGlauRatio, "hSelectionComparisonGlauRatio.pdf");
 
   
   syst::GlauberParameters glauBase("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");

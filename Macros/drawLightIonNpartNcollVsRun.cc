@@ -15,6 +15,7 @@
 #include "Includes/colorManager.h"
 #include "Includes/centralityHelper.h"
 #include "Includes/systematicsHelper.h"
+#include "Includes/saveHelper.h"
 
 static const std::vector<float> NpartVal = { 26.34, 24.08, 21.03, 16.88, 13.05, 9.88, 7.39, 5.51, 4.15, 3.17, 2.42 };
 static const std::vector<float> NpartErr = { 0.59, 0.69, 0.84, 0.89, 0.75, 0.61, 0.48, 0.36, 0.26, 0.23, 0.16 };
@@ -104,6 +105,7 @@ void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* 
   for (int i = 1; i < runPairs.size(); ++i) hRatios[i]->Draw("pe same");
 
   canv->SaveAs(outfile);
+  save::canvasToRoot(canv, outfile);
   for (auto* hRatio : hRatios) delete hRatio;
   hRatios.clear();
   delete canv;

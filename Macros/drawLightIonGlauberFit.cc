@@ -13,6 +13,7 @@
 #include <string>  
 
 #include "Includes/colorManager.h"
+#include "Includes/saveHelper.h"
 
 struct GlauberInfo
 {
@@ -280,6 +281,7 @@ void doColVsBc()
   padBot->cd();
   canvColVsBc->cd();
   canvColVsBc->SaveAs("hGlauberColVsBc.pdf");
+  save::canvasToRoot(canvColVsBc, "hGlauberColVsBc.pdf");
 }
 
 void doGlauber()
@@ -437,6 +439,7 @@ void doGlauber()
   padBot->cd();
   canvGlauber->cd();
   canvGlauber->SaveAs("hGlauber.pdf");
+  save::canvasToRoot(canvGlauber, "hGlauber.pdf");
 }
 
 
