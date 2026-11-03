@@ -75,11 +75,17 @@ void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* 
     for (int b = 1; b <= hRatio->GetNbinsX(); ++b) {
       double content = hRatio->GetBinContent(b);
       double error   = hRatio->GetBinError(b);
-      if (content == 0 && error == 0) continue; // skip empty bins
+      if (content == 0 && error == 0) { // skip empty bins
+        continue;
+      }
       double lo = content - error;
       double hi = content + error;
-      if (lo < globalMin) globalMin = lo;
-      if (hi > globalMax) globalMax = hi;
+      if (lo < globalMin) {
+        globalMin = lo;
+      }
+      if (hi > globalMax) {
+        globalMax = hi;
+      }
     }
 
     hRatios.push_back(hRatio);
@@ -87,20 +93,26 @@ void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* 
 
   // add a bit of padding so points/error bars aren't flush with the pad edge
   double margin = (globalMax - globalMin) * 0.1;
-  if (margin <= 0) margin = 0.01; // fallback in case all values are identical
+  if (margin <= 0) { // fallback in case all values are identical
+    margin = 0.01;
+  }
   globalMin -= margin;
   globalMax += margin;
 
-  for (auto* hRatio : hRatios) {
+  for (const auto& hRatio : hRatios) {
     hRatio->GetYaxis()->SetRangeUser(globalMin, globalMax);
   }
 
   hRatios[0]->Draw("pe");
-  for (int i = 1; i < runPairs.size(); ++i) hRatios[i]->Draw("pe same");
+  for (int i = 1; i < runPairs.size(); ++i) {
+    hRatios[i]->Draw("pe same");
+  }
 
   canv->SaveAs(outfile);
   save::canvasToRoot(canv, outfile);
-  for (auto* hRatio : hRatios) delete hRatio;
+  for (const auto& hRatio : hRatios) {
+    delete hRatio;
+  }
   hRatios.clear();
   delete canv;
 }
@@ -120,12 +132,14 @@ struct Registry {
 void matchBinning(std::vector<TH1F*>& hists)
 {
   int nbinsCommon = hists[0]->GetNbinsX();
-  for (auto* h : hists)
+  for (const auto& h : hists) {
     nbinsCommon = std::min(nbinsCommon, h->GetNbinsX());
+  }
 
   for (auto*& h : hists) {
-    if (h->GetNbinsX() == nbinsCommon)
+    if (h->GetNbinsX() == nbinsCommon) {
       continue;
+    }
     TString newName = TString(h->GetName()) + "_trunc";
     double xmin = h->GetXaxis()->GetXmin();
     double binWidth = h->GetXaxis()->GetBinWidth(1);
@@ -317,7 +331,7 @@ void drawSelectionVariation()
   save::canvasToRoot(canvGlauRatio, "hSelectionComparisonGlauRatio.pdf");
 
   
-  syst::GlauberParameters glauBase("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
+  syst::GlauberParameters<TH2D> glauBase("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
   syst::GlauberParameters glauVtxZ("LHC25ae_pass2_extra2/AR_564374_calibration_hFT0M_Collisions_vtxZ_LightIonDef.root");
   syst::GlauberParameters glauNopileUp("LHC25ae_pass2_extra2/AR_564374_calibration_hFT0M_Collisions_nopileup_LightIonDef.root");
   syst::GlauberParameters glauNoSel("LHC25ae_pass2_extra2/AR_564374_calibration_hFT0M_Collisions_nosel_LightIonDef.root");

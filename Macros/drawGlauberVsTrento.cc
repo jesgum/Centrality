@@ -91,10 +91,11 @@ void drawGlauberVsTrento()
   // keep only the enabled entries
   std::vector<ModelInput> lAllModels = lModels;
   lModels.clear();
-  for (auto& model : lAllModels) {
+  for (const auto& model : lAllModels) {
     Bool_t lGroupEnabled = (model.type == ModelType::Glauber) ? lDrawGlauber : lDrawTrento;
-    if (model.enabled && lGroupEnabled)
+    if (model.enabled && lGroupEnabled) {
       lModels.push_back(model);
+    }
   }
   if (lModels.empty()) {
     cout << "No fits enabled: at least one is needed to provide the data histogram" << endl;
@@ -104,8 +105,9 @@ void drawGlauberVsTrento()
   const Int_t nModels = lModels.size();
 
   Int_t nGlauber = 0, nTrento = 0;
-  for (auto& model : lModels)
+  for (const auto& model : lModels) {
     (model.type == ModelType::Glauber ? nGlauber : nTrento)++;
+  }
   ColorManager lColorsGlauber(TMath::Max(1, nGlauber), lPaletteGlauber);
   ColorManager lColorsTrento(TMath::Max(1, nTrento), lPaletteTrento);
   ColorManager lColorsMult(2, lPaletteMult);
@@ -135,12 +137,14 @@ void drawGlauberVsTrento()
     file->ls();
 
     hData[im] = (TH1F*)file->Get("hData");
-    if (!hData[im])
+    if (!hData[im]) {
       hData[im] = (TH1F*)file->Get("hV0MUltraFine");
+    }
 
     hFit[im] = (TH1F*)file->Get("hGlauber");
-    if (!hFit[im])
+    if (!hFit[im]) {
       hFit[im] = (TH1F*)file->Get("hGlauberFine");
+    }
 
     if (!hData[im] || !hFit[im]) {
       cout << "Data or fit histogram not found in " << lModels[im].fileName << endl;
@@ -192,8 +196,9 @@ void drawGlauberVsTrento()
     TH1F* hScaled = new TH1F(lNewName, "", nBins,
                              hRaw->GetXaxis()->GetXmin() * lScaleTracksToFT0C,
                              hRaw->GetXaxis()->GetXmax() * lScaleTracksToFT0C);
-    for (Int_t ii = 1; ii <= nBins; ii++)
+    for (Int_t ii = 1; ii <= nBins; ii++) {
       hScaled->SetBinContent(ii, hRaw->GetBinContent(ii));
+    }
 
     // contents in counts per bin of the plotted data
     hScaled->Scale(IntegralInNormRange(hData[0]) / IntegralInNormRange(hScaled) * hData[0]->GetBinWidth(1) / hScaled->GetBinWidth(1));
@@ -209,8 +214,9 @@ void drawGlauberVsTrento()
 
   TH1F* hV0M = hData[0];
 
-  if (lRebinToMultFactor < 0)
+  if (lRebinToMultFactor < 0) {
     lRebinToMultFactor = TMath::Max(1, TMath::Nint(lScaleTracksToFT0C));
+  }
 
   // Data/PYTHIA and Data/NGlo: always w.r.t. data rebinned to the multiplicity bin width.
   // Both are in counts per original data bin; the multiplicity curve is evaluated at the
@@ -219,8 +225,9 @@ void drawGlauberVsTrento()
   hDataMult->Rebin(lRebinToMultFactor);
   hDataMult->Scale(1. / lRebinToMultFactor);
   auto GetRatioToMult = [&](TH1F* hMult, TString lNewName) -> TH1F* {
-    if (!hMult)
+    if (!hMult) {
       return 0x0;
+    }
     TH1F* hRatioMult = (TH1F*)hDataMult->Clone(lNewName);
     for (Int_t ii = 1; ii <= hRatioMult->GetNbinsX(); ii++) {
       Double_t lMult = hMult->Interpolate(hRatioMult->GetBinCenter(ii));
@@ -242,7 +249,7 @@ void drawGlauberVsTrento()
     cout << "Rebinning data and fits by " << lRebinToMultFactor << " (scaled by 1/" << lRebinToMultFactor << ")" << endl;
     std::vector<TH1F*> lToRebin = hFit;
     lToRebin.push_back(hV0M); // keep last: its original bin width is the reference above
-    for (auto h : lToRebin) {
+    for (const auto& h : lToRebin) {
       // same final bin width for all; a fit with different binning gets its own factor
       Int_t lRebinHist = TMath::Max(1, TMath::Nint(lRebinToMultFactor * hV0M->GetBinWidth(1) / h->GetBinWidth(1)));
       h->Rebin(lRebinHist);
@@ -304,12 +311,15 @@ void drawGlauberVsTrento()
   hV0M->SetLineWidth(lLineWidth);
   hV0M->SetTitle("");
   hV0M->Draw("hist");
-  for (Int_t im = 0; im < nModels; im++)
+  for (Int_t im = 0; im < nModels; im++) {
     hFit[im]->Draw("same hist");
-  if (hPythia)
+  }
+  if (hPythia) {
     hPythia->Draw("same hist");
-  if (hNGlo)
+  }
+  if (hNGlo) {
     hNGlo->Draw("same hist");
+  }
 
   TLatex* latPer = new TLatex();
   latPer->SetNDC();
@@ -327,12 +337,15 @@ void drawGlauberVsTrento()
   legO->SetBorderSize(0);
   legO->SetFillColorAlpha(0, 0);
   legO->AddEntry(hV0M, "Data", "l");
-  for (Int_t im = 0; im < nModels; im++)
+  for (Int_t im = 0; im < nModels; im++) {
     legO->AddEntry(hFit[im], lModels[im].label.Data(), "l");
-  if (hPythia)
+  }
+  if (hPythia) {
     legO->AddEntry(hPythia, lPythiaLabel.Data(), "l");
-  if (hNGlo)
+  }
+  if (hNGlo) {
     legO->AddEntry(hNGlo, lNGloLabel.Data(), "l");
+  }
   legO->Draw();
 
   // inset: zoom on peripheral region
@@ -357,12 +370,15 @@ void drawGlauberVsTrento()
   hV0Mzoomed->GetXaxis()->SetLabelSize(0.06);
   hV0Mzoomed->GetYaxis()->SetLabelSize(0.06);
   hV0Mzoomed->Draw("hist");
-  for (Int_t im = 0; im < nModels; im++)
+  for (Int_t im = 0; im < nModels; im++) {
     hFit[im]->Draw("same hist");
-  if (hPythia)
+  }
+  if (hPythia) {
     hPythia->Draw("same hist");
-  if (hNGlo)
+  }
+  if (hNGlo) {
     hNGlo->Draw("same hist");
+  }
 
   c1->cd(1);
 
@@ -405,12 +421,15 @@ void drawGlauberVsTrento()
   line->SetLineColor(kGray + 1);
   line->Draw();
 
-  for (Int_t im = 0; im < nModels; im++)
+  for (Int_t im = 0; im < nModels; im++) {
     hRatio[im]->Draw("same hist");
-  if (hRatioPythia)
+  }
+  if (hRatioPythia) {
     hRatioPythia->Draw("same hist");
-  if (hRatioNGlo)
+  }
+  if (hRatioNGlo) {
     hRatioNGlo->Draw("same hist");
+  }
 
   // inset: zoom on peripheral region of the ratio
   Double_t lXmaxInset2 = 1150 * lFitRangeMax / 59000.;
@@ -449,13 +468,16 @@ void drawGlauberVsTrento()
   line2->SetLineColor(kGray + 1);
   line2->Draw();
 
-  for (Int_t im = 0; im < nModels; im++)
+  for (Int_t im = 0; im < nModels; im++) {
     hRatioZoomed[im]->Draw("hist same");
+  }
   // multiplicity ratios stay at the rebinned-data granularity, also in the zoom
-  if (hRatioPythia)
+  if (hRatioPythia) {
     hRatioPythia->Draw("hist same");
-  if (hRatioNGlo)
+  }
+  if (hRatioNGlo) {
     hRatioNGlo->Draw("hist same");
+  }
 
   c1->cd(2);
   inset2->Draw();
@@ -483,12 +505,15 @@ void drawGlauberVsTrento()
   hV0MInset->GetYaxis()->SetTitleOffset(1.3);
   hV0MInset->GetYaxis()->SetTickLength(0.03);
   hV0MInset->Draw("hist");
-  for (Int_t im = 0; im < nModels; im++)
+  for (Int_t im = 0; im < nModels; im++) {
     hFit[im]->Draw("same hist");
-  if (hPythia)
+  }
+  if (hPythia) {
     hPythia->Draw("same hist");
-  if (hNGlo)
+  }
+  if (hNGlo) {
     hNGlo->Draw("same hist");
+  }
 
   TLatex* latInset = new TLatex();
   latInset->SetNDC();
@@ -503,12 +528,15 @@ void drawGlauberVsTrento()
   legInset->SetFillColorAlpha(0, 0);
   legInset->SetTextSize(0.04);
   legInset->AddEntry(hV0MInset, "Data", "l");
-  for (Int_t im = 0; im < nModels; im++)
+  for (Int_t im = 0; im < nModels; im++) {
     legInset->AddEntry(hFit[im], lModels[im].label.Data(), "l");
-  if (hPythia)
+  }
+  if (hPythia) {
     legInset->AddEntry(hPythia, lPythiaLabel.Data(), "l");
-  if (hNGlo)
+  }
+  if (hNGlo) {
     legInset->AddEntry(hNGlo, lNGloLabel.Data(), "l");
+  }
   legInset->Draw();
 
   TString lOutputNameInset = lOutputName;

@@ -59,8 +59,8 @@ void styleCanvas(TCanvas* canv)
 // PbPb 2023    AR_545210.root
 // PbPb 2024    AR_560089.root
 // PbPb 2025    AR_567905.root
-void drawCollisionVsBC(const char* dataset = "LHC25_pass1", const char* ar = "AR_567905.root", const char* system = "Pb#minusPb 2025")
-// void drawCollisionVsBC(const char* dataset = "LHC24_pass3", const char* ar = "AR_560089.root", const char* system = "Pb#minusPb 2024")
+// void drawCollisionVsBC(const char* dataset = "LHC25_pass1", const char* ar = "AR_567905.root", const char* system = "Pb#minusPb 2025")
+void drawCollisionVsBC(const char* dataset = "LHC24_pass3", const char* ar = "AR_560089.root", const char* system = "Pb#minusPb 2024")
 {
   gStyle->SetOptStat(0);
   const char* filePath = Form("../AnalysisResults/%s/%s", dataset, ar);

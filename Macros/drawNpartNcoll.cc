@@ -124,7 +124,7 @@ struct Histos {
   }
   void setColor(int color)
   {
-    for (auto& hist : histos) {
+    for (const auto& hist : histos) {
       hist->SetMarkerColor(color);
       hist->SetLineColor(color);
     }
@@ -175,7 +175,7 @@ void drawNpartNcoll()
   hAvgNcoll->SetLineColor(kBlack);
 
   for (Int_t icent{0}; icent < hAvgNpart->GetNbinsX(); ++icent) {
-    for (auto& hist : registry) {
+    for (const auto& hist : registry) {
       hAvgNpart->SetBinContent(icent + 1, hAvgNpart->GetBinContent(icent + 1) + hist->histos[kNpart]->GetBinContent(icent + 1));
       hAvgNcoll->SetBinContent(icent + 1, hAvgNcoll->GetBinContent(icent + 1) + hist->histos[kNcoll]->GetBinContent(icent + 1));
     }
@@ -242,7 +242,7 @@ void drawNpartNcoll()
   canvNpartRatio->SetBottomMargin(0.13);
 
   bool firstNpart = true;
-  for (auto& hist : registry) {
+  for (const auto& hist : registry) {
     TH1F* hRatio = (TH1F*)hist->histos[kNpart]->Clone();
     hRatio->Divide(hist->histos[kNpart], hAvgNpart, 1, 1, "");
     hRatio->GetYaxis()->SetRangeUser(0.985, 1.015);
@@ -265,7 +265,7 @@ void drawNpartNcoll()
   canvNcollRatio->SetBottomMargin(0.13);
 
   bool firstNcoll = true;
-  for (auto& hist : registry) {
+  for (const auto& hist : registry) {
     TH1F* hRatio = (TH1F*)hist->histos[kNcoll]->Clone();
     hRatio->Divide(hist->histos[kNcoll], hAvgNcoll, 1, 1, "B");
 

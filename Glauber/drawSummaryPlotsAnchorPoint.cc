@@ -1,3 +1,5 @@
+#include "../Macros/Includes/saveHelper.h"
+
 TH1D *GetCentralityHisto(TH1F *hMult, TH1 *hCalib, Double_t lCent1, Double_t lCent2, TString lName = "h"){
   TH1D *h = (TH1D*) hMult->Clone(lName.Data());
   
@@ -326,6 +328,7 @@ void drawSummaryPlotsAnchorPoint( TString lCalibFileName = "../AnalysisResults/L
   inset2->Draw();
 
   c1->SaveAs("hAnchorPointShift.pdf");
+  save::canvasToRoot(c1, "hAnchorPointShift.pdf");
 
   // Second canvas: standalone version of the zoomed-in top pad
   const Double_t lZoomXMax = 590*lFitRangeMax/59000.;
@@ -365,4 +368,5 @@ void drawSummaryPlotsAnchorPoint( TString lCalibFileName = "../AnalysisResults/L
   legZoom->Draw();
 
   c2->SaveAs("hAnchorPointShift_zoom.pdf");
+  save::canvasToRoot(c2, "hAnchorPointShift_zoom.pdf");
 }

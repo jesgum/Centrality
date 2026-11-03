@@ -78,7 +78,9 @@ void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* 
     for (int b = 1; b <= hRatio->GetNbinsX(); ++b) {
       double content = hRatio->GetBinContent(b);
       double error = hRatio->GetBinError(b);
-      if (content == 0 && error == 0) continue; // skip empty bins
+      if (content == 0 && error == 0) { // skip empty bins
+        continue;
+      }
       globalMin = std::min(globalMin, content - error);
       globalMax = std::max(globalMax, content + error);
     }
@@ -88,16 +90,20 @@ void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* 
 
   // add a bit of padding so points/error bars aren't flush with the pad edge
   double margin = (globalMax - globalMin) * 0.1;
-  if (margin <= 0) margin = 0.01; // fallback in case all values are identical
+  if (margin <= 0) { // fallback in case all values are identical
+    margin = 0.01;
+  }
   globalMin -= margin;
   globalMax += margin;
 
-  for (auto* hRatio : hRatios) {
+  for (const auto& hRatio : hRatios) {
     hRatio->GetYaxis()->SetRangeUser(globalMin, globalMax);
   }
 
   hRatios[0]->Draw("pe");
-  for (size_t i = 1; i < hRatios.size(); ++i) hRatios[i]->Draw("pe same");
+  for (size_t i = 1; i < hRatios.size(); ++i) {
+    hRatios[i]->Draw("pe same");
+  }
 
   TLine* lUnity = new TLine(hRatios[0]->GetXaxis()->GetXmin(), 1, hRatios[0]->GetXaxis()->GetXmax(), 1);
   lUnity->SetLineStyle(kDashed);
@@ -106,7 +112,9 @@ void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* 
 
   canv->SaveAs(outfile);
   save::canvasToRoot(canv, outfile);
-  for (auto* hRatio : hRatios) delete hRatio;
+  for (const auto& hRatio : hRatios) {
+    delete hRatio;
+  }
   delete lUnity;
   delete canv;
 }

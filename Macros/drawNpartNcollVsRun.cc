@@ -224,7 +224,7 @@ void drawNpartNcollVsRun()
   std::vector<int> fillOrder;
   {
     std::set<int> seen;
-    for (auto& kv : runToFill) {
+    for (const auto& kv : runToFill) {
       if (seen.insert(kv.second).second) {
         fillOrder.push_back(kv.second);
       }
@@ -295,7 +295,7 @@ void drawNpartNcollVsRun()
     // hNpart->SetMaximum(hNpart->GetMaximum() * 1.001);
     // hNpart->SetMinimum(hNpart->GetMinimum() * 0.999);
     hNpart->Draw();
-    for (auto& box : fillBoxes) {
+    for (const auto& box : fillBoxes) {
       box->SetY1(avgNpart - 5);
       box->SetY2(avgNpart + 5);
       box->Draw("same");
@@ -318,7 +318,7 @@ void drawNpartNcollVsRun()
     hNcoll->SetMaximum(avgNColl + 5);
     hNcoll->SetMinimum(avgNColl - 5);
     hNcoll->Draw();
-    for (auto& box : fillBoxes) {
+    for (const auto& box : fillBoxes) {
       box->SetY1(avgNColl - 5);
       box->SetY2(avgNColl + 5);
       box->Draw("same");

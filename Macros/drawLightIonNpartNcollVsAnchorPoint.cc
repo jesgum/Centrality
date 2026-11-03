@@ -74,11 +74,17 @@ void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* 
     for (int b = 1; b <= hRatio->GetNbinsX(); ++b) {
       double content = hRatio->GetBinContent(b);
       double error   = hRatio->GetBinError(b);
-      if (content == 0 && error == 0) continue; // skip empty bins
+      if (content == 0 && error == 0) { // skip empty bins
+        continue;
+      }
       double lo = content - error;
       double hi = content + error;
-      if (lo < globalMin) globalMin = lo;
-      if (hi > globalMax) globalMax = hi;
+      if (lo < globalMin) {
+        globalMin = lo;
+      }
+      if (hi > globalMax) {
+        globalMax = hi;
+      }
     }
 
     hRatios.push_back(hRatio);
@@ -86,20 +92,26 @@ void doNpartNCollVsAnchorPoint(TH1F* hBase, std::vector<TH1F*> histos, TLegend* 
 
   // add a bit of padding so points/error bars aren't flush with the pad edge
   double margin = (globalMax - globalMin) * 0.1;
-  if (margin <= 0) margin = 0.01; // fallback in case all values are identical
+  if (margin <= 0) { // fallback in case all values are identical
+    margin = 0.01;
+  }
   globalMin -= margin;
   globalMax += margin;
 
-  for (auto* hRatio : hRatios) {
+  for (const auto& hRatio : hRatios) {
     hRatio->GetYaxis()->SetRangeUser(globalMin, globalMax);
   }
 
   hRatios[0]->Draw("pe");
-  for (int i = 1; i < runPairs.size(); ++i) hRatios[i]->Draw("pe same");
+  for (int i = 1; i < runPairs.size(); ++i) {
+    hRatios[i]->Draw("pe same");
+  }
 
   canv->SaveAs(outfile);
   save::canvasToRoot(canv, outfile);
-  for (auto* hRatio : hRatios) delete hRatio;
+  for (const auto& hRatio : hRatios) {
+    delete hRatio;
+  }
   hRatios.clear();
   delete canv;
 }
@@ -116,7 +128,7 @@ void drawLightIonNpartNcollVsAnchorPoint()
   };
 
   // syst::GlauberParameters base("LHC25ae_pass2/calibOO.root");
-  syst::GlauberParameters base("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
+  syst::GlauberParameters<TH2D> base("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_LightIonDef.root");
   syst::GlauberParameters col50("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor50.root");
   syst::GlauberParameters col60("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor60.root");
   syst::GlauberParameters col70("LHC25ae_pass2/AR_564374_calibration_hFT0M_Collisions_Anchor70.root");

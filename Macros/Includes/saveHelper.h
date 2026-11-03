@@ -16,9 +16,10 @@ namespace save {
 // Write all objects drawn in a pad (and its sub-pads) to the file
 inline void writePrimitives(TPad* pad, TFile* f)
 {
-  for (TObject* obj : *pad->GetListOfPrimitives()) {
-    if (obj->InheritsFrom(TFrame::Class()))
+  for (const auto& obj : *pad->GetListOfPrimitives()) {
+    if (obj->InheritsFrom(TFrame::Class())) {
       continue;
+    }
     if (obj->InheritsFrom(TPad::Class())) {
       writePrimitives((TPad*)obj, f);
       continue;
@@ -34,13 +35,14 @@ inline void canvasToRoot(TPad* canv, const char* figureName)
 {
   TString rootName = figureName;
   Ssiz_t dot = rootName.Last('.');
-  if (dot != kNPOS)
+  if (dot != kNPOS) {
     rootName.Remove(dot);
+  }
   rootName += ".root";
 
   // Never clobber an input: refuse if a file with this name is currently open
   const auto target = std::filesystem::weakly_canonical(rootName.Data());
-  for (TObject* obj : *gROOT->GetListOfFiles()) {
+  for (const auto& obj : *gROOT->GetListOfFiles()) {
     if (std::filesystem::weakly_canonical(obj->GetName()) == target) {
       printf("save::canvasToRoot: %s is an open input file, not overwriting it\n", rootName.Data());
       return;

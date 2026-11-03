@@ -112,7 +112,7 @@ void doSystematicsPbPb()
   };
 
   // same line width as the totals for every source
-  for (auto* list : { &sources, &sourcesWoTrento, &sourcesTrentoRun1, &sourcesTrentoRun2, &collisionSources }) {
+  for (const auto& list : { &sources, &sourcesWoTrento, &sourcesTrentoRun1, &sourcesTrentoRun2, &collisionSources }) {
     for (auto& source : *list) {
       source.lineWidth = 2;
     }

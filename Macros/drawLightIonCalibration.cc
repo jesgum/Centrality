@@ -70,7 +70,9 @@ void drawLightIonCalibration()
         for (int ix = 1; ix <= nBins; ix++) {
             double content = h->GetBinContent(ix);
             double error   = h->GetBinError(ix);
-            if (content == 0) continue;
+            if (content == 0) {
+                continue;
+            }
             double oldX = h->GetBinCenter(ix);
             int newBinX = hSwap->GetXaxis()->FindBin(content);
             int newBinY = hSwap->GetYaxis()->FindBin(oldX);
@@ -83,8 +85,11 @@ void drawLightIonCalibration()
     // --- Alternatively: swap into a TGraph (cleaner for a calibration curve) ---
     auto swapToGraph = [](TH1F* h, const char* newName) -> TGraphErrors* {
         int nPoints = 0;
-        for (int ix = 1; ix <= h->GetNbinsX(); ix++)
-            if (h->GetBinContent(ix) != 0) nPoints++;
+        for (int ix = 1; ix <= h->GetNbinsX(); ix++) {
+            if (h->GetBinContent(ix) != 0) {
+                nPoints++;
+            }
+        }
 
         TGraphErrors* g = new TGraphErrors(nPoints);
         g->SetName(newName);
@@ -92,7 +97,9 @@ void drawLightIonCalibration()
         int iPoint = 0;
         for (int ix = 1; ix <= h->GetNbinsX(); ix++) {
             double content = h->GetBinContent(ix);
-            if (content == 0) continue;
+            if (content == 0) {
+                continue;
+            }
 
             double oldX      = h->GetBinCenter(ix);
             double halfWidth = h->GetBinWidth(ix) / 2.0;

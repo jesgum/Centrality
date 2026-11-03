@@ -6,8 +6,12 @@ TH1D *GetCentralityHisto(TH1F *hMult, TH1 *hCalib, Double_t lCent1, Double_t lCe
   //cout<<"lLo = "<<lLo<<", lHi = "<<lHi<<endl;
   for(Int_t ii=1; ii<hMult->GetNbinsX()+1; ii++) {
     float centrality = hCalib->GetBinContent( hCalib->FindBin(hMult->GetBinCenter(ii)));
-    if( centrality < lCent1 ) h->SetBinContent(ii, 0);
-    if( centrality > lCent2 ) h->SetBinContent(ii, 0);
+    if( centrality < lCent1 ) {
+      h->SetBinContent(ii, 0);
+    }
+    if( centrality > lCent2 ) {
+      h->SetBinContent(ii, 0);
+    }
   }
   return h;
 }
@@ -81,7 +85,9 @@ void drawSummaryPlots(){
 //  return ;
   
   TH1F *hV0M = (TH1F*) file2->Get("hData");
-  if(!hV0M) hV0M = (TH1F*) file2->Get("hV0MUltraFine");
+  if(!hV0M) {
+    hV0M = (TH1F*) file2->Get("hV0MUltraFine");
+  }
   //TH1F *hRatio = (TH1F*) file->Get("hRatio");
 //  hRatio->SetName("hRatio");
 //  TH1F *hRawStitched = (TH1F*) file2->Get("hCalib");
@@ -167,8 +173,9 @@ void drawSummaryPlots(){
   for(Int_t ii=0; ii<20; ii=ii+1){
     hSlice[ii] = GetCentralityHisto( hV0M, hCalib, ii*5, ii*5+5, Form("h%i", ii) );
     hSlice[ii] ->SetFillColorAlpha(kBlack,0.1);
-    if(ii%2==0)
+    if(ii%2==0) {
       hSlice[ii]->Draw("same hist");
+    }
   }
   
   for(Int_t ii=0; ii<20; ii=ii+1){
@@ -217,8 +224,9 @@ void drawSummaryPlots(){
   latPerAngle->SetTextSize(0.037);
   latPerAngle->SetTextAngle(0);
   for(Int_t ii=0; ii<20; ii=ii+1){
-    if( ii*5>77 )
+    if( ii*5>77 ) {
       latPerAngle->DrawLatex( GetMidRange(hSlice[ii],lFitRangeMax), hGlauberFunctionHyperFine->GetMaximum() * 0.12, Form("%i-%i%%", ii*5, ii*5+5));
+    }
   }
   latPerAngle->SetTextSize(0.033);
   latPerAngle->SetTextAngle(90);
@@ -294,8 +302,9 @@ void drawSummaryPlots(){
   
   latPerAngle->SetTextColor(kRed);
   for(Int_t ii=0; ii<20; ii=ii+1){
-    if( ii*5<60 )
+    if( ii*5<60 ) {
     latPerAngle->DrawLatex( GetMidRange(hSlice[ii], lFitRangeMax), 0.74, Form("%i-%i%%", ii*5, ii*5+5));
+    }
   }
   //hRatioWide->Draw("same");
   
@@ -341,8 +350,9 @@ void drawSummaryPlots(){
   latPerAngle->SetTextSize(0.04);
   latPerAngle->SetTextAngle(45);
   for(Int_t ii=0; ii<20; ii=ii+1){
-    if( ii*5>70 )
+    if( ii*5>70 ) {
       latPerAngle->DrawLatex( GetMidRange(hSlice[ii], lFitRangeMax)+10, 0.79, Form("%i-%i%%", ii*5, ii*5+5));
+    }
   }
   latPerAngle->SetTextSize(0.033);
   latPerAngle->SetTextAngle(90);

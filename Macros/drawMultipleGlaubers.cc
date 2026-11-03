@@ -224,7 +224,7 @@ void drawMultipleFits(const std::vector<GlauberInput>& inputs, const TString& ou
   // ---- bottom: data / fit ----
   padBot->cd();
   for (size_t i = 0; i < curves.size(); ++i) {
-    for (TH1* hRatio : { curves[i].hRatio, curves[i].hRatioFine }) {
+    for (const auto& hRatio : { curves[i].hRatio, curves[i].hRatioFine }) {
       hRatio->SetTitle("");
       hRatio->SetLineColor(inputs[i].color);
     }

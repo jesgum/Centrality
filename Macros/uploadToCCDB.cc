@@ -80,7 +80,9 @@ void uploadToCCDB()
     TKey* key;
     while ((key = (TKey*)next())) {
       TObject* obj = key->ReadObj(); // actually reads/creates the object
-      if (obj) listHistograms->Add(obj);
+      if (obj) {
+        listHistograms->Add(obj);
+      }
     }
 
     //__________________________________________________________________

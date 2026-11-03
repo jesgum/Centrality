@@ -625,7 +625,7 @@ inline void drawSystematics(const std::vector<SystSource>& sources, const std::v
     }
   }
 
-  for (auto* h : hTotals) {
+  for (const auto& h : hTotals) {
     h->Draw("hist same");
   }
 

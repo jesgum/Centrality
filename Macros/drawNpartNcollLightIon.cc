@@ -124,14 +124,14 @@ struct Histos {
   }
   void setColor(int color)
   {
-    for (auto& hist : histos) {
+    for (const auto& hist : histos) {
       hist->SetMarkerColor(color);
       hist->SetLineColor(color);
     }
   }
   void setMarker(int marker)
   {
-    for (auto& hist : histos) {
+    for (const auto& hist : histos) {
       hist->SetMarkerStyle(marker);
     }
   }
@@ -231,7 +231,7 @@ void drawNpartNcollLightIon()
   legHist->AddEntry(hFullCircle, "Coll", "p");
   legHist->AddEntry(hFullSquare, "BCs", "p");
 
-  for (auto& hist : registry) {
+  for (const auto& hist : registry) {
     hist->histos[kNpart]->GetXaxis()->SetLabelSize(0);
     hist->histos[kNcoll]->GetXaxis()->SetLabelSize(0);
     hist->histos[kNpart]->GetYaxis()->SetLabelSize(0.045);
@@ -300,7 +300,9 @@ void drawNpartNcollLightIon()
     hRatiosNpart.push_back(hRatio);
   }
   hRatiosNpart[0]->Draw("pe");
-  for (int i = 1; i < 4; ++i) hRatiosNpart[i]->Draw("pe same");
+  for (int i = 1; i < 4; ++i) {
+    hRatiosNpart[i]->Draw("pe same");
+  }
 
   TLine* lineNpart = new TLine(hRatiosNpart[0]->GetXaxis()->GetXmin(), 1,
                                 hRatiosNpart[0]->GetXaxis()->GetXmax(), 1);
@@ -366,7 +368,9 @@ void drawNpartNcollLightIon()
     hRatiosNcoll.push_back(hRatio);
   }
   hRatiosNcoll[0]->Draw("pe");
-  for (int i = 1; i < 4; ++i) hRatiosNcoll[i]->Draw("pe same");
+  for (int i = 1; i < 4; ++i) {
+    hRatiosNcoll[i]->Draw("pe same");
+  }
 
   TLine* lineNcoll = new TLine(hRatiosNcoll[0]->GetXaxis()->GetXmin(), 1,
                                 hRatiosNcoll[0]->GetXaxis()->GetXmax(), 1);

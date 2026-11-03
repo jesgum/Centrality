@@ -130,7 +130,7 @@ struct Histos {
   }
   void setColor(int color)
   {
-    for (auto& hist : histos) {
+    for (const auto& hist : histos) {
       hist->SetMarkerColor(color);
       hist->SetLineColor(color);
     }
@@ -173,7 +173,7 @@ void drawWithRatio(int quantity, Histos* reference, const std::vector<Histos*>& 
   TH1F* hFrameTop = (TH1F*)reference->histos[quantity]->Clone(Form("hFrameTop_%s", outName));
   hFrameTop->Reset();
   double yMax = 0.;
-  for (auto& hist : variations) {
+  for (const auto& hist : variations) {
     yMax = std::max(yMax, hist->histos[quantity]->GetMaximum());
   }
   if (drawReference) {
@@ -195,7 +195,7 @@ void drawWithRatio(int quantity, Histos* reference, const std::vector<Histos*>& 
     reference->histos[quantity]->Draw("pe same");
     legend->AddEntry(reference->histos[quantity], reference->label, "pl");
   }
-  for (auto& hist : variations) {
+  for (const auto& hist : variations) {
     hist->histos[quantity]->Draw("pe same");
     legend->AddEntry(hist->histos[quantity], hist->label, "pl");
   }
@@ -230,7 +230,7 @@ void drawWithRatio(int quantity, Histos* reference, const std::vector<Histos*>& 
   line->SetLineColor(kGray + 1);
   line->Draw();
 
-  for (auto& hist : variations) {
+  for (const auto& hist : variations) {
     TH1F* hRatio = (TH1F*)hist->histos[quantity]->Clone(Form("hRatio_%s_%s", outName, hist->label));
     hRatio->Divide(hist->histos[quantity], reference->histos[quantity], 1, 1, "");
     hRatio->Draw("same");

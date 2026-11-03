@@ -53,7 +53,7 @@ void drawTrentoVariationsCompare(TH1F* base, std::vector<TH1F*>& variationHists,
   base->GetYaxis()->SetLabelSize(0.045);
   base->GetYaxis()->SetTitleOffset(1.1);
   base->Draw("pe");
-  for (auto* h : variationHists) {
+  for (const auto& h : variationHists) {
     h->Draw("pe same");
   }
 
@@ -95,7 +95,7 @@ void drawTrentoVariationsCompare(TH1F* base, std::vector<TH1F*>& variationHists,
   hFrame->GetXaxis()->SetLabelSize(0.11);
 
   double ratioMin = 1, ratioMax = 1;
-  for (TH1F* hRatio : ratios) {
+  for (const auto& hRatio : ratios) {
     ratioMin = std::min(ratioMin, hRatio->GetMinimum());
     ratioMax = std::max(ratioMax, hRatio->GetMaximum());
   }
@@ -168,7 +168,7 @@ void drawNpartNcollTrento(const char* bestFile = "")
   ColorManager colorMgr(variations.size());
 
   std::vector<TH1F*> npartHists, ncollHists;
-  for (auto& variation : variations) {
+  for (const auto& variation : variations) {
     npartHists.push_back(variation.hNpart);
     ncollHists.push_back(variation.hNcoll);
   }

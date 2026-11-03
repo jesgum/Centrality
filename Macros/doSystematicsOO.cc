@@ -210,14 +210,30 @@ void doSystematicsOO()
   syst::styleCanvas(canvNpartSystematics);
   syst::styleHist(hSysTotalNpartCopy, "<N_{part}> systematic uncertainty");
   hSysTotalNpartCopy->Draw("");
-  if (drawShape) hSysShapeNpart->Draw("hist same");
-  if (drawAnchor) hSysAnchorNpart->Draw("hist same");
-  if (drawRun) hSysRunNpart->Draw("hist same");
-  if (drawBcs) hSysBcsNpart->Draw("hist same");
-  if (drawMode0) hSystAncestorMode0kNpart->Draw("hist same");
-  if (drawMode1) hSystAncestorMode1kNpart->Draw("hist same");
-  if (drawModeComb) hSystAncestorModeCombkNpart->Draw("hist same");
-  if (drawTotal) hSysTotalNpart->Draw("hist same");
+  if (drawShape) {
+    hSysShapeNpart->Draw("hist same");
+  }
+  if (drawAnchor) {
+    hSysAnchorNpart->Draw("hist same");
+  }
+  if (drawRun) {
+    hSysRunNpart->Draw("hist same");
+  }
+  if (drawBcs) {
+    hSysBcsNpart->Draw("hist same");
+  }
+  if (drawMode0) {
+    hSystAncestorMode0kNpart->Draw("hist same");
+  }
+  if (drawMode1) {
+    hSystAncestorMode1kNpart->Draw("hist same");
+  }
+  if (drawModeComb) {
+    hSystAncestorModeCombkNpart->Draw("hist same");
+  }
+  if (drawTotal) {
+    hSysTotalNpart->Draw("hist same");
+  }
   leg->Draw();
   canvNpartSystematics->SaveAs("hNpartSystematics_OO.pdf");
   save::canvasToRoot(canvNpartSystematics, "hNpartSystematics_OO.pdf");
@@ -226,14 +242,30 @@ void doSystematicsOO()
   syst::styleCanvas(canvNcollSystematics);
   syst::styleHist(hSysTotalNcollCopy, "<N_{coll}> systematic uncertainty");
   hSysTotalNcollCopy->Draw("");
-  if (drawShape) hSysShapeNcoll->Draw("hist same");
-  if (drawAnchor) hSysAnchorNcoll->Draw("hist same");
-  if (drawRun) hSysRunNcoll->Draw("hist same");
-  if (drawBcs) hSysBcsNcoll->Draw("hist same");
-  if (drawMode0) hSystAncestorMode0kNcoll->Draw("hist same");
-  if (drawMode1) hSystAncestorMode1kNcoll->Draw("hist same");
-  if (drawModeComb) hSystAncestorModeCombkNcoll->Draw("hist same");
-  if (drawTotal) hSysTotalNcoll->Draw("hist same");
+  if (drawShape) {
+    hSysShapeNcoll->Draw("hist same");
+  }
+  if (drawAnchor) {
+    hSysAnchorNcoll->Draw("hist same");
+  }
+  if (drawRun) {
+    hSysRunNcoll->Draw("hist same");
+  }
+  if (drawBcs) {
+    hSysBcsNcoll->Draw("hist same");
+  }
+  if (drawMode0) {
+    hSystAncestorMode0kNcoll->Draw("hist same");
+  }
+  if (drawMode1) {
+    hSystAncestorMode1kNcoll->Draw("hist same");
+  }
+  if (drawModeComb) {
+    hSystAncestorModeCombkNcoll->Draw("hist same");
+  }
+  if (drawTotal) {
+    hSysTotalNcoll->Draw("hist same");
+  }
   leg->Draw();
   canvNcollSystematics->SaveAs("hNcollSystematics_OO.pdf");
   save::canvasToRoot(canvNcollSystematics, "hNcollSystematics_OO.pdf");
@@ -242,14 +274,30 @@ void doSystematicsOO()
   syst::styleCanvas(canvRelNpartSystematics);
   syst::styleHist(hRelSysTotalNpartCopy, "<N_{part}> relative systematic uncertainty");
   hRelSysTotalNpartCopy->Draw("");
-  if (drawShape) hRelSysShapeNpart->Draw("hist same");
-  if (drawAnchor) hRelSysAnchorNpart->Draw("hist same");
-  if (drawRun) hRelSysRunNpart->Draw("hist same");
-  if (drawBcs) hRelSysBcsNpart->Draw("hist same");
-  if (drawMode0) hRelSystAncestorMode0kNpart->Draw("hist same");
-  if (drawMode1) hRelSystAncestorMode1kNpart->Draw("hist same");
-  if (drawModeComb) hRelSystAncestorModeCombkNpart->Draw("hist same");
-  if (drawTotal) hRelSysTotalNpart->Draw("hist same");
+  if (drawShape) {
+    hRelSysShapeNpart->Draw("hist same");
+  }
+  if (drawAnchor) {
+    hRelSysAnchorNpart->Draw("hist same");
+  }
+  if (drawRun) {
+    hRelSysRunNpart->Draw("hist same");
+  }
+  if (drawBcs) {
+    hRelSysBcsNpart->Draw("hist same");
+  }
+  if (drawMode0) {
+    hRelSystAncestorMode0kNpart->Draw("hist same");
+  }
+  if (drawMode1) {
+    hRelSystAncestorMode1kNpart->Draw("hist same");
+  }
+  if (drawModeComb) {
+    hRelSystAncestorModeCombkNpart->Draw("hist same");
+  }
+  if (drawTotal) {
+    hRelSysTotalNpart->Draw("hist same");
+  }
   leg->Draw();
   canvRelNpartSystematics->SaveAs("FiguresSystematics/hNpartRelSystematics_OO.pdf");
   save::canvasToRoot(canvRelNpartSystematics, "FiguresSystematics/hNpartRelSystematics_OO.pdf");
@@ -258,14 +306,30 @@ void doSystematicsOO()
   syst::styleCanvas(canvRelNcollSystematics);
   syst::styleHist(hRelSysTotalNcollCopy, "<N_{coll}> relative systematic uncertainty");
   hRelSysTotalNcollCopy->Draw("");
-  if (drawShape) hRelSysShapeNcoll->Draw("hist same");
-  if (drawAnchor) hRelSysAnchorNcoll->Draw("hist same");
-  if (drawRun) hRelSysRunNcoll->Draw("hist same");
-  if (drawBcs) hRelSysBcsNcoll->Draw("hist same");
-  if (drawMode0) hRelSystAncestorMode0kNcoll->Draw("hist same");
-  if (drawMode1) hRelSystAncestorMode1kNcoll->Draw("hist same");
-  if (drawModeComb) hRelSystAncestorModeCombkNcoll->Draw("hist same");
-  if (drawTotal) hRelSysTotalNcoll->Draw("hist same");
+  if (drawShape) {
+    hRelSysShapeNcoll->Draw("hist same");
+  }
+  if (drawAnchor) {
+    hRelSysAnchorNcoll->Draw("hist same");
+  }
+  if (drawRun) {
+    hRelSysRunNcoll->Draw("hist same");
+  }
+  if (drawBcs) {
+    hRelSysBcsNcoll->Draw("hist same");
+  }
+  if (drawMode0) {
+    hRelSystAncestorMode0kNcoll->Draw("hist same");
+  }
+  if (drawMode1) {
+    hRelSystAncestorMode1kNcoll->Draw("hist same");
+  }
+  if (drawModeComb) {
+    hRelSystAncestorModeCombkNcoll->Draw("hist same");
+  }
+  if (drawTotal) {
+    hRelSysTotalNcoll->Draw("hist same");
+  }
   leg->Draw();
   canvRelNcollSystematics->SaveAs("FiguresSystematics/hNcollRelSystematics_OO.pdf");
   save::canvasToRoot(canvRelNcollSystematics, "FiguresSystematics/hNcollRelSystematics_OO.pdf");
